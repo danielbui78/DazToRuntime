@@ -170,9 +170,10 @@ namespace Daz3D
 			var dualLobeSpecularWeight = dtuMaterial.Get("Dual Lobe Specular Weight");
 			var dualLobeSpecularReflectivity = dtuMaterial.Get("Dual Lobe Specular Reflectivity");
 
-			if(dtuMaterial.MaterialType == "omUberSurface" || dtuMaterial.MaterialType == "omHumanSurface")
+			// DB (2021-05-03): added "Iray Uber" and "PBRSkin" to materialtypes which can potential be classified as skin.
+			if (dtuMaterial.MaterialType == "omUberSurface" || dtuMaterial.MaterialType == "omHumanSurface" || dtuMaterial.MaterialType == "Iray Uber" || dtuMaterial.MaterialType == "PBRSkin")
 			{
-				if(IsDTUMaterialWet(dtuMaterial))
+				if (IsDTUMaterialWet(dtuMaterial))
 				{
 					return false;
 				}
@@ -1845,6 +1846,11 @@ namespace Daz3D
 				 */
 				materialType = DTUMaterialType.PBRSP;
 
+			}
+			else if (dtuMaterial.MaterialType == "PBRSkin")
+            {
+				// DB (2021-05-03): created PBRSkin conditional block, currently just passing PBRSkin materials to IrayUber shader.
+				materialType = DTUMaterialType.IrayUber;
 			}
 			else if(dtuMaterial.MaterialType == "Iray Uber" || dtuMaterial.MaterialType == "Front")
 			{
