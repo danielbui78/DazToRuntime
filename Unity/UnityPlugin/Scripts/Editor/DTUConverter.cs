@@ -806,7 +806,7 @@ namespace Daz3D
 							
 							//In our gloss shader, ensure we do a one minus on this
 							specularLobe1RoughnessTexture = ImportTextureFromPath(specularLobe1Glossiness.Texture,materialDir,record,false,true);
-							specularLobe1RoughnessTexture = ImportTextureFromPath(specularLobe2Glossiness.Texture,materialDir,record,false,true);
+							specularLobe2RoughnessTexture = ImportTextureFromPath(specularLobe2Glossiness.Texture,materialDir,record,false,true);
 						}
 						else
 						{
@@ -814,7 +814,7 @@ namespace Daz3D
 							specularLobe2RoughnessValue = specularLobe2Roughness.Float;
 
 							specularLobe1RoughnessTexture = ImportTextureFromPath(specularLobe1Roughness.Texture,materialDir,record,false,true);
-							specularLobe1RoughnessTexture = ImportTextureFromPath(specularLobe2Roughness.Texture,materialDir,record,false,true);
+							specularLobe2RoughnessTexture = ImportTextureFromPath(specularLobe2Roughness.Texture,materialDir,record,false,true);
 						}
 
 						mat.SetFloat("_SpecularLobe1Roughness",specularLobe1RoughnessValue);
