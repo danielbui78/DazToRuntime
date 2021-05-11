@@ -13,6 +13,12 @@ namespace Daz3D
 		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Hair";
 		public const string shaderNameWet = "Daz3D/Wet";
+#elif USING_URP
+		public const string shaderNameMetal = "Daz3D/URP IrayUberMetal";
+		public const string shaderNameSpecular = "Daz3D/URP IrayUberSpec";
+		public const string shaderNameIraySkin = "Daz3D/URP IrayUberSkin";
+		public const string shaderNameHair = "Daz3D/URP Hair";
+		public const string shaderNameWet = "Daz3D/URP Wet";
 #else
 		public const string shaderNameMetal = "Daz3D/Built-In IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/Built-In IrayUberSpec";
