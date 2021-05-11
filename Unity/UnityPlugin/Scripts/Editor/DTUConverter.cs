@@ -13,7 +13,7 @@ namespace Daz3D
 		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Hair";
 		public const string shaderNameWet = "Daz3D/Wet";
-#else
+#elif USING_BUILTIN
 		public const string shaderNameMetal = "Daz3D/Built-In IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/Built-In IrayUberSpec";
 		public const string shaderNameIraySkin = "Daz3D/Built-In IrayUberSkin";
@@ -673,7 +673,12 @@ namespace Daz3D
 				mat.SetFloat("_Height",bumpStrength.Float);
 				mat.SetTexture("_HeightMap",ImportTextureFromPath(bumpStrength.Texture,materialDir, record, false, true));
 				mat.SetFloat("_HeightOffset",0.25f);
+#if USING_HDRP || USING_URP
 				mat.SetTexture("_CutoutOpacityMap",ImportTextureFromPath(cutoutOpacity.Texture,materialDir, record, false, true));
+#elif USING_BUILTIN
+				mat.SetFloat("_Alpha", cutoutOpacity.Float);
+				mat.SetTexture("_AlphaMap", ImportTextureFromPath(cutoutOpacity.Texture, materialDir, record, false, true));
+#endif
 				mat.SetTexture("_GlossyRoughnessMap",ImportTextureFromPath(glossyRoughness.Texture,materialDir, record, false, true));
 				mat.SetFloat("_GlossyRoughness",glossyRoughness.Float);
 				Color specularColor = Color.black;
@@ -688,7 +693,11 @@ namespace Daz3D
 				//A few magic values that work for most hairs
 				mat.SetFloat("_AlphaStrength",1.5f);
 				mat.SetFloat("_AlphaOffset",0.35f);
+#if USING_HDRP || USING_URP
 				mat.SetFloat("_AlphaClip",0.75f);
+#elif USING_BUILTIN
+				mat.SetFloat("_AlphaClip", 0.025f);
+#endif
 				mat.SetFloat("_AlphaPower",0.4f);
 			}
 			else if(isWet)
