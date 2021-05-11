@@ -7,11 +7,19 @@ namespace Daz3D
 {
 	public static class DTU_Constants
 	{
+#if USING_HDRP
 		public const string shaderNameMetal = "Daz3D/IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/IrayUberSpec";
 		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Hair";
 		public const string shaderNameWet = "Daz3D/Wet";
+#else
+		public const string shaderNameMetal = "Daz3D/Built-In IrayUberMetal";
+		public const string shaderNameSpecular = "Daz3D/Built-In IrayUberSpec";
+		public const string shaderNameIraySkin = "Daz3D/Built-In IrayUberSkin";
+		public const string shaderNameHair = "Daz3D/Built-In Hair";
+		public const string shaderNameWet = "Daz3D/Built-In Wet";
+#endif
 		public const string shaderNameInvisible = "Daz3D/Invisible";        //special shader that doesn't render anything
 
 	}
@@ -1961,7 +1969,9 @@ namespace Daz3D
 			AssetDatabase.CreateAsset(mat,materialPath);
 
 			//Works around a bug in HDRP, see: https://docs.unity3d.com/Packages/com.unity.render-pipelines.high-definition@7.1/manual/Creating-and-Editing-HDRP-Shader-Graphs.html "Known Issues"
+#if USING_HDRP
 			UnityEditor.Rendering.HighDefinition.HDShaderUtils.ResetMaterialKeywords(mat);
+#endif
 		}
 
 		private static DTUMaterialProperty ExtractDTUMatProperty(ref DTUMaterial dtuMaterial, string key)
