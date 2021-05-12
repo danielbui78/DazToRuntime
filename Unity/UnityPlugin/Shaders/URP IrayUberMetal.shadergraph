@@ -259,10 +259,10 @@
             "m_Id": "37e4f915f5bb47fe905566aa64319d28"
         },
         {
-            "m_Id": "e6c2320fe97a41e3b87eabaeb88e04a5"
+            "m_Id": "ddc3edd06d0947449f1573094cb6c807"
         },
         {
-            "m_Id": "ddc3edd06d0947449f1573094cb6c807"
+            "m_Id": "b2f13216e3dc49f684313c790ca62f12"
         }
     ],
     "m_GroupDatas": [
@@ -977,13 +977,13 @@
                 "m_Id": "37e4f915f5bb47fe905566aa64319d28"
             },
             {
-                "m_Id": "e6c2320fe97a41e3b87eabaeb88e04a5"
-            },
-            {
                 "m_Id": "48fffff81a2243eb85209b9278279161"
             },
             {
                 "m_Id": "ddc3edd06d0947449f1573094cb6c807"
+            },
+            {
+                "m_Id": "b2f13216e3dc49f684313c790ca62f12"
             }
         ]
     },
@@ -1131,6 +1131,21 @@
         "b": 0.5,
         "a": 1.0
     }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "0557fd44e3b54ade9bab6d3ffa44e8dc",
+    "m_Id": 0,
+    "m_DisplayName": "Alpha Clip Threshold",
+    "m_SlotType": 0,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "AlphaClipThreshold",
+    "m_StageCapability": 2,
+    "m_Value": 0.5,
+    "m_DefaultValue": 0.5,
+    "m_Labels": []
 }
 
 {
@@ -5269,6 +5284,39 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
+    "m_ObjectId": "b2f13216e3dc49f684313c790ca62f12",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "SurfaceDescription.AlphaClipThreshold",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 0.0,
+            "height": 0.0
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "0557fd44e3b54ade9bab6d3ffa44e8dc"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_SerializedDescriptor": "SurfaceDescription.AlphaClipThreshold"
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
     "m_ObjectId": "b414f3304637df87a861bad64d27df7d",
     "m_Group": {
@@ -5334,10 +5382,10 @@
     "m_ActiveSubTarget": {
         "m_Id": "cc9924e5637645aab7a656fc57d94ca1"
     },
-    "m_SurfaceType": 1,
+    "m_SurfaceType": 0,
     "m_AlphaMode": 0,
-    "m_TwoSided": false,
-    "m_AlphaClip": false,
+    "m_TwoSided": true,
+    "m_AlphaClip": true,
     "m_CustomEditorGUI": ""
 }
 
@@ -5699,7 +5747,7 @@
     "m_ObjectId": "cc9924e5637645aab7a656fc57d94ca1",
     "m_WorkflowMode": 1,
     "m_NormalDropOffSpace": 0,
-    "m_ClearCoat": true
+    "m_ClearCoat": false
 }
 
 {
@@ -5876,21 +5924,6 @@
         "z": 0.0,
         "w": 0.0
     },
-    "m_Labels": []
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
-    "m_ObjectId": "d0a4f5ea369e4767ae61a3dec08077c2",
-    "m_Id": 0,
-    "m_DisplayName": "Coat Smoothness",
-    "m_SlotType": 0,
-    "m_Hidden": false,
-    "m_ShaderOutputName": "CoatSmoothness",
-    "m_StageCapability": 2,
-    "m_Value": 1.0,
-    "m_DefaultValue": 1.0,
     "m_Labels": []
 }
 
@@ -6547,39 +6580,6 @@
     },
     "m_Modifiable": true,
     "m_DefaultType": 0
-}
-
-{
-    "m_SGVersion": 0,
-    "m_Type": "UnityEditor.ShaderGraph.BlockNode",
-    "m_ObjectId": "e6c2320fe97a41e3b87eabaeb88e04a5",
-    "m_Group": {
-        "m_Id": ""
-    },
-    "m_Name": "SurfaceDescription.CoatSmoothness",
-    "m_DrawState": {
-        "m_Expanded": true,
-        "m_Position": {
-            "serializedVersion": "2",
-            "x": 557.0000610351563,
-            "y": 376.0,
-            "width": 200.00001525878907,
-            "height": 41.0
-        }
-    },
-    "m_Slots": [
-        {
-            "m_Id": "d0a4f5ea369e4767ae61a3dec08077c2"
-        }
-    ],
-    "synonyms": [],
-    "m_Precision": 0,
-    "m_PreviewExpanded": true,
-    "m_PreviewMode": 0,
-    "m_CustomColors": {
-        "m_SerializableColors": []
-    },
-    "m_SerializedDescriptor": "SurfaceDescription.CoatSmoothness"
 }
 
 {
