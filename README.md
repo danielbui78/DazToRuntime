@@ -14,5 +14,8 @@ Supports:
 - Normal Maps
 - Height Maps
 - Alpha Maps
+- Metallic Maps
+- Specular Maps
 
 Not working / not yet implemented:
+- Dual Lobe Specular
