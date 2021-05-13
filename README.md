@@ -13,11 +13,11 @@ Currently supports:
 - Diffuse Maps
 - Normal Maps
 - Height Maps
+- Alpha Maps
 - Metallic Maps
 - Roughness Maps
 - Specular Maps
 
 Not yet working / not yet implemented:
 - Dual lobe Specular
-- Alpha cutout maps, alpha clipping / thresholds
 - SSS
