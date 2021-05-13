@@ -3,7 +3,7 @@ Unofficial updates to DazToUnity Bridge.
 
 BRANCH: unity-builtin-support
 
-Confirmed working with: 2019.4.11f1 (LTS), 2020.3.4f1 (LTS)
+Confirmed working with: 2019.4.11f1 (LTS), 2020.3.4f1 (LTS), 2021.1.5f1
 
 Must add following Symbol Definition: USING_BUILTIN
 
