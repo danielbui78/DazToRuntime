@@ -12,17 +12,19 @@ Shader "Daz3D/Built-In Wet"
 //        _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
         _AlphaClip("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
 
-        _Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
-        _GlossMapScale("Smoothness Scale", Range(0.0, 1.0)) = 1.0
-        [Enum(Metallic Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel("Smoothness texture channel", Float) = 0
+//        _Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
+//        _GlossMapScale("Smoothness Scale", Range(0.0, 1.0)) = 1.0
+//        [Enum(Metallic Alpha,0,Albedo Alpha,1)] _SmoothnessTextureChannel("Smoothness texture channel", Float) = 0
+        _Roughness("Roughness", Range(0.0, 1.0)) = 0.5
+        _RoughnessMap("Roughness Map", 2D) = "white" {}
 
 //        [Gamma] _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
         [Gamma] _Metallic("Metallic Weight", Range(0.0, 1.0)) = 0.0
 //        _METALLICMAP("Metallic", 2D) = "white" {}
         _MetallicMap("Metallic Map", 2D) = "white" {}
 
-        _SpecularColor("Specular Color", Color) = (1,1,1,1)
-        _SpecularColorMap("Specular Color Map", 2D) = "white" {}
+        _SpecularColor("Specular Color", Color) = (0.5,0.5,0.5,1)
+        _SpecularColorMap("Specular Color Map", 2D) = "grey" {}
 
         [ToggleOff] _SpecularHighlights("Specular Highlights", Float) = 1.0
         [ToggleOff] _GlossyReflections("Glossy Reflections", Float) = 1.0
@@ -77,7 +79,8 @@ Shader "Daz3D/Built-In Wet"
 #define _NORMALMAP 1
 //#define _PARALLAXMAP 1
 #define _ALPHAMAP 1
-#define UNITY_SETUP_BRDF_INPUT MetallicSetup
+//#define UNITY_SETUP_BRDF_INPUT MetallicSetup
+#define UNITY_SETUP_BRDF_INPUT SpecularSetup
             ENDCG
 
             SubShader

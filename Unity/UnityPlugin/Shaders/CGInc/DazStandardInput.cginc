@@ -47,8 +47,11 @@ sampler2D   _SpecularColorMap;
 //sampler2D   _MetallicGlossMap;
 sampler2D   _MetallicMap;
 half        _Metallic;
-float       _Glossiness;
-float       _GlossMapScale;
+//float       _Glossiness;
+//float       _GlossMapScale;
+
+float       _Roughness;
+sampler2D   _RoughnessMap;
 
 sampler2D   _OcclusionMap;
 half        _OcclusionStrength;
@@ -156,19 +159,26 @@ half4 SpecularGloss(float2 uv)
 #ifdef _SPECULARCOLORMAP
 #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
         sg.rgb = tex2D(_SpecularColorMap, uv).rgb;
+//added
+        sg.rgb *= _SpecularColor.rgb;
         sg.a = tex2D(_DiffuseMap, uv).a;
     #else
         sg = tex2D(_SpecularColorMap, uv);
-    #endif
-    sg.a *= _GlossMapScale;
+        //added
+        sg *= 0.5f * _SpecularColor;
+#endif
+//    sg.a *= _GlossMapScale;
+    sg.a *= 1.0f - _Roughness;
 #else
 //    sg.rgb = _SpecColor.rgb;
     sg.rgb = _SpecularColor.rgb;
 #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-        sg.a = tex2D(_DiffuseMap, uv).a * _GlossMapScale;
-    #else
-        sg.a = _Glossiness;
-    #endif
+//        sg.a = tex2D(_DiffuseMap, uv).a * _GlossMapScale;
+        sg.a = tex2D(_DiffuseMap, uv).a * _Roughness;
+#else
+//        sg.a = _Glossiness;
+        sg.a = 1.0f - _Roughness;
+#endif
 #endif
     return sg;
 }
@@ -184,14 +194,19 @@ half2 MetallicGloss(float2 uv)
         mg.g = tex2D(_DiffuseMap, uv).a;
     #else
         mg = tex2D(_MetallicMap, uv).ra;
+        // added
+        mg.r *= _Metallic;
     #endif
-    mg.g *= _GlossMapScale;
+//    mg.g *= _GlossMapScale;
+    mg.g *= 1.0f - _Roughness;
 #else
     mg.r = _Metallic;
     #ifdef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-        mg.g = tex2D(_DiffuseMap, uv).a * _GlossMapScale;
-    #else
-        mg.g = _Glossiness;
+//        mg.g = tex2D(_DiffuseMap, uv).a * _GlossMapScale;
+        mg.g = tex2D(_DiffuseMap, uv).a * _Roughness;
+#else
+//        mg.g = _Glossiness;
+    mg.g = 1.0f - _Roughness;
     #endif
 #endif
     return mg;
@@ -203,6 +218,8 @@ half2 MetallicRough(float2 uv)
 //#ifdef _METALLICGLOSSMAP
 #ifdef _METALLICMAP
     mg.r = tex2D(_MetallicMap, uv).r;
+    // added
+    mg.r *= _Metallic;
 #else
     mg.r = _Metallic;
 #endif
@@ -210,8 +227,11 @@ half2 MetallicRough(float2 uv)
 //#ifdef _SPECGLOSSMAP
 #ifdef _SPECULARCOLORMAP
     mg.g = 1.0f - tex2D(_SpecularColorMap, uv).r;
+    //added
+    mg.g *= _SpecularColor.r;
 #else
-    mg.g = 1.0f - _Glossiness;
+//    mg.g = 1.0f - _Glossiness;
+    mg.g = 1.0f - _Roughness;
 #endif
     return mg;
 }
