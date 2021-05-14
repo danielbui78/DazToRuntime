@@ -9,15 +9,15 @@ class QCheckBox;
 class QComboBox;
 class QGroupBox;
 
-class DzUnityDialog : public DzBasicDialog {
+class UnofficialDzUnityDialog : public DzBasicDialog {
 	Q_OBJECT
 public:
 
 	/** Constructor **/
-	 DzUnityDialog(QWidget *parent);
+	 UnofficialDzUnityDialog(QWidget *parent);
 
 	/** Destructor **/
-	virtual ~DzUnityDialog() {}
+	virtual ~UnofficialDzUnityDialog() {}
 
 	QLineEdit* assetNameEdit;
 	QLineEdit* projectEdit;

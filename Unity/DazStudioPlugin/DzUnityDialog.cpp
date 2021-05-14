@@ -31,10 +31,10 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME "DazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME "UnofficialDazToUnity"
 
 
-DzUnityDialog::DzUnityDialog(QWidget* parent) :
+UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 DzBasicDialog(parent, DAZ_TO_UNITY_PLUGIN_NAME)
 {
 	 assetNameEdit = NULL;
@@ -53,7 +53,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 #endif
 	 installUnityFilesCheckBox = NULL;
 
-	 settings = new QSettings("Daz 3D", "DazToUnity");
+	 settings = new QSettings("Daz 3D", "UnofficialDazToUnity");
 
 	 // Declarations
 	 int margin = style()->pixelMetric(DZ_PM_GeneralMargin);
@@ -146,7 +146,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 }
 	 else
 	 {
-		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DazToUnity";
+		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDazToUnity";
 		  assetsFolderEdit->setText(DefaultPath);
 	 }
 	 if (!settings->value("MorphsEnabled").isNull())
@@ -192,7 +192,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 }
 }
 
-void DzUnityDialog::HandleSelectAssetsFolderButton()
+void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 {
 	 QString directoryName = QFileDialog::getExistingDirectory(this, tr("Choose Directory"),
 		  "/home",
@@ -233,7 +233,7 @@ void DzUnityDialog::HandleSelectAssetsFolderButton()
 	 }
 }
 
-void DzUnityDialog::HandleChooseMorphsButton()
+void UnofficialDzUnityDialog::HandleChooseMorphsButton()
 {
 	 DzUnityMorphSelectionDialog* dlg = DzUnityMorphSelectionDialog::Get(this);
 	 dlg->exec();
@@ -241,36 +241,36 @@ void DzUnityDialog::HandleChooseMorphsButton()
 	 morphMapping = dlg->GetMorphRenaming();
 }
 
-void DzUnityDialog::HandleChooseSubdivisionsButton()
+void UnofficialDzUnityDialog::HandleChooseSubdivisionsButton()
 {
 	 DzUnitySubdivisionDialog* dlg = DzUnitySubdivisionDialog::Get(this);
 	 dlg->exec();
 }
 
-QString DzUnityDialog::GetMorphString()
+QString UnofficialDzUnityDialog::GetMorphString()
 {
 	 morphMapping = DzUnityMorphSelectionDialog::Get(this)->GetMorphRenaming();
 	 return DzUnityMorphSelectionDialog::Get(this)->GetMorphString();
 }
 
-void DzUnityDialog::HandleMorphsCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleMorphsCheckBoxChange(int state)
 {
 	 settings->setValue("MorphsEnabled", state == Qt::Checked);
 }
 
-void DzUnityDialog::HandleSubdivisionCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleSubdivisionCheckBoxChange(int state)
 {
 	 settings->setValue("SubdivisionEnabled", state == Qt::Checked);
 }
 
 #ifdef FBXOPTIONS
-void DzUnityDialog::HandleShowFbxDialogCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleShowFbxDialogCheckBoxChange(int state)
 {
 	 settings->setValue("ShowFBXDialog", state == Qt::Checked);
 }
 #endif
 
-void DzUnityDialog::HandleInstallUnityFilesCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleInstallUnityFilesCheckBoxChange(int state)
 {
 	 settings->setValue("InstallUnityFiles", state == Qt::Checked);
 }

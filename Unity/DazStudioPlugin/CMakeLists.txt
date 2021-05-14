@@ -2,8 +2,8 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(DZ_PLUGIN_TGT_NAME dzunitybridge)
-set(DZ_PLUGIN_PROJECT_NAME "DzUnityBridge")
+set(DZ_PLUGIN_TGT_NAME unofficialdzunitybridge)
+set(DZ_PLUGIN_PROJECT_NAME "UnofficialDzUnityBridge")
 
 option(FBXOPTIONS "Show FBX Export Dialog" OFF)
 if(FBXOPTIONS)

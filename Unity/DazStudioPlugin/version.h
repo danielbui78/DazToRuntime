@@ -2,8 +2,8 @@
 #include "dzversion.h"
 
 // Version number for DazToUnity
-#define PLUGIN_MAJOR	1
-#define PLUGIN_MINOR	0
+#define PLUGIN_MAJOR	0
+#define PLUGIN_MINOR	1
 #define PLUGIN_REV		0
 #define PLUGIN_BUILD	1
 

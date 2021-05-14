@@ -47,7 +47,7 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME		"DazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDazToUnity"
 
 
 DzUnitySubdivisionDialog* DzUnitySubdivisionDialog::singleton = nullptr;
@@ -65,7 +65,7 @@ DzUnitySubdivisionDialog::DzUnitySubdivisionDialog(QWidget *parent) :
 	setWindowTitle(tr("Choose Subdivision Levels"));
 
 	// Setup folder
-	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DazToUnity" + QDir::separator() + "Presets";
+	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDazToUnity" + QDir::separator() + "Presets";
 
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);

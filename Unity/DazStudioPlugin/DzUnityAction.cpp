@@ -20,14 +20,14 @@
 #include "DzUnityDialog.h"
 #include "DzUnityAction.h"
 
-DzUnityAction::DzUnityAction() :
+UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 DzRuntimePluginAction(tr("&Daz to Unity"), tr("Send the selected node to Unity."))
 {
 	 SubdivisionDialog = nullptr;
 	 QAction::setIcon(QIcon(":/Images/icon"));
 }
 
-void DzUnityAction::executeAction()
+void UnofficialDzUnityAction::executeAction()
 {
 	 // Check if the main window has been created yet.
 	 // If it hasn't, alert the user and exit early.
@@ -52,7 +52,7 @@ void DzUnityAction::executeAction()
 	 }
 
 	 // Create the dialog
-	 DzUnityDialog* dlg = new DzUnityDialog(mw);
+	 UnofficialDzUnityDialog* dlg = new UnofficialDzUnityDialog(mw);
 
 	 // If the Accept button was pressed, start the export
 	 if (dlg->exec() == QDialog::Accepted)
@@ -90,7 +90,7 @@ void DzUnityAction::executeAction()
 	 }
 }
 
-QString DzUnityAction::GetMD5(const QString &path)
+QString UnofficialDzUnityAction::GetMD5(const QString &path)
 {
 	auto algo = QCryptographicHash::Md5;
 	QFile sourceFile(path);
@@ -117,7 +117,7 @@ QString DzUnityAction::GetMD5(const QString &path)
     return QString();
 }
 
-bool DzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, bool compareFiles)
+bool UnofficialDzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, bool compareFiles)
 {
 	bool dstExists = QFile::exists(*dst);
 
@@ -160,7 +160,7 @@ bool DzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, bool compa
 	return result;
 }
 
-void DzUnityAction::CreateUnityFiles(bool replace)
+void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 {
 	 if (!InstallUnityFiles)
 		  return;
@@ -258,7 +258,7 @@ void DzUnityAction::CreateUnityFiles(bool replace)
 	 }
 }
 
-void DzUnityAction::WriteConfiguration()
+void UnofficialDzUnityAction::WriteConfiguration()
 {
 	 QString DTUfilename = CharacterFolder + CharacterName + ".dtu";
 	 QFile DTUfile(DTUfilename);
@@ -299,7 +299,7 @@ void DzUnityAction::WriteConfiguration()
 }
 
 // Setup custom FBX export options
-void DzUnityAction::SetExportOptions(DzFileIOSettings& ExportOptions)
+void UnofficialDzUnityAction::SetExportOptions(DzFileIOSettings& ExportOptions)
 {
 	 ExportOptions.setBoolValue("doSelected", true);
 	 ExportOptions.setBoolValue("doLights", true);
@@ -328,7 +328,7 @@ void DzUnityAction::SetExportOptions(DzFileIOSettings& ExportOptions)
 }
 
 // Write out all the surface properties
-void DzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
+void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 {
 	 DzObject* Object = Node->getObject();
 	 DzShape* Shape = Object ? Object->getCurrentShape() : NULL;

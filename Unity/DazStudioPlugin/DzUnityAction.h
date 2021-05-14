@@ -7,10 +7,10 @@
 #include <DzRuntimePluginAction.h>
 #include "DzUnitySubdivisionDialog.h"
 
-class DzUnityAction : public DzRuntimePluginAction {
+class UnofficialDzUnityAction : public DzRuntimePluginAction {
 	 Q_OBJECT
 public:
-	 DzUnityAction();
+	 UnofficialDzUnityAction();
 
 protected:
 	 DzUnitySubdivisionDialog* SubdivisionDialog;
