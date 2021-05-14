@@ -1,5 +1,4 @@
 # Unofficial DazToUnity Bridge Updates
-Unofficial updates to DazToUnity Bridge.
 
 This default branch (unity-master) currently only serves as a staging area as I finalize code and features of the sub-branches and merge them together.
 
