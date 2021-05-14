@@ -48,7 +48,7 @@ Shader "Daz3D/Built-In Hair"
 //        _EmissionMap("Emission", 2D) = "white" {}
         _EmissionMap("Emission Map", 2D) = "white" {}
 
-        _Alpha("Cutout Opacity", Float) = 0.0
+        _Alpha("Cutout Opacity", Float) = 1.0
         _AlphaMap("Cutout Opacity Map", 2D) = "white" {}
 
 //        _DetailMask("Detail Mask", 2D) = "white" {}
@@ -87,7 +87,7 @@ Shader "Daz3D/Built-In Hair"
         {
             Tags { "RenderType" = "Opaque" "PerformanceChecks" = "False" }
             LOD 300
-//          Cull off
+            Cull off
 
             // ------------------------------------------------------------------
             //  Base forward pass (directional light, emission, lightmaps, ...)
