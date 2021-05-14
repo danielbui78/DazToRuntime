@@ -27,13 +27,45 @@
 		<file alias="Wet.shadergraph.meta">../../UnityPlugin/Shaders/Wet.shadergraph.meta</file>
 		<file alias="Invisible.shader">../../UnityPlugin/Shaders/Invisible.shader</file>
 		<file alias="Invisible.shader.meta">../../UnityPlugin/Shaders/Invisible.shader.meta</file>
-	</qresource>
-	<qresource prefix="/ShaderHelpers">
+    <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/Built-In Hair.shader</file>
+    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/Built-In Hair.shader.meta</file>
+    <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/Built-In Wet.shader</file>
+    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/Built-In Wet.shader.meta</file>
+    <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader</file>
+    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader.meta</file>
+    <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader</file>
+    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader.meta</file>
+    <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader</file>
+    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader.meta</file>
+    <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/URP Hair.shader</file>
+    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/URP Hair.shader.meta</file>
+    <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/URP Wet.shader</file>
+    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/URP Wet.shader.meta</file>
+    <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/URP IrayUberSkin.shader</file>
+    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSkin.shader.meta</file>
+    <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/URP IrayUberSpec.shader</file>
+    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shader.meta</file>
+    <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/URP IrayUberMetal.shader</file>
+    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shader.meta</file>
+  </qresource>
+  <qresource prefix="/ShaderCGInc">
+    <file alias="DazStandardCore.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc</file>
+    <file alias="DazStandardCore.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc.meta</file>
+    <file alias="DazStandardCoreForward.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc</file>
+    <file alias="DazStandardCoreForward.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc.meta</file>
+    <file alias="DazStandardInput.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc</file>
+    <file alias="DazStandardInput.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc.meta</file>
+    <file alias="DazStandardMeta.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc</file>
+    <file alias="DazStandardMeta.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc.meta</file>
+    <file alias="DazStandardShadow.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc</file>
+    <file alias="DazStandardShadow.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc.meta</file>
+  </qresource>
+  <qresource prefix="/ShaderHelpers">
 		<file alias="GetLighDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
 		<file alias="GetLighDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
 		<file alias="LightDirection.shadersubgraph">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph</file>
 		<file alias="LightDirection.shadersubgraph.meta">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph.meta</file>
-	</qresource>
+  </qresource>
 	<qresource prefix="/Vendors">
 		<file alias="SimpleJSON.cs">../../UnityPlugin/Vendors/SimpleJSON.cs</file>
 	</qresource>

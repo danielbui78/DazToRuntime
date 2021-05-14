@@ -204,7 +204,20 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 		  CopyFile(&file, &shader, replace);
 		  file.close();
 	 }
-	 
+
+	 //Create shader CGInc folder if it doesn't exist
+	 QString shaderCGIncFolder = ImportFolder + "\\Shaders\\CGInc";
+	 dir.mkpath(shaderCGIncFolder);
+
+	 QStringList shaderCGIncStringList = QDir(":/ShaderCGInc/").entryList();
+	 for (int i = 0; i < shaderCGIncStringList.size(); i++)
+	 {
+		 QString shaderCGIncFilename = shaderCGIncFolder + "\\" + shaderCGIncStringList[i];
+		 QFile file(":/ShaderCGInc/" + shaderCGIncStringList[i]);
+		 CopyFile(&file, &shaderCGIncFilename, replace);
+		 file.close();
+	 }
+
 	 //Create shader helpers folder if it doesn't exist
 	 QString shaderHelperFolder = ImportFolder + "\\Shaders\\Helpers";
 	 dir.mkpath(shaderHelperFolder);
