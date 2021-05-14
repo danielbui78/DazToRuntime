@@ -565,7 +565,8 @@ namespace Daz3D
 			//isTransparent = translucencyWeight.Value.AsDouble > 0 || refractionWeight.Value.AsDouble > 0 || cutoutOpacity.TextureExists();
 
 			//for now we're only assuming transparent if a cutout texture is present
-			isTransparent = cutoutOpacity.TextureExists();
+			// DB (2021-05-13): ...or if cutoutopacity.float < 1.0f
+			isTransparent = cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
 			isTranslucent = translucencyWeight.Float > 0f;
 
 			isHair = IsDTUMaterialHair(dtuMaterial);
@@ -702,8 +703,8 @@ namespace Daz3D
 			else 
 			{
 				//this means we're either skin, metal, spec, etc... 
-
-				isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists();
+				// DB (2021-05-13): add cutoutopacity.float < 1.0
+				isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
 
 				//These properties are going to be parsed/interpretted in roughly the order that they appear in the table of iray props in the large comment block
 
@@ -1090,8 +1091,8 @@ namespace Daz3D
 				mat.SetVector("_Offset",offset);
 			}
 
-
-			bool isTransparent = opacityStrength.TextureExists() || opacityStrength.Float < 1.0f || (cutoutOpacity.Exists && cutoutOpacity.TextureExists());
+			// DB (2021-05-13): or cutoutopacity.float < 1.0f
+			bool isTransparent = opacityStrength.TextureExists() || opacityStrength.Float < 1.0f || (cutoutOpacity.Exists && (cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f)) );
 
 			if (isWet)
 			{
@@ -1289,7 +1290,8 @@ namespace Daz3D
 			var valueLower = dtuMaterial.Value.ToLower();
 			bool isDoubleSided = true;
 			bool isTranslucent = false;
-			bool isTransparent = cutoutOpacity.TextureExists();
+			// DB (2021-05-13): cutoutopacity.float < 1.0f
+			bool isTransparent = cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
 
 			bool hasDualLobeSpecularWeight = false;
 			bool hasDualLobeSpecularReflectivity = false;
