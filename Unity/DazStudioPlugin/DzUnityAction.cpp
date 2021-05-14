@@ -315,9 +315,9 @@ void UnofficialDzUnityAction::WriteConfiguration()
 void UnofficialDzUnityAction::SetExportOptions(DzFileIOSettings& ExportOptions)
 {
 	 ExportOptions.setBoolValue("doSelected", true);
-	 ExportOptions.setBoolValue("doLights", true);
-	 ExportOptions.setBoolValue("doCameras", true);
-	 ExportOptions.setBoolValue("doAnims", false);
+//	 ExportOptions.setBoolValue("doLights", true);
+//	 ExportOptions.setBoolValue("doCameras", true);
+//	 ExportOptions.setBoolValue("doAnims", false);
 
 	 if (AssetType == "SkeletalMesh" && ExportMorphs && MorphString != "")
 	 {
