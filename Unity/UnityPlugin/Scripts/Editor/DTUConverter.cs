@@ -14,20 +14,12 @@ namespace Daz3D
 		public const string shaderNameHair = "Daz3D/Hair";
 		public const string shaderNameWet = "Daz3D/Wet";
 #elif USING_URP
-#if USING_2019
-		public const string shaderNameMetal = "Shader Graphs/URP IrayUberMetal";
-		public const string shaderNameSpecular = "Shader Graphs/URP IrayUberSpec";
-		public const string shaderNameIraySkin = "Shader Graphs/URP IrayUberSkin";
-		public const string shaderNameHair = "Shader Graphs/URP Hair";
-		public const string shaderNameWet = "Shader Graphs/URP Wet";
-#else
 		public const string shaderNameMetal = "Daz3D/URP IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/URP IrayUberSpec";
 		public const string shaderNameIraySkin = "Daz3D/URP IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/URP Hair";
 		public const string shaderNameWet = "Daz3D/URP Wet";
-#endif // USING_2019
-#else
+#elif USING_BUILTIN
 		public const string shaderNameMetal = "Daz3D/Built-In IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/Built-In IrayUberSpec";
 		public const string shaderNameIraySkin = "Daz3D/Built-In IrayUberSkin";
@@ -133,9 +125,9 @@ namespace Daz3D
 			// this is one of the outlier material types that doesn't use the same property types
 			//TODO: this lookup feels a bit silly, we should make a function where we pass in this mat and it does something smarter
 			if(
-				valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair") 
-				|| valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache") 
-				|| valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard") 
+				valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair")
+				|| valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache")
+				|| valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard")
 			)
 			{
 				return true;
@@ -143,7 +135,7 @@ namespace Daz3D
 
 			return false;
 		}
-		
+
 		/// <summary>
 		/// Guess if our material is wet, such as a cornea, or eye moisture
 		/// </summary>
@@ -261,7 +253,7 @@ namespace Daz3D
 				mat.EnableKeyword("_BLENDMODE_ALPHA");
 				mat.EnableKeyword("_ENABLE_FOG_ON_TRANSPARENT");
 				mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-				
+
 				mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent + sortingPriority;
 			}
 			else
@@ -278,7 +270,7 @@ namespace Daz3D
 				mat.DisableKeyword("_BLENDMODE_ALPHA");
 				mat.DisableKeyword("_ENABLE_FOG_ON_TRANSPARENT");
 				mat.DisableKeyword("_SURFACE_TYPE_TRANSPARENT");
-				
+
 				mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Geometry + sortingPriority;
 			}
 
@@ -302,9 +294,9 @@ namespace Daz3D
 					mat.SetFloat("_ZWrite",1f);
 					mat.SetFloat("_TransparentZWrite",1f);
 				}
-				
+
 				mat.EnableKeyword("_DOUBLESIDED_ON");
-				
+
 				mat.doubleSidedGI = true;
 			}
 			else
@@ -313,9 +305,9 @@ namespace Daz3D
 				mat.SetFloat("_CullModeForward",2f);
 				mat.SetFloat("_DoubleSidedEnable",0f);
 				mat.SetFloat("_DoubleSidedNormalMode",2f); //None
-				
+
 				mat.DisableKeyword("_DOUBLESIDED_ON");
-				
+
 				mat.doubleSidedGI = false;
 			}
 
@@ -371,7 +363,7 @@ namespace Daz3D
 			//  IrayUberTranslucent - Used when the material is translucent, note metal flow no longer works now
 			//  IrayUberSkin - Used when we guess that the mat is for skin
 			//  IrayUberHair - Used when we guess that the mat is for hair
-	
+
 			/**
 			The Lit master node in unity supports a few material types:
 			 Standard (metal/rough), Specular Color (Spec/gloss), Tranlsucent (no sss), SSS (same as translucent but with a SSS mask)
@@ -389,7 +381,7 @@ namespace Daz3D
 			In order to decide which shader to use, we scan and look for a few property values below
 			 then pick one path and stick to it, this means we will ignore some features that iray
 			 supports in daz
-			
+
 			Below is a table I generated that explains some mappings between daz->unity and which base mixing value
 			 they belong to along with what types of inputs are supported, you can use that as a guide if you want
 			 to make your own shader or customize this material generator
@@ -413,11 +405,11 @@ namespace Daz3D
 			| Diffuse Roughness                  | X | X | X | DT   | Seemingly affects roughness, but has almost no effect |
 			| Diffuse Overlay Weight             | X | X | X | D    | If > 0 mixes the "Diffuse Overlay Color" into the diffuse on top (amongst other props, see below) |
 			| ++ Diffuse Overlay Weight Squared  | X | X | X | B    | if on, take diffuse overlay weight and square the value (0.5 => 0.25) |
-			| ++ Diffuse Overlay Color           | X | X | X | CT   |  applies a color (mixes into the diffuse channel on top of the existing) | 
-			| ++ Diffuse Overlay Color Effect    | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity | 
+			| ++ Diffuse Overlay Color           | X | X | X | CT   |  applies a color (mixes into the diffuse channel on top of the existing) |
+			| ++ Diffuse Overlay Color Effect    | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity |
 			| ++ Diffuse Overlay Roughness       | X | X | X | D    | (same effect as Diffuse Roughness |
 			| Translucency Weight                | X | X | X | D    | if > 0 makes the material translucent (see through) and enables the following |
-			| ++ Base Color Effect               | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity | 
+			| ++ Base Color Effect               | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity |
 			| ++ Translucency Color              | X | X | X | CT   | Sets the color that the mat is translucent (like how the light passes through it) greatly effects the final color, washes out diffuse quite a bit |
 			| ++ Invert Transmission Normal      | X | X | X | B    | ?Flips the normal? |
 			| Dual Lobe Specular Weight          | X | X | X | D    | See GDC notes on Next Generateion Character Rendering for info, the gist is these are top coat specular highlights (primiarily used for skin), 0 => off, 1=>on at 100% |
@@ -428,14 +420,14 @@ namespace Daz3D
 			| ++ Specular Lobe 2 Glossiness      |   | X |   | D    | 0=>rough, 1=>smooth |
 			| ++ Dual Lobe Specular Ratio        | X | X | X | D    | A lerp between lobe 1 and 2, where 0 is just lobe 2, 1 is just lobe 1 (notice the flip there!) and 0.5 is 50% of each|
 			| Glossy Layered Weight              | X | X |   | D    | 0 => Rough, 1 => Smooth, controls metal/spec paths for all gloss values below |
-			| Glossy Weight                      |   |   | X | D    | 0 => Rough, 1 => Smooth If > 0 enables: Glossy Color, Glossy Color Effect, Glossy Roughness, Glossy Anisotropy, Backscattering Weight | 
+			| Glossy Weight                      |   |   | X | D    | 0 => Rough, 1 => Smooth If > 0 enables: Glossy Color, Glossy Color Effect, Glossy Roughness, Glossy Anisotropy, Backscattering Weight |
 			| ++ Glossy Color                    | X | X | X | CT   | Effects specular highlights, (on by default for Metal and Spec) |
-			| ++ Glossy Color Effect             | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity (on by default for Metal and Spec) | 
-			| ++ Glossy Roughness                | X | X | X | DT   | 0 => smooth, 1 => Rough (on by default for Metal and Spec) | 
+			| ++ Glossy Color Effect             | X | X | X | E    | Scatter Only/ Scatter Transmit / Scatter Transmit Intensity (on by default for Metal and Spec) |
+			| ++ Glossy Roughness                | X | X | X | DT   | 0 => smooth, 1 => Rough (on by default for Metal and Spec) |
 			| ++ Glossy Reflectivity             | X |   |   | DT   | How much of the environment should be reflected in the gloss layer? 1=> high, 0=>off
 			| ++++ Glossy Anisotropy             | X | X | X | DT   | |
 			| ++++ Glossy Anisotropy Rotations   | X | X |   | DT   | |
-			| ++ Backscattering Weight           | X | X | X | DT   | (on by default for Metal and Spec) | 
+			| ++ Backscattering Weight           | X | X | X | DT   | (on by default for Metal and Spec) |
 			| Share Glossy Inputs                | X | X | X | B    | Setting on or off had no effect? |
 			| Glossy Specular                    |   | X |   | CT   | Affects the gloss epcular highlights |
 			| Glossiness                         |   | X |   | DT   | Affects smoothness (0=>rough 1=>smooth), ignored if Glossy Layered Weight = 0
@@ -447,8 +439,8 @@ namespace Daz3D
 			| ++ Abbe                            | X | X | X | D    | Used to detmine how much the light splits like with a prism, high values have low dispersion, low values have high dispersion, see: https://en.wikipedia.org/wiki/Abbe_number |
 			| Base Thin Film                     | X | X | X | DT   | |
 			| ++ Base Thin Film IOR              | X | X | X | DT   | |
-			| Base Bump                          | X | X | X | DT   | A height map, you want to read both the texture and the value | 
-			| Normal Map                         | X | X | X | DT   | A normal map, the value is the "strength" of the normal | 
+			| Base Bump                          | X | X | X | DT   | A height map, you want to read both the texture and the value |
+			| Normal Map                         | X | X | X | DT   | A normal map, the value is the "strength" of the normal |
 			| Metallic Flakes Weight             | X | X | X | DT   | Enables a lot of flake options, we're ignoring this for now |
 			| Top Coat Weight                    | X | X | X | DT   | Enables additional options, adds a 3rd layer to iray, ignored by us |
 			| Thin Walled                        | X | X | X | B    | On for thin things like bubbles, hollow, etc, off for thick things like fluids and solids |
@@ -469,7 +461,7 @@ namespace Daz3D
 
 
 			Types: B => Boolean,C => Color, D => Double, E => Enum, T => Texture
-			  
+
 			*/
 
 			var matNameLower = dtuMaterial.MaterialName.ToLower();
@@ -510,14 +502,14 @@ namespace Daz3D
 
 			bool isSclera = false;
 
-			
+
 
 
 			//Let's load all the properties we might use, not all paths read all these values
 
 			var diffuseColor = dtuMaterial.Get("Diffuse Color");
 			var metallicWeight = dtuMaterial.Get("Metallic Weight");
-			
+
 			var diffuseWeight = dtuMaterial.Get("Diffuse Weight");
 			var diffuseRougness = dtuMaterial.Get("Diffuse Roughness");
 
@@ -582,7 +574,7 @@ namespace Daz3D
 					isSpecular = true;
 					break;
 			}
-			
+
 			//This will be set for things like corenas, eye moisture, glass, etc
 			//isTransparent = translucencyWeight.Value.AsDouble > 0 || refractionWeight.Value.AsDouble > 0 || cutoutOpacity.TextureExists();
 
@@ -596,7 +588,7 @@ namespace Daz3D
 			isSclera = IsDTUMaterialSclera(dtuMaterial);
 
 			//Swap shaders if we need to
-			
+
 			if(isHair)
 			{
 				shaderName = DTU_Constants.shaderNameHair;
@@ -721,9 +713,9 @@ namespace Daz3D
 				mat.SetTexture("_HeightMap",ImportTextureFromPath(bumpStrength.Texture,materialDir, record, false,true));
 				mat.SetFloat("_HeightOffset",0.25f);
 			}
-			else 
+			else
 			{
-				//this means we're either skin, metal, spec, etc... 
+				//this means we're either skin, metal, spec, etc...
 
 				isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists();
 
@@ -825,7 +817,7 @@ namespace Daz3D
 						{
 							specularLobe1RoughnessValue = 1.0f - specularLobe1Glossiness.Float;
 							specularLobe2RoughnessValue = 1.0f - specularLobe2Glossiness.Float;
-							
+
 							//In our gloss shader, ensure we do a one minus on this
 							specularLobe1RoughnessTexture = ImportTextureFromPath(specularLobe1Glossiness.Texture,materialDir,record,false,true);
 							specularLobe2RoughnessTexture = ImportTextureFromPath(specularLobe2Glossiness.Texture,materialDir,record,false,true);
@@ -974,7 +966,7 @@ namespace Daz3D
 			if(isSpecular)
 			{
 				mat.EnableKeyword("IRAYUBER_GLOSSYCOLORACTIVE");
-			} else 
+			} else
 			{
 				mat.DisableKeyword("IRAYUBER_GLOSSYCOLORACTIVE");
 			}
@@ -1037,7 +1029,7 @@ namespace Daz3D
 				Sheen Color
 				Scatter Color
 				Thickness
-			
+
 			Skin uses all
 
 			Matte uses all but
@@ -1053,7 +1045,7 @@ namespace Daz3D
 				Sheen Color
 				Scatter Color
 				Thickness
-			
+
 			Info from http://docs.daz3d.com/doku.php/artzone/pub/software/dazstudio/reference/st_lighting
 
 			Plastic: The Plastic lighting model has additive Specular highlights. Highlights are generally very bright and reflect the color of light projected on to it.
@@ -1083,7 +1075,7 @@ namespace Daz3D
 					shaderName = DTU_Constants.shaderNameSpecular;
 					break;
 			}
-			
+
 			bool isWet = IsDTUMaterialWet(dtuMaterial);
 
 			if(isWet)
@@ -1098,7 +1090,7 @@ namespace Daz3D
 				return null;
 			}
 			var mat = new Material(shader);
-			
+
 			var record = new Daz3DDTUImporter.ImportEventRecord();
 
 			if(horizontalTile.Exists && mat.HasProperty("_Tiling"))
@@ -1222,7 +1214,7 @@ namespace Daz3D
 			ToggleCommonMaterialProperties(ref mat,matNameLower,isTransparent,isDoubleSided, hasDualLobeSpecularWeight, hasDualLobeSpecularReflectivity,sortingPriority,hasGlossyLayeredWeight,hasGlossyColor);
 
 			mat.EnableKeyword("IRAYUBER_GLOSSYCOLORACTIVE");
-		
+
 			if (record.Tokens.Count > 0)
 			{
 				Daz3DDTUImporter.EventQueue.Enqueue(record);
@@ -1249,7 +1241,7 @@ namespace Daz3D
 			var normalMap = dtuMaterial.Get("Normal Map");
 			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
 			var roughnessSquared = dtuMaterial.Get("Roughness Squared");
-			
+
 			var horizontalTile = dtuMaterial.Get("Horizontal Tiles");
 			var horizontalOffset = dtuMaterial.Get("Horizontal Offset");
 			var verticalTile = dtuMaterial.Get("Vertical Tiles");
@@ -1265,7 +1257,7 @@ namespace Daz3D
 				return null;
 			}
 			var mat = new Material(shader);
-			
+
 			var record = new Daz3DDTUImporter.ImportEventRecord();
 
 
@@ -1279,7 +1271,7 @@ namespace Daz3D
 				var offset = new Vector2(horizontalOffset.Float,verticalOffset.Float);
 				mat.SetVector("_Offset",offset);
 			}
-			
+
 			mat.SetColor("_Diffuse",diffuseColor.Color);
 			mat.SetTexture("_DiffuseMap",ImportTextureFromPath(diffuseColor.Texture,materialDir,record));
 
@@ -1407,7 +1399,7 @@ namespace Daz3D
 			var acceptShadows = dtuMaterial.Get("Accept Shadows");
 			var occlusion = dtuMaterial.Get("Occlusion");
 			var occlusionShadingRateMode = dtuMaterial.Get("Occlusion Shading Rate Mode");
-			
+
 			var horizontalTile = dtuMaterial.Get("Horizontal Tiles");
 			//var horizontalTile = dtuMaterial.Get("Map Tiling U");
 			//var horizontalOffset = dtuMaterial.Get("Horizontal Offset");
@@ -1461,7 +1453,7 @@ namespace Daz3D
 				return null;
 			}
 			var mat = new Material(shader);
-			
+
 			var record = new Daz3DDTUImporter.ImportEventRecord();
 			if(horizontalTile.Exists && mat.HasProperty("_Tiling"))
 			{
@@ -1477,7 +1469,7 @@ namespace Daz3D
 
 
 			//TODO: opacityColor defines the "opaque" value, in most cases I've seen it's white which is what we'd expect with most maps, but we need to add support for this at some point
-			
+
 
 			//TODO: we handle this nearly the same as iray uber, these switches should be combined instead and have the same logic applied
 
@@ -1529,11 +1521,11 @@ namespace Daz3D
 				mat.SetTexture("_HeightMap",ImportTextureFromPath(bumpStrength.Texture,materialDir, record, false,true));
 				mat.SetFloat("_HeightOffset",0.25f);
 			}
-			else 
+			else
 			{
 				mat.SetColor("_Diffuse",diffuseColor.Color);
 				mat.SetTexture("_DiffuseMap",ImportTextureFromPath(diffuseColor.Texture,materialDir, record));
-				
+
 				if(opacityActive.Float > 0f)
 				{
 					mat.SetFloat("_Alpha",opacityStrength.Float);
@@ -1640,7 +1632,7 @@ namespace Daz3D
 			var matNameLower = dtuMaterial.MaterialName.ToLower();
 			var assetNameLower = dtuMaterial.AssetName.ToLower();
 			var valueLower = dtuMaterial.Value.ToLower();
-			
+
 			string shaderName = DTU_Constants.shaderNameHair;
 			var shader = Shader.Find(shaderName);
 			if(shader == null)
@@ -1678,7 +1670,7 @@ namespace Daz3D
 
 			mat.SetTexture("_SpecularMap",ImportTextureFromPath(hairRootColor.Texture,materialDir,record));
 			mat.SetColor("_SpecularColor",hairRootColor.Color);
-			
+
 			mat.SetTexture("_SpecularMapSecondary",ImportTextureFromPath(hairTipColor.Texture,materialDir,record));
 			mat.SetColor("_SpecularColorSecondary",hairTipColor.Color);
 
@@ -1704,7 +1696,7 @@ namespace Daz3D
 
 			return mat;
 		}
-		
+
 		public Material ConvertToUnityOOTHairblendingHair(DTUMaterial dtuMaterial, string materialDir)
 		{
 			//This material type is used for hair in Daz so we can make a few assumptions
@@ -1773,7 +1765,7 @@ namespace Daz3D
 			var matNameLower = dtuMaterial.MaterialName.ToLower();
 			var assetNameLower = dtuMaterial.AssetName.ToLower();
 			var valueLower = dtuMaterial.Value.ToLower();
-			
+
 			string shaderName = DTU_Constants.shaderNameHair;
 			var shader = Shader.Find(shaderName);
 			if(shader == null)
@@ -1829,7 +1821,7 @@ namespace Daz3D
 			return mat;
 
 		}
-		
+
 
 		/// <summary>
 		/// Creates a unity material (and the physical asset on disk defined by the GetMaterialDir) from the json record inside a .dtu file
@@ -2023,7 +2015,7 @@ namespace Daz3D
 					copyRemtoe = false;
 				}
 			}
-			
+
 			bool dirty = false;
 
 
@@ -2035,7 +2027,7 @@ namespace Daz3D
 				System.IO.File.Copy(path,cleanPath);
 				AssetDatabase.Refresh();
 			}
-			
+
 
 			var tex = AssetDatabase.LoadAssetAtPath<Texture2D>(cleanPath);
 			var ti = TextureImporter.GetAtPath(cleanPath) as TextureImporter;
@@ -2091,7 +2083,7 @@ namespace Daz3D
 
 		private Dictionary<string,DTUMaterialProperty> _map;
 
-		public Dictionary<string,DTUMaterialProperty> Map 
+		public Dictionary<string,DTUMaterialProperty> Map
 		{
 			get
 			{
@@ -2131,7 +2123,7 @@ namespace Daz3D
 		/// </summary>
 		public bool Exists;
 
-		public Color Color 
+		public Color Color
 		{
 			get {
 				return Value.AsColor;
@@ -2294,7 +2286,7 @@ namespace Daz3D
 					{
 						v.Type = DTUValue.DataType.Texture;
 
-						//these values will be hex colors 
+						//these values will be hex colors
 						var tmpStr = prop["Value"].Value;
 						Color color;
 						if(!ColorUtility.TryParseHtmlString(tmpStr,out color))
@@ -2304,7 +2296,7 @@ namespace Daz3D
 						}
 						v.AsColor = color;
 					}
-					
+
 					else
 					{
 						UnityEngine.Debug.LogError("Type: " + propDataType + " is not supported");
@@ -2336,7 +2328,7 @@ namespace Daz3D
 			// then only replace it with the first capture and third capture group, skipping the 2nd capture group (the space)
 			var result = Regex.Replace(jsonText,"^(\\s+\"[^\"]+)([\\s]+)([^\"]+\"\\s*)","$1$3",RegexOptions.Multiline);
 			return result;
-			
+
 		}
 
 		/// <summary>
@@ -2350,7 +2342,7 @@ namespace Daz3D
 			var path = AssetDatabase.GetAssetPath(activeObject);
 
 			var dtu = ParseDTUFile(path);
-			
+
 			UnityEngine.Debug.Log("DTU: " + dtu.AssetName + " contains: " + dtu.Materials.Count + " materials");
 
 			foreach(var dtuMat in dtu.Materials)
@@ -2360,7 +2352,7 @@ namespace Daz3D
 
 		}
 
-		 
+
 
 	}
 
