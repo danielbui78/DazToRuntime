@@ -554,7 +554,8 @@ namespace Daz3D
 			var normalMap = dtuMaterial.Get("Normal Map");
 			var thinWalled = dtuMaterial.Get("Thin Walled");
 			var emissionColor = dtuMaterial.Get("Emission Color");
-			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
+			// DB (2021-05-14): added functionallity to return default value if property does not exist
+			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
 
 			//we don't support these yet, but they're easy to add, need to apply a mat.SetTextureOffset/Scale to each texture we set
 			var horizontalTile = dtuMaterial.Get("Horizontal Tiles");
@@ -1050,7 +1051,9 @@ namespace Daz3D
 
 
 			//Fallback properties (not in the Daz Studio Default)
-			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
+			// DB (2021-05-14): added functionallity to return default value if property does not exist
+			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
+
 
 
 			/**
@@ -1268,7 +1271,8 @@ namespace Daz3D
 			var glossyRoughness = dtuMaterial.Get("Glossy Roughness");
 			var bumpStrength = dtuMaterial.Get("Bump Strength");
 			var normalMap = dtuMaterial.Get("Normal Map");
-			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
+			// DB (2021-05-14): added functionallity to return default value if property does not exist
+			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
 			var roughnessSquared = dtuMaterial.Get("Roughness Squared");
 
 			var horizontalTile = dtuMaterial.Get("Horizontal Tiles");
@@ -1644,7 +1648,8 @@ namespace Daz3D
 			var anisotropyRotations = dtuMaterial.Get("Anisotropy Rotations");
 			var bumpMode = dtuMaterial.Get("Bump Mode"); //Can either be "Height Map"=0 or "Normal Map"=1
 			var bumpStrength = dtuMaterial.Get("Bump Strength");
-			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
+			// DB (2021-05-14): added functionallity to return default value if property does not exist
+			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
 			var strength = dtuMaterial.Get("strength"); //not a typo
 			var minimumDisplacement = dtuMaterial.Get("Minimum Displacement");
 			var maximumDisplacement = dtuMaterial.Get("Maximum Displacement");
@@ -1770,7 +1775,8 @@ namespace Daz3D
 			var scatteringMeasurementDistance = dtuMaterial.Get("Scattering Measurement Distance");
 			var sssAmount = dtuMaterial.Get("SSS Amount");
 			var sssDirection = dtuMaterial.Get("SSS Direction");
-			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity");
+			// DB (2021-05-14): added functionallity to return default value if property does not exist
+			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
 			var displacementStrength = dtuMaterial.Get("Displacement Strength");
 			var minimumDisplacement = dtuMaterial.Get("Minimum Displacement");
 			var maximumDisplacement = dtuMaterial.Get("Maximum Displacement");
@@ -2144,6 +2150,20 @@ namespace Daz3D
 			return new DTUMaterialProperty();
 		}
 
+		// DB (2021-05-14): new override which returns defaultValue if property does not exist
+		public DTUMaterialProperty Get(string key, DTUValue defaultValue)
+		{
+			if (Map.ContainsKey(key))
+			{
+				return Map[key];
+			}
+
+			DTUMaterialProperty newProp = new DTUMaterialProperty();
+			newProp.Value = defaultValue;
+			return newProp;
+
+		}
+
 	}
 
 	public struct DTUMaterialProperty
@@ -2224,6 +2244,17 @@ namespace Daz3D
 					throw new System.Exception("Unsupported type");
 			}
 		}
+
+		public DTUValue(double value)
+        {
+			AsDouble = value;
+			Type = DataType.Double;
+			AsFloat = (float)value;
+			AsInteger = (int) value;
+			AsColor = new Color((float) value, (float) value, (float) value);
+			AsString = "";
+        }
+
 	}
 
 
