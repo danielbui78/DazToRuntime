@@ -210,6 +210,8 @@ namespace Daz3D
 
         private static bool IrayShadersReady()
         {
+
+#if USING_HDRP || USING_URP || USING_BUILTIN
             if (
                 Shader.Find(DTU_Constants.shaderNameMetal) == null ||
                 Shader.Find(DTU_Constants.shaderNameSpecular) == null ||
@@ -222,6 +224,9 @@ namespace Daz3D
             }
 
             return true;
+#else
+            return false;
+#endif
         }
 
 

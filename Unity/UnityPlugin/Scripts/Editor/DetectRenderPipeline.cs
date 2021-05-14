@@ -13,6 +13,7 @@ public static class DetectRenderPipeline
 			 "USING_HDRP",
 			 "USING_URP",
 			 "USING_BUILTIN",
+			 "USING_2019",
 		 };
 
 	static string CleanPreprocessorDirectives(string definedSymbolsString)
@@ -57,6 +58,11 @@ public static class DetectRenderPipeline
         else if (IsURPInstalled())
         {
 			newSymbolString += "USING_URP";
+			// check for 2019
+			if (Application.unityVersion.Contains("2019"))
+            {
+				newSymbolString += ";USING_2019";
+            }
 		}
 		else
         {

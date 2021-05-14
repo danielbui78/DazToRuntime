@@ -7,13 +7,7 @@ namespace Daz3D
 {
 	public static class DTU_Constants
 	{
-#if USING_HDRP
-		public const string shaderNameMetal = "Daz3D/IrayUberMetal";
-		public const string shaderNameSpecular = "Daz3D/IrayUberSpec";
-		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
-		public const string shaderNameHair = "Daz3D/Hair";
-		public const string shaderNameWet = "Daz3D/Wet";
-#elif USING_URP
+#if USING_URP
 #if USING_2019
 		public const string shaderNameMetal = "Shader Graphs/URP IrayUberMetal";
 		public const string shaderNameSpecular = "Shader Graphs/URP IrayUberSpec";
@@ -33,6 +27,12 @@ namespace Daz3D
 		public const string shaderNameIraySkin = "Daz3D/Built-In IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Built-In Hair";
 		public const string shaderNameWet = "Daz3D/Built-In Wet";
+#else
+		public const string shaderNameMetal = "Daz3D/IrayUberMetal";
+		public const string shaderNameSpecular = "Daz3D/IrayUberSpec";
+		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
+		public const string shaderNameHair = "Daz3D/Hair";
+		public const string shaderNameWet = "Daz3D/Wet";
 #endif
 		public const string shaderNameInvisible = "Daz3D/Invisible";        //special shader that doesn't render anything
 
