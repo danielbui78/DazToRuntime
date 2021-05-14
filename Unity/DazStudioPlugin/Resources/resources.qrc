@@ -37,16 +37,16 @@
     <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader.meta</file>
     <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader</file>
     <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader.meta</file>
-    <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/URP Hair.shader</file>
-    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/URP Hair.shader.meta</file>
-    <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/URP Wet.shader</file>
-    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/URP Wet.shader.meta</file>
-    <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/URP IrayUberSkin.shader</file>
-    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSkin.shader.meta</file>
-    <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/URP IrayUberSpec.shader</file>
-    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shader.meta</file>
-    <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/URP IrayUberMetal.shader</file>
-    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shader.meta</file>
+    <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/URP Hair.shadergraph</file>
+    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/URP Hair.shadergraph.meta</file>
+    <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/URP Wet.shadergraph</file>
+    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/URP Wet.shadergraph.meta</file>
+    <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph</file>
+    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph.meta</file>
+    <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph</file>
+    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph.meta</file>
+    <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph</file>
+    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph.meta</file>
   </qresource>
   <qresource prefix="/ShaderCGInc">
     <file alias="DazStandardCore.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc</file>
