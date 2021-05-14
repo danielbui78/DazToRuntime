@@ -15,6 +15,8 @@ namespace Daz3D
     /// </summary>
     public class Daz3DBridge : EditorWindow
     {
+        public static bool DetectRP_RunOnce = false;
+        
         private Vector2 _scrollPos;
         //Tuple<UnityEngine.Object, Texture> thumbnail = null;
         public static readonly Color ThemedColor = new Color(.7f, 1f, .8f);
@@ -52,6 +54,12 @@ namespace Daz3D
 
         void Update()
         {
+            if (DetectRP_RunOnce == false)
+            {
+                DetectRenderPipeline.RunOnce();
+                DetectRP_RunOnce = true;
+            }
+
             if (_needsRepaint)
             {
                 _needsRepaint = false;
