@@ -1,7 +1,6 @@
-# Unofficial DazToRuntime
-Unofficial updates to DazToUnity Bridge.
+# Unofficial DazToUnity Bridge
 
-BRANCH: combined experimental branch: bugfixes, PBRSkin support, URP support, Built-In support
+EXPERIMENTAL BRANCH: bugfixes, PBRSkin support, URP support, Built-In support, autodetect active renderpipeline
 
 unity-URP-support for 2019 and 2020
 unity-builtin-support confirmed working with: 2019.4.11f1 (LTS), 2020.3.4f1 (LTS), 2021.1.5f1
