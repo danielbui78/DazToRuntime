@@ -13,6 +13,7 @@ namespace Daz3D
     [ScriptedImporter(1, "dtu", 0x7FFFFFFF)]
     public class Daz3DDTUImporter : ScriptedImporter
     {
+        public static bool DetectRP_RunOnce = false;
 
         public static bool AutoImportDTUChanges = true;
         public static bool GenerateUnityPrefab = true;
@@ -26,6 +27,7 @@ namespace Daz3D
             ReplaceSceneInstances = true;
             AutomateMecanimAvatarMappings = true;
             ReplaceMaterials = true;
+            DetectRP_RunOnce = false;
         }
 
 
@@ -151,6 +153,12 @@ namespace Daz3D
 
         private static IEnumerator ImportRoutine(string dtuPath, string fbxPath)
         {
+            if (DetectRP_RunOnce == false)
+            {
+                DetectRenderPipeline.RunOnce();
+                DetectRP_RunOnce = true;
+            }
+
             Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History;//force into history mode during import
 
             Daz3DBridge.Progress = .03f;
