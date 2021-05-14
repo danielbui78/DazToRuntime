@@ -5,7 +5,7 @@ using UnityEditor;
 using System.Linq;
 
 #if UNITY_EDITOR
-[InitializeOnLoad]
+//[InitializeOnLoad]
 public static class DetectRenderPipeline
 {
 
@@ -103,7 +103,7 @@ public static class DetectRenderPipeline
 		return false;
 	}
 
-	static DetectRenderPipeline()
+	public static void RunOnce()
 	{
 		string oldSymbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(EditorUserBuildSettings.selectedBuildTargetGroup);
 
