@@ -24,7 +24,7 @@ UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 DzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
 {
 	 SubdivisionDialog = nullptr;
-	 QAction::setIcon(QIcon(":/Images/icon"));
+	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
 }
 
 void UnofficialDzUnityAction::executeAction()
@@ -170,11 +170,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString scriptsFolder = ImportFolder + "\\Scripts";
 	 dir.mkpath(scriptsFolder);
 
-	 QStringList scripts = QDir(":/Scripts/").entryList();
+	 QStringList scripts = QDir(":/UnofficialDaz/Scripts/").entryList();
 	 for (int i = 0; i < scripts.size(); i++)
 	 {
 		  QString script = scriptsFolder + "\\" + scripts[i];
-		  QFile file(":/Scripts/" + scripts[i]);
+		  QFile file(":/UnofficialDaz/Scripts/" + scripts[i]);
 		  CopyFile(&file, &script, replace);
 		  file.close();
 	 }
@@ -183,11 +183,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString editorFolder = ImportFolder + "\\Scripts\\Editor";
 	 dir.mkpath(editorFolder);
 
-	 QStringList editorScripts = QDir(":/Editor/").entryList();
+	 QStringList editorScripts = QDir(":/UnofficialDaz/Editor/").entryList();
 	 for (int i = 0; i < editorScripts.size(); i++)
 	 {
 		  QString script = editorFolder + "\\" + editorScripts[i];
-		  QFile file(":/Editor/" + editorScripts[i]);
+		  QFile file(":/UnofficialDaz/Editor/" + editorScripts[i]);
 		  CopyFile(&file, &script, replace);
 		  file.close();
 	 }
@@ -196,11 +196,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString shaderFolder = ImportFolder + "\\Shaders";
 	 dir.mkpath(shaderFolder);
 
-	 QStringList shaders = QDir(":/Shaders/").entryList();
+	 QStringList shaders = QDir(":/UnofficialDaz/Shaders/").entryList();
 	 for (int i = 0; i < shaders.size(); i++)
 	 {
 		  QString shader = shaderFolder + "\\" + shaders[i];
-		  QFile file(":/Shaders/" + shaders[i]);
+		  QFile file(":/UnofficialDaz/Shaders/" + shaders[i]);
 		  CopyFile(&file, &shader, replace);
 		  file.close();
 	 }
@@ -209,11 +209,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString shaderCGIncFolder = ImportFolder + "\\Shaders\\CGInc";
 	 dir.mkpath(shaderCGIncFolder);
 
-	 QStringList shaderCGIncStringList = QDir(":/ShaderCGInc/").entryList();
+	 QStringList shaderCGIncStringList = QDir(":/UnofficialDaz/ShaderCGInc/").entryList();
 	 for (int i = 0; i < shaderCGIncStringList.size(); i++)
 	 {
 		 QString shaderCGIncFilename = shaderCGIncFolder + "\\" + shaderCGIncStringList[i];
-		 QFile file(":/ShaderCGInc/" + shaderCGIncStringList[i]);
+		 QFile file(":/UnofficialDaz/ShaderCGInc/" + shaderCGIncStringList[i]);
 		 CopyFile(&file, &shaderCGIncFilename, replace);
 		 file.close();
 	 }
@@ -222,11 +222,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString shaderHelperFolder = ImportFolder + "\\Shaders\\Helpers";
 	 dir.mkpath(shaderHelperFolder);
 
-	 QStringList shaderHelpers = QDir(":/ShaderHelpers/").entryList();
+	 QStringList shaderHelpers = QDir(":/UnofficialDaz/ShaderHelpers/").entryList();
 	 for (int i = 0; i < shaderHelpers.size(); i++)
 	 {
 		  QString shaderHelper = shaderHelperFolder + "\\" + shaderHelpers[i];
-		  QFile file(":/ShaderHelpers/" + shaderHelpers[i]);
+		  QFile file(":/UnofficialDaz/ShaderHelpers/" + shaderHelpers[i]);
 		  CopyFile(&file, &shaderHelper, replace);
 		  file.close();
 	 }
@@ -235,11 +235,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString vendorsFolder = ImportFolder + "\\Vendors";
 	 dir.mkpath(vendorsFolder);
 
-	 QStringList vendors = QDir(":/Vendors/").entryList();
+	 QStringList vendors = QDir(":/UnofficialDaz/Vendors/").entryList();
 	 for (int i = 0; i < vendors.size(); i++)
 	 {
 		  QString vendor = vendorsFolder + "\\" + vendors[i];
-		  QFile file(":/Vendors/" + vendors[i]);
+		  QFile file(":/UnofficialDaz/Vendors/" + vendors[i]);
 		  CopyFile(&file, &vendor, replace);
 		  file.close();
 	 }
@@ -248,11 +248,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString profilesFolder = ImportFolder + "\\DiffusionProfiles";
 	 dir.mkpath(profilesFolder);
 
-	 QStringList profiles = QDir(":/DiffusionProfiles/").entryList();
+	 QStringList profiles = QDir(":/UnofficialDaz/DiffusionProfiles/").entryList();
 	 for (int i = 0; i < profiles.size(); i++)
 	 {
 		  QString profile = profilesFolder + "\\" + profiles[i];
-		  QFile file(":/DiffusionProfiles/" + profiles[i]);
+		  QFile file(":/UnofficialDaz/DiffusionProfiles/" + profiles[i]);
 		  CopyFile(&file, &profile, replace);
 		  file.close();
 	 }
@@ -261,11 +261,11 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 	 QString resourcesFolder = ImportFolder + "\\Resources";
 	 dir.mkpath(resourcesFolder);
 
-	 QStringList resources = QDir(":/Resources/").entryList();
+	 QStringList resources = QDir(":/UnofficialDaz/Resources/").entryList();
 	 for (int i = 0; i < resources.size(); i++)
 	 {
 		  QString resource = resourcesFolder + "\\" + resources[i];
-		  QFile file(":/Resources/" + resources[i]);
+		  QFile file(":/UnofficialDaz/Resources/" + resources[i]);
 		  CopyFile(&file, &resource, replace);
 		  file.close();
 	 }
