@@ -13,7 +13,6 @@ namespace Daz3D
     [ScriptedImporter(1, "dtu", 0x7FFFFFFF)]
     public class Daz3DDTUImporter : ScriptedImporter
     {
-
         public static bool AutoImportDTUChanges = true;
         public static bool GenerateUnityPrefab = true;
         public static bool ReplaceSceneInstances = true;
@@ -26,10 +25,7 @@ namespace Daz3D
             ReplaceSceneInstances = true;
             AutomateMecanimAvatarMappings = true;
             ReplaceMaterials = true;
-            Daz3DBridge.DetectRP_RunOnce = false;
         }
-
-
 
         [Serializable]
         public class ImportEventRecord

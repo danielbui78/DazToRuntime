@@ -49,7 +49,15 @@ namespace Daz3D
         private static void ObtainInstance() 
         {  
             _instance = (Daz3DBridge)GetWindow(typeof(Daz3DBridge));
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge");
+#if USING_HDRP
+            _instance.titleContent = new GUIContent("Daz to Unity Bridge - HDRP");
+#elif USING_URP
+            _instance.titleContent = new GUIContent("Daz to Unity Bridge - URP");
+#elif USING_BUILTIN
+            _instance.titleContent = new GUIContent("Daz to Unity Bridge - Built-In Rendering");
+#else
+            _instance.titleContent = new GUIContent("Daz to Unity Bridge - RenderPipeline Not Detected");
+#endif
         }
 
         void Update()
@@ -207,6 +215,20 @@ namespace Daz3D
             GUILayout.Space(12);
             if (GUILayout.Button("Reset All", GUILayout.Width(100)))
                 Daz3DDTUImporter.ResetOptions();
+
+            GUILayout.Space(12);
+#if USING_HDRP
+            GUILayout.TextArea("DazToUnity Configured for HDRP");
+#elif USING_URP
+            GUILayout.TextArea("DazToUnity Configured for URP");
+#elif USING_BUILTIN
+            GUILayout.TextArea("DazToUnity Configured for Built-In Rendering");
+#else
+            GUILayout.TextArea("DazToUnity - No Renderpipeline configured.  Press Redetect RenderPipeline to configure now.");
+#endif
+            GUILayout.Space(12);
+            if (GUILayout.Button("Redetect RenderPipeline", GUILayout.Width(200)))
+                DetectRenderPipeline.RunOnce();
 
             GUILayout.EndVertical();
 
