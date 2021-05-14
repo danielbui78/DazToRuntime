@@ -1,5 +1,8 @@
 # Unofficial DazToUnity Bridge Updates
 
+The unity-experimental branch contains the latest unity plugin with combined support for all 3 renderpipelines with autodetection/configuration.
+
+
 This default branch (unity-master) currently only serves as a staging area as I finalize code and features of the sub-branches and merge them together.
 
 Currently in development:
