@@ -142,7 +142,21 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 // Load Settings
 	 if (!settings->value("AssetsPath").isNull())
 	 {
-		  assetsFolderEdit->setText(settings->value("AssetsPath").toString());
+		 // DB (2021-05-15): check AssetsPath folder and set InstallUnityFiles if Daz3D subfolder does not exist
+		 QString directoryName = settings->value("AssetsPath").toString();
+		  assetsFolderEdit->setText(directoryName);
+		  if (QDir(directoryName + QDir::separator() + "Daz3D").exists())
+		  {
+			  // deselect install unity files
+			  settings->setValue("InstallUnityFiles", false);
+			  installUnityFilesCheckBox->setChecked(false);
+		  }
+		  else
+		  {
+			  settings->setValue("InstallUnityFiles", true);
+			  installUnityFilesCheckBox->setChecked(true);
+		  }
+
 	 }
 	 else
 	 {
@@ -163,12 +177,13 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 		  showFbxDialogCheckBox->setChecked(settings->value("ShowFBXDialog").toBool());
 	 }
 #endif
-	 if (!settings->value("InstallUnityFiles").isNull())
-	 {
-		  installUnityFilesCheckBox->setChecked(settings->value("InstallUnityFiles").toBool());
-	 }
-	 else
-		  installUnityFilesCheckBox->setChecked(true);
+	 // DB (2021-05-15): installUnityFiles is now handled by existence of "Assets/Daz3D" subfolder
+	 //if (!settings->value("InstallUnityFiles").isNull())
+	 //{
+		//  installUnityFilesCheckBox->setChecked(settings->value("InstallUnityFiles").toBool());
+	 //}
+	 //else
+		//  installUnityFilesCheckBox->setChecked(true);
 
 	 // Set Defaults
 	 DzNode* Selection = dzScene->getPrimarySelection();
@@ -231,6 +246,19 @@ void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 				{
 					 QMessageBox::warning(0, tr("Error"), tr("Please select Unity Root Assets Folder."), QMessageBox::Ok);
 					 return;
+				}
+
+				// DB (2021-05-15): Check for presence of Daz3D folder, and set installUnityFiles if not present
+				if ( QDir(directoryName + QDir::separator() + "Daz3D").exists() )
+				{
+					// deselect install unity files
+					settings->setValue("InstallUnityFiles", false);
+					installUnityFilesCheckBox->setChecked(false);
+				}
+				else
+				{
+					settings->setValue("InstallUnityFiles", true);
+					installUnityFilesCheckBox->setChecked(true);
 				}
 
 				assetsFolderEdit->setText(directoryName);
