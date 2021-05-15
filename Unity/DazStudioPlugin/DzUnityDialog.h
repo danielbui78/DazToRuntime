@@ -52,6 +52,7 @@ private slots:
 	void HandleShowFbxDialogCheckBoxChange(int state);
 #endif
 	void HandleInstallUnityFilesCheckBoxChange(int state);
+	void HandleAssetTypeComboChange(int state);
 
 private:
 	QSettings* settings;

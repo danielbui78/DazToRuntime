@@ -85,6 +85,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 assetTypeCombo->addItem("Static Mesh");
 	 assetTypeCombo->addItem("Animation");
 	 //assetTypeCombo->addItem("Pose");
+	 connect(assetTypeCombo, SIGNAL(activated(int)), this, SLOT(HandleAssetTypeComboChange(int)));
 
 	 // Morphs
 	 QHBoxLayout* morphsLayout = new QHBoxLayout(this);
@@ -308,4 +309,54 @@ void UnofficialDzUnityDialog::HandleInstallUnityFilesCheckBoxChange(int state)
 {
 	 settings->setValue("InstallUnityFiles", state == Qt::Checked);
 }
+
+void UnofficialDzUnityDialog::HandleAssetTypeComboChange(int state)
+{
+	QString assetNameString = assetNameEdit->text();
+	uint animIndex = 0;
+	QString animString = assetNameString + QString("@anim%1").arg(animIndex, 4, 10, QChar('0'));
+
+	// enable/disable Morphs and Subdivision only if Skeletal selected
+	if (assetTypeCombo->currentText() != "Skeletal Mesh")
+	{
+		morphsEnabledCheckBox->setChecked(false);
+		subdivisionEnabledCheckBox->setChecked(false);
+	}
+
+	// if "Animation", change assetname
+	if (assetTypeCombo->currentText() == "Animation")
+	{
+		// check assetname is in @anim[0000] format
+		if ( !assetNameString.contains("@") || assetNameString.contains(QRegExp("^[a-ZA-Z0-9_]*@[anim][0-9]*")) )
+		{
+			// extract true assetName and recompose animString
+			if (assetNameString.contains("@")) {
+				assetNameString = assetNameString.left(assetNameString.indexOf("@"));
+			}
+			// if file exists, then increment
+			QString filePath = settings->value("AssetsPath").toString() + QDir::separator() + animString + ".fbx";
+			while (QFileInfo(filePath).exists())
+			{
+				if (++animIndex > 9999)
+				{
+					break;
+				}
+				QString animString = assetNameString + QString("@anim%1").arg(animIndex, 4, 10, QChar('0'));
+				filePath = settings->value("AssetsPath").toString() + QDir::separator() + animString + ".fbx";
+			}
+			assetNameEdit->setText(animString);
+		}
+
+	}
+	else
+	{
+		// remove @anim if present
+		if (assetNameString.contains("@")) {
+			assetNameString = assetNameString.left(assetNameString.indexOf("@"));
+		}
+		assetNameEdit->setText(assetNameString);
+	}
+
+}
+
 #include "moc_DzUnityDialog.cpp"
