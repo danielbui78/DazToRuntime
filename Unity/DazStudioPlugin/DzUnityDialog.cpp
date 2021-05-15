@@ -194,8 +194,14 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 
 void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 {
-	 QString directoryName = QFileDialog::getExistingDirectory(this, tr("Choose Directory"),
-		  "/home",
+	 // DB (2021-05-15): prepopulate with existing folder string
+	 QString directoryName = "/home";
+	 if (!settings->value("AssetsPath").isNull())
+	 {
+		 directoryName = settings->value("AssetsPath").toString();
+	 }
+	 directoryName = QFileDialog::getExistingDirectory(this, tr("Choose Directory"),
+		  directoryName,
 		  QFileDialog::ShowDirsOnly
 		  | QFileDialog::DontResolveSymlinks);
 
