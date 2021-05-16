@@ -6,12 +6,12 @@
 #include "QtCore/qfile.h"
 #include "QtCore/qtextstream.h"
 
-class DzRuntimePluginAction : public DzAction {
+class UnofficialDzRuntimePluginAction : public DzAction {
 	 Q_OBJECT
 public:
 
-	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
-	 virtual ~DzRuntimePluginAction();
+	 UnofficialDzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
+	 virtual ~UnofficialDzRuntimePluginAction();
 
 protected:
 	 QString CharacterName;

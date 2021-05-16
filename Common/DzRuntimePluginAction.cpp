@@ -35,7 +35,7 @@
 
 #include "DzRuntimePluginAction.h"
 
-DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString& desc) :
+UnofficialDzRuntimePluginAction::UnofficialDzRuntimePluginAction(const QString& text, const QString& desc) :
 	 DzAction(text, desc)
 {
 	 ExportMorphs = false;
@@ -43,11 +43,11 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 	 ShowFbxDialog = false;
 }
 
-DzRuntimePluginAction::~DzRuntimePluginAction()
+UnofficialDzRuntimePluginAction::~UnofficialDzRuntimePluginAction()
 {
 }
 
-void DzRuntimePluginAction::Export()
+void UnofficialDzRuntimePluginAction::Export()
 {
 	 // FBX Export
 	 Selection = dzScene->getPrimarySelection();
@@ -125,7 +125,7 @@ void DzRuntimePluginAction::Export()
 }
 
 // If there are duplicate material names, save off the original and rename one
-void DzRuntimePluginAction::RenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames)
+void UnofficialDzRuntimePluginAction::RenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames)
 {
 	 DzObject* Object = Node->getObject();
 	 DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
@@ -155,7 +155,7 @@ void DzRuntimePluginAction::RenameDuplicateMaterials(DzNode* Node, QList<QString
 }
 
 // Restore the original material names
-void DzRuntimePluginAction::UndoRenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames)
+void UnofficialDzRuntimePluginAction::UndoRenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames)
 {
 	 QMap<DzMaterial*, QString>::iterator iter;
 	 for (iter = OriginalMaterialNames.begin(); iter != OriginalMaterialNames.end(); ++iter)

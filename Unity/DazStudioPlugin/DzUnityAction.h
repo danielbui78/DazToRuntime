@@ -7,7 +7,7 @@
 #include <DzRuntimePluginAction.h>
 #include "DzUnitySubdivisionDialog.h"
 
-class UnofficialDzUnityAction : public DzRuntimePluginAction {
+class UnofficialDzUnityAction : public UnofficialDzRuntimePluginAction {
 	 Q_OBJECT
 public:
 	 UnofficialDzUnityAction();

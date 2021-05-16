@@ -21,7 +21,7 @@
 #include "DzUnityAction.h"
 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
-	 DzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
+	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
 {
 	 SubdivisionDialog = nullptr;
 	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
