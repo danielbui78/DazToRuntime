@@ -29,8 +29,8 @@
 		<file alias="Invisible.shader.meta">../../UnityPlugin/Shaders/Invisible.shader.meta</file>
 	</qresource>
 	<qresource prefix="/ShaderHelpers">
-		<file alias="GetLighDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
-		<file alias="GetLighDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
+		<file alias="GetLightDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
+		<file alias="GetLightDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
 		<file alias="LightDirection.shadersubgraph">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph</file>
 		<file alias="LightDirection.shadersubgraph.meta">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph.meta</file>
 	</qresource>
