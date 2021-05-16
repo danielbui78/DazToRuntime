@@ -60,6 +60,8 @@ void UnofficialDzRuntimePluginAction::Export()
 	 if (Exporter)
 	 {
 		 bool bDoMaterials = false;
+		 bool bDoAnimation = false;
+
 
 		  DzFileIOSettings ExportOptions;
 		  ExportOptions.setBoolValue("doSelected", true);
@@ -74,6 +76,10 @@ void UnofficialDzRuntimePluginAction::Export()
 		  {
 				ExportOptions.setBoolValue("doFigures", true);
 				ExportOptions.setBoolValue("doProps", false);
+		  }
+		  if (AssetType == "Animation")
+		  {
+			  bDoAnimation = true;
 		  }
 		  ExportOptions.setBoolValue("doLights", false);
 		  ExportOptions.setBoolValue("doCameras", false);
@@ -124,7 +130,8 @@ void UnofficialDzRuntimePluginAction::Export()
 		  ///////////////
 		  // Prepare Animation exports
 		  ///////////////
-		  if (AssetType == "Animation")
+		  DzNodeList undoHideList;
+		  if (bDoAnimation)
 		  {
 			  // correct CharacterFolder
 			  CharacterFolder = ImportFolder + QDir::separator() + CharacterName.left(CharacterName.indexOf("@")) + QDir::separator();
@@ -133,6 +140,8 @@ void UnofficialDzRuntimePluginAction::Export()
 			  // correct export options
 			  ExportOptions.setBoolValue("doAnims", true);
 			  // disable props, morphs, subD, textures, etc
+			  ExportOptions.setBoolValue("doVisible", true);
+			  ExportOptions.setBoolValue("doMergeClothing", false);
 			  ExportOptions.setBoolValue("doEmbed", false);
 			  ExportOptions.setBoolValue("doCopyTextures", false);
 			  ExportOptions.setBoolValue("doDiffuseOpacity", false);
@@ -140,6 +149,21 @@ void UnofficialDzRuntimePluginAction::Export()
 			  ExportOptions.setBoolValue("doCollapseUVTiles", false);
 			  ExportOptions.setBoolValue("doLocks", false);
 			  ExportOptions.setBoolValue("doLimits", false);
+
+			  // Loop through and Hide all visible geometry, putting it into list to unhide
+			  DzNodeListIterator *nodeIterator = &dzScene->nodeListIterator();
+			  nodeIterator->toFront();
+			  while (nodeIterator->hasNext())
+			  {
+				  DzNode *node = nodeIterator->next();
+				  if (node == Selection)
+					  continue;
+				  if (node->isVisible())
+				  {
+					  undoHideList.append(node);
+					  node->setVisible(false);
+				  }
+			  }			  
 		  }
 
 
@@ -159,6 +183,20 @@ void UnofficialDzRuntimePluginAction::Export()
 		  // DONE: Export FBX
 		  ////////////////////////
 
+		  //////////////////////
+		  // Undo Export Preparations
+		  //////////////////////
+		  if (bDoAnimation)
+		  {
+			  // loop through list to undo hidden geometry
+			  while (undoHideList.isEmpty() == false)
+			  {
+				  DzNode *node = undoHideList.first();
+				  node->setVisible(true);
+				  undoHideList.pop_front();
+			  }
+
+		  }
 		  if (bDoMaterials)
 		  {
 			  // Change back material names
