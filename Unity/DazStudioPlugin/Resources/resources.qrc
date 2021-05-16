@@ -41,7 +41,7 @@
     <file alias="DazStandardShadow.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc</file>
   </qresource>
   <qresource prefix="/UnofficialDaz/ShaderHelpers">
-		<file alias="GetLighDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
+		<file alias="GetLightDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
 		<file alias="LightDirection.shadersubgraph">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph</file>
   </qresource>
 	<qresource prefix="/UnofficialDaz/Vendors">
