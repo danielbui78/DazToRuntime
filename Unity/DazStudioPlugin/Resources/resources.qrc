@@ -17,41 +17,67 @@
 	</qresource>
 	<qresource prefix="/UnofficialDaz/Shaders">
 		<file alias="IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/IrayUberMetal.shadergraph</file>
+		<file alias="IrayUberMetal.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberMetal.shadergraph.meta</file>
 		<file alias="IrayUberSpec.shadergraph">../../UnityPlugin/Shaders/IrayUberSpec.shadergraph</file>
+		<file alias="IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSpec.shadergraph.meta</file>
 		<file alias="IrayUberSkin.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph</file>
+		<file alias="IrayUberSkin.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph.meta</file>
 		<file alias="Hair.shadergraph">../../UnityPlugin/Shaders/Hair.shadergraph</file>
+		<file alias="Hair.shadergraph.meta">../../UnityPlugin/Shaders/Hair.shadergraph.meta</file>
 		<file alias="Wet.shadergraph">../../UnityPlugin/Shaders/Wet.shadergraph</file>
+		<file alias="Wet.shadergraph.meta">../../UnityPlugin/Shaders/Wet.shadergraph.meta</file>
 		<file alias="Invisible.shader">../../UnityPlugin/Shaders/Invisible.shader</file>
+		<file alias="Invisible.shader.meta">../../UnityPlugin/Shaders/Invisible.shader.meta</file>
     <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/Built-In Hair.shader</file>
+    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/Built-In Hair.shader.meta</file>
     <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/Built-In Wet.shader</file>
+    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/Built-In Wet.shader.meta</file>
     <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader</file>
+    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader.meta</file>
     <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader</file>
+    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader.meta</file>
     <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader</file>
+    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader.meta</file>
     <file alias="URP Hair.shadergraph">../../UnityPlugin/Shaders/URP Hair.shadergraph</file>
+    <file alias="URP Hair.shadergraph.meta">../../UnityPlugin/Shaders/URP Hair.shadergraph.meta</file>
     <file alias="URP Wet.shadergraph">../../UnityPlugin/Shaders/URP Wet.shadergraph</file>
+    <file alias="URP Wet.shadergraph.meta">../../UnityPlugin/Shaders/URP Wet.shadergraph.meta</file>
     <file alias="URP IrayUberSkin.shadergraph">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph</file>
+    <file alias="URP IrayUberSkin.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph.meta</file>
     <file alias="URP IrayUberSpec.shadergraph">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph</file>
+    <file alias="URP IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph.meta</file>
     <file alias="URP IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph</file>
+    <file alias="URP IrayUberMetal.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph.meta</file>
   </qresource>
   <qresource prefix="/UnofficialDaz/ShaderCGInc">
     <file alias="DazStandardCore.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc</file>
+    <file alias="DazStandardCore.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc.meta</file>
     <file alias="DazStandardCoreForward.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc</file>
+    <file alias="DazStandardCoreForward.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc.meta</file>
     <file alias="DazStandardInput.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc</file>
+    <file alias="DazStandardInput.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc.meta</file>
     <file alias="DazStandardMeta.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc</file>
+    <file alias="DazStandardMeta.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc.meta</file>
     <file alias="DazStandardShadow.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc</file>
+    <file alias="DazStandardShadow.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc.meta</file>
   </qresource>
   <qresource prefix="/UnofficialDaz/ShaderHelpers">
 		<file alias="GetLightDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
+		<file alias="GetLightDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
 		<file alias="LightDirection.shadersubgraph">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph</file>
+		<file alias="LightDirection.shadersubgraph.meta">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph.meta</file>
   </qresource>
 	<qresource prefix="/UnofficialDaz/Vendors">
 		<file alias="SimpleJSON.cs">../../UnityPlugin/Vendors/SimpleJSON.cs</file>
 	</qresource>
 	<qresource prefix="/UnofficialDaz/DiffusionProfiles">
 		<file alias="IrayUberSkinDiffusionProfile.asset">../../UnityPlugin/DiffusionProfiles/IrayUberSkinDiffusionProfile.asset</file>
+		<file alias="IrayUberSkinDiffusionProfile.asset.meta">../../UnityPlugin/DiffusionProfiles/GenericDiffusionProfile.asset.meta</file>
 	</qresource>
 	<qresource prefix="/UnofficialDaz/Resources">
 		<file alias="Daz_Combined_Small.png">../../UnityPlugin/Resources/Daz_Combined_Small.png</file>
+		<file alias="Daz_Combined_Small.png.meta">../../UnityPlugin/Resources/Daz_Combined_Small.png.meta</file>
 		<file alias="ReadMe.txt">../../UnityPlugin/Resources/ReadMe.txt</file>
+		<file alias="ReadMe.txt.meta">../../UnityPlugin/Resources/ReadMe.txt.meta</file>
 	</qresource>
 </RCC>
