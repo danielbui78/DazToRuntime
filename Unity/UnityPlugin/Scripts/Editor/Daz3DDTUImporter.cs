@@ -163,6 +163,12 @@ namespace Daz3D
             while (routine.MoveNext())
                 yield return new WaitForEndOfFrame();
 
+            if (dtu.AssetType == "Animation")
+            {
+                Daz3DBridge.Progress = 0;
+                yield break;
+            }
+
             //ImportDTU(dtuPath);
 
             DazFigurePlatform platform = DiscoverFigurePlatform(dtu);
@@ -232,6 +238,13 @@ namespace Daz3D
 
             var dtuObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
 
+            // DB (2021-05-15): skip anim DTU
+            if (dtu.AssetType == "Animation")
+            {
+                record.AddToken("Skipping prefab creation for animation DTU file: " + path);
+                return;
+            }
+
             record.AddToken("Imported DTU file: " + path);
             record.AddToken(dtuObject.name, dtuObject, ENDLINE);
 
@@ -277,6 +290,15 @@ namespace Daz3D
             EventQueue.Enqueue(record);
 
             var dtu = DTUConverter.ParseDTUFile(path);
+
+            // DB (2021-05-15): skip DTU import if animation
+            if (dtu.AssetType == "Animation")
+            {
+                record.AddToken("Skipping prefab creation for animation DTU file: " + path);
+                Daz3DBridge.Progress = 0;
+                yield break;
+            }
+
             dtuOut(dtu);
 
             var dtuObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
