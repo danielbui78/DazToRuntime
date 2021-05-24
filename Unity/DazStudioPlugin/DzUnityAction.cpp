@@ -346,6 +346,16 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 	 DzObject* Object = Node->getObject();
 	 DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
 
+	 // DB (2021-05-24): dForce Additions
+	 // 1. check: for dForce modifier in object
+	 // 2. if dForce modifier exists, look for SimulationSettingsProvider
+	 // 2a. prep script: load FindSimulationProvider script from file/resource
+	 // 2b. prep arguments: pass Node object + Material string to script
+	 // 2c. execute script
+	 // 2d. wait for return
+	 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
+	 // 4. process SimulationsSettingsProvider after other Material properties
+
 	 if (Shape)
 	 {
 		  for (int i = 0; i < Shape->getNumMaterials(); i++)
