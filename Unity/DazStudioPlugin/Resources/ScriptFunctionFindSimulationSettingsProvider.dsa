@@ -1,0 +1,65 @@
+// DAZ Studio version 4.15.0.2 filetype DAZ Script
+function ScriptedFindSimulationSettingsProvider()
+{
+	var oNode = arguments[0];
+	var sMaterial = arguments[1];
+
+	// Error Checking
+	if (!oNode)
+	{
+		print("ERROR: ScriptedFindSimulationSettingsProvider(): oNode is null");
+		UnofficialDzUnityAction().ScriptReturn(false);
+		return false;
+	}
+	if (!sMaterial)
+	{
+		print("ERROR: ScriptedFindSimulationSettingsProvider():  material name is null");
+		UnofficialDzUnityAction().ScriptReturn(false);
+		return false;
+	}
+
+	var nodeIndex = Scene.findNodeIndex(oNode);
+	if (nodeIndex != -1)
+	{
+		var newNode = Scene.getNode(nodeIndex);
+	}
+	else
+	{
+		print("ERROR: ScriptedFindSimulationSettingsProvider(): FindNodeIndex: FAIL");
+		UnofficialDzUnityAction().ScriptReturn(false);
+		return false;
+	}
+
+	var oObject = newNode.getObject();
+	if (!oObject)
+	{
+		print("ERROR: ScriptedFindSimulationSettingsProvider(): could not retrieve Object class from Node");
+		UnofficialDzUnityAction().scriptReturn(false);
+		return false;
+	}
+	var oShape = oObject.getCurrentShape();
+	if (!oShape)
+	{
+		print("ERROR: ScriptedFindSimulationSettingsProvider(): could not retrieve Shape class from Object");
+		UnofficialDzUnityAction().ScriptReturn(false);
+		return false;
+	}
+
+	var oProvider = oShape.findSimulationSettingsProvider( sMaterial );
+
+	if (oProvider)
+	{
+		UnofficialDzUnityAction().ScriptReturn(oProvider);
+		print("ScriptedFindSimulationSettingsProvider(): SUCCESS:" + oProvider.getName() + ", from: " + sMaterial);
+		return true;
+
+	}
+	else
+	{
+		print ("ERROR: ScriptedFindSimulationSettingsProvider(): simulation settings provider for material name could not be found");
+		UnofficialDzUnityAction().ScriptReturn(false);
+		return false;
+	}
+
+
+}

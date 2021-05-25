@@ -484,7 +484,7 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 						 // 2. if dForce modifier exists, look for SimulationSettingsProvider
 						 // 2a. prep script: load FindSimulationProvider script from file/resource
 						 DzScript* script = new DzScript();
-						 if (script->loadFromFile("c:/users/dbui/documents/ScriptFunctionFindSimulationSettingsProvider.dsa"))
+						 if (script->loadFromFile(":/UnofficialDaz/dsa/ScriptFunctionFindSimulationSettingsProvider.dsa"))
 						 {
 							 // 2b. prep arguments: pass Node object + Material string to script
 							 QVariantList args;

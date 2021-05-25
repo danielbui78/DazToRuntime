@@ -1,6 +1,9 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
-	<qresource prefix="/UnofficialDaz/Images">
+  <qresource prefix="/UnofficialDaz/dsa">
+    <file alias="ScriptFunctionFindSimulationSettingsProvider.dsa">ScriptFunctionFindSimulationSettingsProvider.dsa</file>
+  </qresource>
+    <qresource prefix="/UnofficialDaz/Images">
 		<file alias="icon">Images/Icon.png</file>
 	</qresource>
 	<qresource prefix="/UnofficialDaz/Scripts">
