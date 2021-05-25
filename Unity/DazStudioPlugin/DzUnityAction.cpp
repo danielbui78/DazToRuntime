@@ -20,6 +20,20 @@
 #include "DzUnityDialog.h"
 #include "DzUnityAction.h"
 
+#include "dzmodifier.h"
+#include "dzscript.h"
+#include "QtCore/qvariant.h"
+
+
+
+#include <QTime>
+void delay(int ms)
+{
+	QTime dieTime = QTime::currentTime().addSecs(ms / 1000);
+	while (QTime::currentTime() < dieTime)
+		QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+}
+
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
 {
@@ -356,6 +370,24 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 	 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
 	 // 4. process SimulationsSettingsProvider after other Material properties
 
+
+	 // 1. check: for dForce modifier in object
+	 bool bDForceSettingsAvailable = false;
+	 if (Shape)
+	 {
+		 DzModifierIterator* modIter = &Object->modifierIterator();
+		 while (modIter->hasNext())
+		 {
+			 DzModifier* modifier = modIter->next();
+			 QString mod_Class = modifier->className();
+			 if (mod_Class.toLower().contains("dforce"))
+			 {
+				 bDForceSettingsAvailable = true;
+				 break;
+			 }
+		 }
+	 }
+
 	 if (Shape)
 	 {
 		  for (int i = 0; i < Shape->getNumMaterials(); i++)
@@ -443,6 +475,84 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 								Writer.finishObject();
 						  }
 					 }
+
+					 /***********************************************************************/
+					 // Add DForce Settings to Material Properties Array
+					 /***********************************************************************/
+					 if (bDForceSettingsAvailable) 
+					 {
+						 // 2. if dForce modifier exists, look for SimulationSettingsProvider
+						 // 2a. prep script: load FindSimulationProvider script from file/resource
+						 DzScript* script = new DzScript();
+						 if (script->loadFromFile("c:/users/dbui/documents/ScriptFunctionFindSimulationSettingsProvider.dsa"))
+						 {
+							 // 2b. prep arguments: pass Node object + Material string to script
+							 QVariantList args;
+							 QVariant varNode;
+							 varNode.setValue((QObject*)Node);
+							 args.append(varNode);
+							 args.append(Material->getName());
+
+							 // 2c. execute script
+							 m_ScriptReturn_ReturnCode = 0;
+							 m_ScriptReturn_Object = NULL;
+							 bool callResult = script->call("ScriptedFindSimulationSettingsProvider", args);
+							 if (callResult)
+							 {
+								 // 2d. wait for return
+								 int timeout = 5;
+								 bool bTimeout = false;
+								 while (m_ScriptReturn_Object == NULL && m_ScriptReturn_ReturnCode == 0)
+								 {
+									 delay(100);
+									 if (timeout-- <= 0)
+									 {
+										 bTimeout = true;
+										 break;
+									 }
+								 }
+
+								 if (bTimeout == false && m_ScriptReturn_ReturnCode > 0)
+								 {
+									 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
+									 // 4. process SimulationsSettingsProvider after other Material properties
+									 DzElement* elSimulationSettingsProvider = (DzElement*) m_ScriptReturn_Object;
+									 int numProperties = elSimulationSettingsProvider->getNumProperties();
+									 DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+									 QString propString = "";
+									 int propIndex = 0;
+									 while (propIter->hasNext())
+									 {
+										 DzProperty* Property = propIter->next();
+										 DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
+										 if (NumericProperty)
+										 {
+											 QString Name = Property->getName();
+											 QString TextureName = "";
+
+											 if (NumericProperty->getMapValue())
+											 {
+												 TextureName = NumericProperty->getMapValue()->getFilename();
+											 }
+
+											 Writer.startObject(true);
+											 Writer.addMember("Name", Name);
+											 Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
+											 Writer.addMember("Data Type", QString("Double"));
+											 Writer.addMember("Texture", TextureName);
+											 Writer.finishObject();
+										 }
+									 }
+
+								 }
+
+
+							 }
+						 }
+
+
+					 }
+
 					 Writer.finishArray();
 
 					 Writer.finishObject();
