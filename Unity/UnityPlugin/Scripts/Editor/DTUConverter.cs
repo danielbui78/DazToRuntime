@@ -115,6 +115,22 @@ namespace Daz3D
 			Weighted = 2,
 		}
 
+		// DB (2021-05-25): dForce import
+		public bool IsDTUMaterialDForceEnabled(DTUMaterial dtuMaterial)
+        {
+			var dforceEnabled = dtuMaterial.Get("Visible in Simulation", new DTUValue(0.0f));
+
+			if (dforceEnabled.Boolean)
+            {
+				return true;
+            }
+            else
+			{
+				return false;
+			}
+		}
+
+
 		/// <summary>
 		/// Guess if our material looks like a hair
 		/// </summary>
