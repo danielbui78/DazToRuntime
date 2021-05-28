@@ -661,8 +661,32 @@ namespace Daz3D
                                                 Debug.LogWarning("DFORCE IMPORT: vertex_index for dforce weights is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
                                                 continue;
                                             }
-                                            float value = simulation_strength * 0.2f;
-                                            newCoefficients[vertex_index].maxDistance = value;
+                                            float strength_max = 1.0f;
+                                            float strength_min = 0.0f;
+                                            float strength_scale_threshold = 0.5f;
+                                            float adjusted_simulation_strength;
+                                            // tiered scaling
+                                            if (simulation_strength <= strength_scale_threshold)
+                                            {
+                                                // stronger compression of values below threshold
+                                                float scale = 0.075f;
+                                                float offset = 0.2f;
+                                                adjusted_simulation_strength = (simulation_strength - offset) * scale;
+                                            }
+                                            else
+                                            {
+                                                float offset = (strength_scale_threshold - 0.2f) * 0.075f; // offset = (threshold - previous tier's offset) * previous teir's scale
+                                                float scale = 0.2f;
+                                                adjusted_simulation_strength = (simulation_strength - offset)/(1 - offset); // apply offset, then normalize to 1.0
+                                                adjusted_simulation_strength *= scale;
+
+                                            }
+                                            // clamp to 0.0f to 0.2f
+                                            float coeff_min = 0.0f;
+                                            float coeff_max = 0.2f;
+                                            adjusted_simulation_strength = (adjusted_simulation_strength > coeff_min) ? adjusted_simulation_strength : coeff_min;
+                                            adjusted_simulation_strength = (adjusted_simulation_strength < coeff_max) ? adjusted_simulation_strength : coeff_max;
+                                            newCoefficients[vertex_index].maxDistance = adjusted_simulation_strength;
                                         }
 
                                         cloth.coefficients = newCoefficients;
