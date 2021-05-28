@@ -215,6 +215,13 @@ namespace Daz3D
             }
 
             //ImportDTU(dtuPath);
+            if (dtu.AssetType == null)
+            {
+                Daz3DBridge.Progress = 0;
+                _map = null;
+                _dforceMap = null;
+                yield break;
+            }
 
             DazFigurePlatform platform = DiscoverFigurePlatform(dtu);
 
@@ -630,15 +637,17 @@ namespace Daz3D
                                         // fix SkinnedMeshRenderer boundaries bug
                                         skinned.updateWhenOffscreen = true;
 
-                                        // Add G8F collision rig
-                                        var searchResult = workingInstance.transform.Find("Collision Rig");
+                                        // Add G8F cloth collision rig
+                                        var searchResult = workingInstance.transform.Find("Cloth Collision Rig");
                                         GameObject collision_instance = (searchResult != null) ? searchResult.gameObject : null;
                                         if (collision_instance == null)
                                         {
                                             GameObject collision_prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Daz3D/Resources/G8F Collision Rig.prefab");
                                             collision_instance = Instantiate<GameObject>(collision_prefab);
-                                            collision_instance.name = "Collision Rig";
+                                            collision_instance.name = "Cloth Collision Rig";
                                             collision_instance.transform.parent = workingInstance.transform;
+                                            // merge cloth collision rig to figure root bone
+                                            collision_instance.GetComponent<ClothCollisionAssigner>().mergeRig(skinned.rootBone);
                                         }
                                         ClothCollisionAssigner.ClothConfig clothConfig = new ClothCollisionAssigner.ClothConfig();
                                         clothConfig.m_ClothToManage = cloth;
