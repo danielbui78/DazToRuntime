@@ -62,6 +62,56 @@ public class ClothCollisionAssigner : MonoBehaviour
         m_ClothConfigurationList[new_size - 1] = newConfig;
     }
 
+
+    // merge cloth collision rig into rootnode of main figure rig
+    public void mergeRig(Transform destination_rootTransform)
+    {
+        Transform source_rootTransform = this.transform.Find("hip");
+        List<Transform> childTransform_stack = new List<Transform>();
+        childTransform_stack.Add(source_rootTransform);
+
+        while (childTransform_stack.Count > 0)
+        {
+            int next_Index = childTransform_stack.Count - 1;
+            Transform child = childTransform_stack[next_Index];
+            childTransform_stack.RemoveAt(next_Index);
+
+            if (child == null) continue;
+
+            // add all children to stack
+            for (int i = 0; i < child.childCount; i++)
+            {
+                Transform grandchild = child.GetChild(i);
+                if (grandchild != null)
+                    childTransform_stack.Add(grandchild);
+            }
+
+            // check if child is a dforce collider
+            if (child.CompareTag("dForceCollider"))
+            {
+                // 1. unroll parent tree to get full path
+                Transform parent = child.parent;
+                String path_name = parent.name;
+                while (parent != null && parent.parent != source_rootTransform)
+                {
+                    if (parent.parent == null) break;
+                    parent = parent.parent;
+                    path_name = parent.name + "/" + path_name;
+                }
+                // 2. find destination parent node
+                var dest_parent = destination_rootTransform.Find(path_name);
+                if (dest_parent != null)
+                {
+                    // 3. move child to destination parent, worldspace = false
+                    child.transform.SetParent(dest_parent, false);
+                }
+            }
+
+        }
+
+    }
+
+
     // Start is called before the first frame update
     void Start()
     {
