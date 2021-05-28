@@ -9,7 +9,9 @@
 	<qresource prefix="/UnofficialDaz/Scripts">
 		<file alias="Utilities.cs">../../UnityPlugin/Scripts/Utilities.cs</file>
 		<file alias="Daz3DInstance.cs">../../UnityPlugin/Scripts/Daz3DInstance.cs</file>
-	</qresource>
+    <file alias="ClothCollisionAssigner.cs">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs</file>
+    <file alias="ClothCollisionAssigner.cs.meta">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs.meta</file>
+  </qresource>
 	<qresource prefix="/UnofficialDaz/Editor">
 		<file alias="Daz3DBridge.cs">../../UnityPlugin/Scripts/Editor/Daz3DBridge.cs</file>
 		<file alias="Daz3DDTUImporter.cs">../../UnityPlugin/Scripts/Editor/Daz3DDTUImporter.cs</file>
@@ -82,5 +84,7 @@
 		<file alias="Daz_Combined_Small.png.meta">../../UnityPlugin/Resources/Daz_Combined_Small.png.meta</file>
 		<file alias="ReadMe.txt">../../UnityPlugin/Resources/ReadMe.txt</file>
 		<file alias="ReadMe.txt.meta">../../UnityPlugin/Resources/ReadMe.txt.meta</file>
-	</qresource>
+    <file alias="G8F Collision Rig.prefab">../../UnityPlugin/Resources/G8F Collision Rig.prefab</file>
+    <file alias="G8F Collision Rig.prefab.meta">../../UnityPlugin/Resources/G8F Collision Rig.prefab.meta</file>
+  </qresource>
 </RCC>
