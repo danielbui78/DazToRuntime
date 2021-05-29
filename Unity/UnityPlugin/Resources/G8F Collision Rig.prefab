@@ -233,7 +233,7 @@ GameObject:
   - component: {fileID: 8193405965017973769}
   m_Layer: 0
   m_Name: LWaist Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -427,7 +427,7 @@ GameObject:
   - component: {fileID: 816959608591558633}
   m_Layer: 0
   m_Name: RCalf Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -471,7 +471,7 @@ GameObject:
   - component: {fileID: 816959609121272850}
   m_Layer: 0
   m_Name: RGlut Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 816959610343012248}
   m_Layer: 0
   m_Name: LCalf Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -559,7 +559,7 @@ GameObject:
   - component: {fileID: 816959610475346639}
   m_Layer: 0
   m_Name: LGlut Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -932,7 +932,7 @@ GameObject:
   - component: {fileID: 3209578781322896332}
   m_Layer: 0
   m_Name: RAnkle Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1142,7 +1142,7 @@ GameObject:
   - component: {fileID: 6595418331672656872}
   m_Layer: 0
   m_Name: RWrist Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4385,7 +4385,7 @@ GameObject:
   - component: {fileID: 8084964102343342479}
   m_Layer: 0
   m_Name: RWaist Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4937,7 +4937,7 @@ GameObject:
   - component: {fileID: 444310478190581533}
   m_Layer: 0
   m_Name: RThigh Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5041,7 +5041,7 @@ GameObject:
   - component: {fileID: 4533726437650472070}
   m_Layer: 0
   m_Name: LWrist Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5736,7 +5736,7 @@ GameObject:
   - component: {fileID: 1123828428019886574}
   m_Layer: 0
   m_Name: LThigh Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -5780,7 +5780,7 @@ GameObject:
   - component: {fileID: 8834151165568606410}
   m_Layer: 0
   m_Name: LAnkle Collider
-  m_TagString: Untagged
+  m_TagString: dForceCollider
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
