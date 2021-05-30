@@ -21,6 +21,8 @@
 #include "DzUnityAction.h"
 
 #include "QtCore/qmetaobject.h"
+#include "dzmodifier.h"
+
 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
@@ -106,7 +108,7 @@ QString UnofficialDzUnityAction::GetMD5(const QString &path)
         int readSize = qMin(fileSize, bufferSize);
 
         QCryptographicHash hash(algo);
-        while (readSize > 0 && (bytesRead = sourceFile.read(buffer, readSize)) > 0) 
+        while (readSize > 0 && (bytesRead = sourceFile.read(buffer, readSize)) > 0)
         {
             fileSize -= bytesRead;
             hash.addData(buffer, bytesRead);
@@ -153,7 +155,7 @@ bool UnofficialDzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, 
 	//file->setPermissions(QFile::ReadOther | QFile::WriteOther);
 
 	auto result = file->copy(*dst);
-	
+
 	if(QFile::exists(*dst))
 	{
 		QFile::setPermissions(*dst, QFile::ReadOther | QFile::WriteOther);
@@ -258,7 +260,7 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 		  CopyFile(&file, &profile, replace);
 		  file.close();
 	 }
-	 
+
 	 //Create Resources folder if it doesn't exist
 	 QString resourcesFolder = ImportFolder + "\\Resources";
 	 dir.mkpath(resourcesFolder);
@@ -357,6 +359,24 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 	 // 2d. wait for return
 	 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
 	 // 4. process SimulationsSettingsProvider after other Material properties
+
+
+	 // 1. check: for dForce modifier in object
+	 bool bDForceSettingsAvailable = false;
+	 if (Shape)
+	 {
+		 DzModifierIterator* modIter = &Object->modifierIterator();
+		 while (modIter->hasNext())
+		 {
+			 DzModifier* modifier = modIter->next();
+			 QString mod_Class = modifier->className();
+			 if (mod_Class.toLower().contains("dforce"))
+			 {
+				 bDForceSettingsAvailable = true;
+				 break;
+			 }
+		 }
+	 }
 
 	 if (Shape)
 	 {
@@ -463,6 +483,84 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 								Writer.finishObject();
 						  }
 					 }
+
+					 /***********************************************************************/
+					 // Add DForce Settings to Material Properties Array
+					 /***********************************************************************/
+					 if (bDForceSettingsAvailable)
+					 {
+						 // 2. if dForce modifier exists, look for SimulationSettingsProvider
+						 // 2a. prep script: load FindSimulationProvider script from file/resource
+						 DzScript* script = new DzScript();
+						 if (script->loadFromFile(":/UnofficialDaz/dsa/ScriptFunctionFindSimulationSettingsProvider.dsa"))
+						 {
+							 // 2b. prep arguments: pass Node object + Material string to script
+							 QVariantList args;
+							 QVariant varNode;
+							 varNode.setValue((QObject*)Node);
+							 args.append(varNode);
+							 args.append(Material->getName());
+
+							 // 2c. execute script
+							 m_ScriptReturn_ReturnCode = 0;
+							 m_ScriptReturn_Object = NULL;
+							 bool callResult = script->call("ScriptedFindSimulationSettingsProvider", args);
+							 if (callResult)
+							 {
+								 // 2d. wait for return
+								 int timeout = 5;
+								 bool bTimeout = false;
+								 while (m_ScriptReturn_Object == NULL && m_ScriptReturn_ReturnCode == 0)
+								 {
+									 delay(100);
+									 if (timeout-- <= 0)
+									 {
+										 bTimeout = true;
+										 break;
+									 }
+								 }
+
+								 if (bTimeout == false && m_ScriptReturn_ReturnCode > 0)
+								 {
+									 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
+									 // 4. process SimulationsSettingsProvider after other Material properties
+									 DzElement* elSimulationSettingsProvider = (DzElement*) m_ScriptReturn_Object;
+									 int numProperties = elSimulationSettingsProvider->getNumProperties();
+									 DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+									 QString propString = "";
+									 int propIndex = 0;
+									 while (propIter->hasNext())
+									 {
+										 DzProperty* Property = propIter->next();
+										 DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
+										 if (NumericProperty)
+										 {
+											 QString Name = Property->getName();
+											 QString TextureName = "";
+
+											 if (NumericProperty->getMapValue())
+											 {
+												 TextureName = NumericProperty->getMapValue()->getFilename();
+											 }
+
+											 Writer.startObject(true);
+											 Writer.addMember("Name", Name);
+											 Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
+											 Writer.addMember("Data Type", QString("Double"));
+											 Writer.addMember("Texture", TextureName);
+											 Writer.finishObject();
+										 }
+									 }
+
+								 }
+
+
+							 }
+						 }
+
+
+					 }
+
 					 Writer.finishArray();
 
 					 Writer.finishObject();

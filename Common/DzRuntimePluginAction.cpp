@@ -35,12 +35,20 @@
 
 #include "DzRuntimePluginAction.h"
 
+QObject* UnofficialDzRuntimePluginAction::m_ScriptReturn_Object;
+int UnofficialDzRuntimePluginAction::m_ScriptReturn_ReturnCode;
+
+
 UnofficialDzRuntimePluginAction::UnofficialDzRuntimePluginAction(const QString& text, const QString& desc) :
 	 DzAction(text, desc)
 {
 	 ExportMorphs = false;
 	 ExportSubdivisions = false;
 	 ShowFbxDialog = false;
+
+	 connect(this, SIGNAL(ScriptReturn(QObject*)), this, SLOT(HandleScriptReturn(QObject*)));
+	 connect(this, SIGNAL(ScriptReturn(bool)), this, SLOT(HandleScriptReturn(bool)));
+
 }
 
 UnofficialDzRuntimePluginAction::~UnofficialDzRuntimePluginAction()
@@ -244,6 +252,36 @@ void UnofficialDzRuntimePluginAction::UndoRenameDuplicateMaterials(DzNode* Node,
 	 {
 		  iter.key()->setName(iter.value());
 	 }
+}
+
+
+// DB (2021-05-24): hybrid C++/script system
+void UnofficialDzRuntimePluginAction::HandleScriptReturn(bool result)
+{
+	m_ScriptReturn_Object = NULL;
+	if (result == false)
+	{
+		m_ScriptReturn_ReturnCode = -1;
+	}
+	else
+	{
+		m_ScriptReturn_ReturnCode = 1;
+	}
+}
+
+// DB (2021-05-24): hybrid C++/script system
+void UnofficialDzRuntimePluginAction::HandleScriptReturn(QObject* object)
+{
+	if (object == NULL)
+	{
+		m_ScriptReturn_Object = NULL;
+		m_ScriptReturn_ReturnCode = -1;
+	}
+	else
+	{
+		m_ScriptReturn_Object = object;
+		m_ScriptReturn_ReturnCode = 1;
+	}
 }
 
 #include "moc_DzRuntimePluginAction.cpp"
