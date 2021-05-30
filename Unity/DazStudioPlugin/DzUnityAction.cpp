@@ -489,74 +489,132 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 					 /***********************************************************************/
 					 if (bDForceSettingsAvailable)
 					 {
-						 // 2. if dForce modifier exists, look for SimulationSettingsProvider
-						 // 2a. prep script: load FindSimulationProvider script from file/resource
-						 DzScript* script = new DzScript();
-						 if (script->loadFromFile(":/UnofficialDaz/dsa/ScriptFunctionFindSimulationSettingsProvider.dsa"))
+						 // look up all Shape methods, find closest match for "findSimulationSettingsProvider"
+						 //const QMetaObject *metaObj = Shape->metaObject();
+						 //int searchResult = -1;
+						 //for (int i = 0; i < metaObj->methodCount(); i++)
+						 //{
+							//const char* methodSig = metaObj->method(i).signature();
+							//if (QString(methodSig).toLower().contains("findsimulationsettingsprovider"))
+							//{
+							//	searchResult = i;
+							//	break;
+							//}
+						 //}
+						 DzElement* elSimulationSettingsProvider;
+						 bool ret = false;
+						 int methodIndex = -1;
+						 methodIndex = Shape->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("findSimulationSettingsProvider(QString)"));
+						 if (methodIndex != -1)
 						 {
-							 // 2b. prep arguments: pass Node object + Material string to script
-							 QVariantList args;
-							 QVariant varNode;
-							 varNode.setValue((QObject*)Node);
-							 args.append(varNode);
-							 args.append(Material->getName());
-
-							 // 2c. execute script
-							 m_ScriptReturn_ReturnCode = 0;
-							 m_ScriptReturn_Object = NULL;
-							 bool callResult = script->call("ScriptedFindSimulationSettingsProvider", args);
-							 if (callResult)
+							 QMetaMethod method = Shape->metaObject()->method(methodIndex);
+							 QGenericReturnArgument returnArgument(
+								 method.typeName(),
+								 &elSimulationSettingsProvider
+							 );
+							 ret = method.invoke(Shape, returnArgument, Q_ARG(QString, Material->getName()));
+							 if (elSimulationSettingsProvider)
 							 {
-								 // 2d. wait for return
-								 int timeout = 5;
-								 bool bTimeout = false;
-								 while (m_ScriptReturn_Object == NULL && m_ScriptReturn_ReturnCode == 0)
-								 {
-									 delay(100);
-									 if (timeout-- <= 0)
-									 {
-										 bTimeout = true;
-										 break;
-									 }
-								 }
+								int numProperties = elSimulationSettingsProvider->getNumProperties();
+								DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+								QString propString = "";
+								int propIndex = 0;
+								while (propIter->hasNext())
+								{
+									DzProperty* Property = propIter->next();
+									DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
+									if (NumericProperty)
+									{
+										QString Name = Property->getName();
+										QString TextureName = "";
 
-								 if (bTimeout == false && m_ScriptReturn_ReturnCode > 0)
-								 {
-									 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
-									 // 4. process SimulationsSettingsProvider after other Material properties
-									 DzElement* elSimulationSettingsProvider = (DzElement*) m_ScriptReturn_Object;
-									 int numProperties = elSimulationSettingsProvider->getNumProperties();
-									 DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
-									 QString propString = "";
-									 int propIndex = 0;
-									 while (propIter->hasNext())
-									 {
-										 DzProperty* Property = propIter->next();
-										 DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
-										 if (NumericProperty)
-										 {
-											 QString Name = Property->getName();
-											 QString TextureName = "";
+										if (NumericProperty->getMapValue())
+										{
+											TextureName = NumericProperty->getMapValue()->getFilename();
+										}
 
-											 if (NumericProperty->getMapValue())
-											 {
-												 TextureName = NumericProperty->getMapValue()->getFilename();
-											 }
-
-											 Writer.startObject(true);
-											 Writer.addMember("Name", Name);
-											 Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
-											 Writer.addMember("Data Type", QString("Double"));
-											 Writer.addMember("Texture", TextureName);
-											 Writer.finishObject();
-										 }
-									 }
-
-								 }
-
+										Writer.startObject(true);
+										Writer.addMember("Name", Name);
+										Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
+										Writer.addMember("Data Type", QString("Double"));
+										Writer.addMember("Texture", TextureName);
+										Writer.finishObject();
+									}
+								}
 
 							 }
+
 						 }
+
+
+						 //// 2. if dForce modifier exists, look for SimulationSettingsProvider
+						 //// 2a. prep script: load FindSimulationProvider script from file/resource
+						 //DzScript* script = new DzScript();
+						 //if (script->loadFromFile(":/UnofficialDaz/dsa/ScriptFunctionFindSimulationSettingsProvider.dsa"))
+						 //{
+							// // 2b. prep arguments: pass Node object + Material string to script
+							// QVariantList args;
+							// QVariant varNode;
+							// varNode.setValue((QObject*)Node);
+							// args.append(varNode);
+							// args.append(Material->getName());
+
+							// // 2c. execute script
+							// m_ScriptReturn_ReturnCode = 0;
+							// m_ScriptReturn_Object = NULL;
+							// bool callResult = script->call("ScriptedFindSimulationSettingsProvider", args);
+							// if (callResult)
+							// {
+							//	 // 2d. wait for return
+							//	 int timeout = 5;
+							//	 bool bTimeout = false;
+							//	 while (m_ScriptReturn_Object == NULL && m_ScriptReturn_ReturnCode == 0)
+							//	 {
+							//		 delay(100);
+							//		 if (timeout-- <= 0)
+							//		 {
+							//			 bTimeout = true;
+							//			 break;
+							//		 }
+							//	 }
+
+							//	 if (bTimeout == false && m_ScriptReturn_ReturnCode > 0)
+							//	 {
+							//		 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
+							//		 // 4. process SimulationsSettingsProvider after other Material properties
+							//		 DzElement* elSimulationSettingsProvider = (DzElement*) m_ScriptReturn_Object;
+							//		 int numProperties = elSimulationSettingsProvider->getNumProperties();
+							//		 DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+							//		 QString propString = "";
+							//		 int propIndex = 0;
+							//		 while (propIter->hasNext())
+							//		 {
+							//			 DzProperty* Property = propIter->next();
+							//			 DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
+							//			 if (NumericProperty)
+							//			 {
+							//				 QString Name = Property->getName();
+							//				 QString TextureName = "";
+
+							//				 if (NumericProperty->getMapValue())
+							//				 {
+							//					 TextureName = NumericProperty->getMapValue()->getFilename();
+							//				 }
+
+							//				 Writer.startObject(true);
+							//				 Writer.addMember("Name", Name);
+							//				 Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
+							//				 Writer.addMember("Data Type", QString("Double"));
+							//				 Writer.addMember("Texture", TextureName);
+							//				 Writer.finishObject();
+							//			 }
+							//		 }
+
+							//	 }
+
+
+							// }
+						 //}
 
 
 					 }
