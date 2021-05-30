@@ -22,7 +22,8 @@
 
 #include "QtCore/qmetaobject.h"
 #include "dzmodifier.h"
-
+#include "dzgeometry.h"
+#include "dzweightmap.h"
 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
@@ -308,6 +309,16 @@ void UnofficialDzUnityAction::WriteConfiguration()
 	 writer.startMemberArray("Subdivisions", true);
 	 if (ExportSubdivisions)
 		  SubdivisionDialog->WriteSubdivisions(writer);
+
+	 if (AssetType.toLower().contains("skeletalmesh"))
+	 {
+		 bool ExportDForce = true;
+		 writer.startMemberArray("dForce WeightMaps", true);
+		 if (ExportDForce)
+		 {
+			 WriteWeightMaps(Selection, writer);
+		 } 
+	 }
 
 	 writer.finishArray();
 	 writer.finishObject();
@@ -608,6 +619,318 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 		  DzNode* Child = Iterator.next();
 		  WriteMaterials(Child, Writer);
 	 }
+}
+
+// Write weightmaps - recursively traverse parent/children, and export all associated weightmaps
+void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer)
+{
+	DzObject* Object = Node->getObject();
+	DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
+
+	bool bDForceSettingsAvailable = false;
+
+	if (Shape)
+	{
+		DzModifierIterator* modIter = &Object->modifierIterator();
+		while (modIter->hasNext())
+		{
+			DzModifier* modifier = modIter->next();
+			QString mod_Class = modifier->className();
+			if (mod_Class.toLower().contains("dforce"))
+			{
+				bDForceSettingsAvailable = true;
+				break;
+			}
+		}
+
+		if (bDForceSettingsAvailable)
+		{
+			// 1. check if weightmap modifier present
+			// 2. if not add an undoable weightnode
+			// 3. use weightnode to find weightmap
+			// 4. extract weightmap weights to file --> tied to Shape?
+			// 5. undo any added weightmap modifier
+
+			DzWeightMapPtr weightMap = getWeightMapPtr(Node);
+			if (weightMap != NULL)
+			{
+				int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+				unsigned short* weights = weightMap->getWeights();
+				char* buffer = (char*)weights;
+
+				// export to raw file
+				QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
+				QFile rawWeight(CharacterFolder + filename);
+				if (rawWeight.open(QIODevice::WriteOnly))
+				{
+					int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
+					if (bytesWritten != sizeof(weights) * numVerts)
+					{
+						// write error
+						QString errString = rawWeight.errorString();
+						QMessageBox::warning(0, tr("Error"),
+							errString, QMessageBox::Ok);
+					}
+					rawWeight.close();
+				}
+
+			}
+
+			//DzNodeListIterator Iterator = Node->nodeChildrenIterator();
+			//while (Iterator.hasNext())
+			//{
+			//	DzNode* Child = Iterator.next();
+			//	if (Child->className().contains("DzDForceModifierWeightNode"))
+			//	{
+			//		QObject *handler;
+			//		if (metaInvokeMethod(Child, "getWeightMapHandler()", handler))
+			//		{
+			//			QObject* weightGroup;
+			//			if (metaInvokeMethod(handler, "currentWeightGroup()", weightGroup))
+			//			{
+			//				QObject* context;
+			//				if (metaInvokeMethod(weightGroup, "currentWeightContext()", context))
+			//				{
+			//					// DzWeightMapPtr
+			//					QMetaMethod metaMethod = context->metaObject()->method(30); // getWeightMap()
+			//					DzWeightMapPtr weightMap;
+			//					QGenericReturnArgument returnArgument(
+			//						metaMethod.typeName(),
+			//						&weightMap
+			//					);
+			//					int result = metaMethod.invoke((QObject*)context, returnArgument);
+			//					if (result != -1)
+			//					{
+			//						if (weightMap != NULL)
+			//						{										 
+			//							int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+			//							unsigned short* weights = weightMap->getWeights();
+			//							char* buffer = (char*)weights;
+			//
+			//							// export to raw file
+			//							QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
+			//							QFile rawWeight(CharacterFolder + filename);
+			//							if (rawWeight.open(QIODevice::WriteOnly))
+			//							{
+			//								int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
+			//								if (bytesWritten != sizeof(weights) * numVerts)
+			//								{
+			//									// write error
+			//									QString errString = rawWeight.errorString();
+			//									QMessageBox::warning(0, tr("Error"),
+			//										errString, QMessageBox::Ok);
+			//								}
+			//								rawWeight.close();
+			//							}
+			//						}
+			//
+			//					}
+			//				}
+			//			}
+			//		}
+			//
+			//		//// DzDForceModifierWeightHandler
+			//		//QMetaMethod metaMethod = Child->metaObject()->method(372); // getWeightMapHandler
+			//		//DzBase* handler;
+			//		//QGenericReturnArgument returnArgument(
+			//		//	metaMethod.typeName(),
+			//		//	&handler
+			//		//);
+			//		//int result = metaMethod.invoke((QObject*)Child, returnArgument);
+			//		//if (result)
+			//		//{
+			//		//	if (handler != NULL)
+			//		//	{
+			//		//		// DzDForceModifierWeightGroup
+			//		//		QMetaMethod metaMethod = handler->metaObject()->method(18); // getWeightGroup
+			//		//		QObject* weightGroup;
+			//		//		QGenericReturnArgument returnArgument(
+			//		//			metaMethod.typeName(),
+			//		//			&weightGroup
+			//		//		);
+			//		//		int result = metaMethod.invoke((QObject*)handler, returnArgument, Q_ARG(int, 0));
+			//		//		if (result)
+			//		//		{
+			//		//			if (weightGroup != NULL)
+			//		//			{
+			//		//				// DzWeightMapContext
+			//		//				QMetaMethod metaMethod = weightGroup->metaObject()->method(19); // getWeightMapContext
+			//		//				QObject* context;
+			//		//				QGenericReturnArgument returnArgument(
+			//		//					metaMethod.typeName(),
+			//		//					&context
+			//		//				);
+			//		//				int result = metaMethod.invoke((QObject*)weightGroup, returnArgument, Q_ARG(int, 0));
+			//		//				if (result)
+			//		//				{
+			//		//					if (context != NULL)
+			//		//					{
+			//		//						// DzWeightMapPtr
+			//		//						QMetaMethod metaMethod = context->metaObject()->method(30); // getWeightMap
+			//		//						DzWeightMapPtr weightMap;
+			//		//						QGenericReturnArgument returnArgument(
+			//		//							metaMethod.typeName(),
+			//		//							&weightMap
+			//		//						);
+			//		//						int result = metaMethod.invoke((QObject*)context, returnArgument);
+			//		//						if (result)
+			//		//						{
+			//		//							if (weightMap != NULL)
+			//		//							{
+			//		//								int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+			//		//								unsigned short *weights = weightMap->getWeights();
+			//		//								char *buffer = (char*)weights;
+			//		//
+			//		//								// export to raw file
+			//		//								QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
+			//		//								QFile rawWeight(CharacterFolder + filename);
+			//		//								if (rawWeight.open(QIODevice::WriteOnly))
+			//		//								{
+			//		//									int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
+			//		//									if (bytesWritten != sizeof(weights) * numVerts)
+			//		//									{
+			//		//										// write error
+			//		//										QString errString = rawWeight.errorString();
+			//		//										QMessageBox::warning(0, tr("Error"),
+			//		//											errString, QMessageBox::Ok);
+			//		//									}
+			//		//									rawWeight.close();
+			//		//								}
+			//		//							}
+			//		//						}
+			//		//					}
+			//		//				}
+			//		//			}
+			//		//		}
+			//		//	}
+			//		//}
+			//	}
+			//
+			//}
+
+
+		}
+
+	} // if (Shape)
+
+	DzNodeListIterator Iterator = Node->nodeChildrenIterator();
+	while (Iterator.hasNext())
+	{
+		DzNode* Child = Iterator.next();
+		WriteWeightMaps(Child, Writer);
+	}
+
+}
+
+DzWeightMapPtr UnofficialDzUnityAction::getWeightMapPtr(DzNode* Node)
+{
+	// 1. check if weightmap modifier present
+	DzNodeListIterator Iterator = Node->nodeChildrenIterator();
+	while (Iterator.hasNext())
+	{
+		DzNode* Child = Iterator.next();
+		if (Child->className().contains("DzDForceModifierWeightNode"))
+		{
+			QObject* handler;
+			if (metaInvokeMethod(Child, "getWeightMapHandler()", (void**) &handler))
+			{
+				QObject* weightGroup;
+				if (metaInvokeMethod(handler, "currentWeightGroup()", (void**) &weightGroup))
+				{
+					QObject* context;
+					if (metaInvokeMethod(weightGroup, "currentWeightContext()", (void**) &context))
+					{
+						DzWeightMapPtr weightMap;
+						// DzWeightMapPtr
+						QMetaMethod metaMethod = context->metaObject()->method(30); // getWeightMap()
+						QGenericReturnArgument returnArgument(
+							metaMethod.typeName(),
+							&weightMap
+						);
+						int result = metaMethod.invoke((QObject*)context, returnArgument);
+						if (result != -1)
+						{
+							return weightMap;
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	return NULL;
+
+}
+
+bool UnofficialDzUnityAction::metaInvokeMethod(QObject* object, const char* methodSig, void** returnPtr)
+{
+	if (object == NULL)
+	{
+		return false;
+	}
+
+	//////////////////////////////////////////////////////////////////
+	// REFERENCE Signatures obtained by QMetaObject->method() query
+	//////////////////////////////////////////////////////////////////
+	//
+	// DzDForceModifierWeightNode::getWeightMapHandler() = 372
+	//
+	// DzDForceModifierWeightHandler::getWeightGroup(int) = 18
+	// DzDForceModifierWeightHandler::currentWeightGroup() = 20
+	//
+	// DzDForceModifierWeightGroup::getWeightMapContext(int) = 19
+	// DzDForceModifierWeightGroup::currentWeightContext() = 22
+	//
+	// DzDForceModiferMapContext::getWeightMap() = 30
+	/////////////////////////////////////////////////////////////////////////
+
+	// find the metamethod
+	const QMetaObject *metaObject = object->metaObject();
+	int methodIndex = metaObject->indexOfMethod(QMetaObject::normalizedSignature(methodSig));
+	if (methodIndex == -1)
+	{
+		// use fuzzy search
+		// look up all methods, find closest match for methodSig
+		int searchResult = -1;
+		QString fuzzySig = QString(QMetaObject::normalizedSignature(methodSig)).toLower().remove("()");
+		for (int i = 0; i < metaObject->methodCount(); i++)
+		{
+			const char* sig = metaObject->method(i).signature();
+			if (QString(sig).toLower().contains(fuzzySig))
+			{
+				searchResult = i;
+				break;
+			}
+		}
+		if (searchResult == -1)
+		{
+			return false;
+		}
+		else
+		{
+			methodIndex = searchResult;
+		}
+
+	}
+
+	// invoke metamethod
+	QMetaMethod metaMethod = metaObject->method(methodIndex); 
+	void* returnVal;
+	QGenericReturnArgument returnArgument(
+		metaMethod.typeName(),
+		&returnVal
+	);
+	int result = metaMethod.invoke((QObject*)object, returnArgument);
+	if (result)
+	{
+		// set returnvalue
+		*returnPtr = returnVal;
+
+		return true;
+	}
+
+	return false;
 }
 
 
