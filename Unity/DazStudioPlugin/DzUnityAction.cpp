@@ -509,12 +509,10 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 									{
 										QString Name = Property->getName();
 										QString TextureName = "";
-
 										if (NumericProperty->getMapValue())
 										{
 											TextureName = NumericProperty->getMapValue()->getFilename();
 										}
-
 										Writer.startObject(true);
 										Writer.addMember("Name", Name);
 										Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
@@ -528,7 +526,9 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 
 						 }
 
-
+						 ////*******************************************************************************
+						 //// Below is the old, unused hybrid script/C++ implementation of "findSimulationSettingsProvider"
+						 ////*******************************************************************************
 						 //// 2. if dForce modifier exists, look for SimulationSettingsProvider
 						 //// 2a. prep script: load FindSimulationProvider script from file/resource
 						 //DzScript* script = new DzScript();
@@ -540,7 +540,7 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							// varNode.setValue((QObject*)Node);
 							// args.append(varNode);
 							// args.append(Material->getName());
-
+							//
 							// // 2c. execute script
 							// m_ScriptReturn_ReturnCode = 0;
 							// m_ScriptReturn_Object = NULL;
@@ -559,7 +559,7 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							//			 break;
 							//		 }
 							//	 }
-
+							//
 							//	 if (bTimeout == false && m_ScriptReturn_ReturnCode > 0)
 							//	 {
 							//		 // 3. if script call successful, get returnvalue into DzElement* SimulationSettingsProvider
@@ -577,12 +577,10 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							//			 {
 							//				 QString Name = Property->getName();
 							//				 QString TextureName = "";
-
 							//				 if (NumericProperty->getMapValue())
 							//				 {
 							//					 TextureName = NumericProperty->getMapValue()->getFilename();
 							//				 }
-
 							//				 Writer.startObject(true);
 							//				 Writer.addMember("Name", Name);
 							//				 Writer.addMember("Value", QString::number(NumericProperty->getDoubleValue()));
@@ -591,15 +589,11 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							//				 Writer.finishObject();
 							//			 }
 							//		 }
-
 							//	 }
-
-
 							// }
 						 //}
 
-
-					 }
+					 } // if (bDForceSettingsAvailable)
 
 					 Writer.finishArray();
 
