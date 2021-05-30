@@ -380,24 +380,6 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 
 	 if (Shape)
 	 {
-		 DzElement* elSimulationSettingsProvider;
-		 bool ret = false;
-		 int methodIndex = Shape->metaObject()->indexOfMethod("findSimulationSettingsProvider");
-		 if (methodIndex != -1)
-		 {
-			 QMetaMethod method = Shape->metaObject()->method(methodIndex);
-			 ret = method.invoke(Shape, Q_RETURN_ARG(DzElement*, elSimulationSettingsProvider), Q_ARG(QString&, QString("Skirt1")));
-		 }
-
-		 ret = QMetaObject::invokeMethod(Shape, "findSimulationSettingsProvider", Q_RETURN_ARG(DzElement*, elSimulationSettingsProvider), Q_ARG(QString*,&QString("Skirt1")));
-		 if (ret)
-		 {
-			 if (elSimulationSettingsProvider)
-			 {
-				 int numProperties = elSimulationSettingsProvider->getNumProperties();
-			 }
-		 }
-
 		  for (int i = 0; i < Shape->getNumMaterials(); i++)
 		  {
 				DzMaterial* Material = Shape->getMaterial(i);
