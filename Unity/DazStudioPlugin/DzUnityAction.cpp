@@ -631,6 +631,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 	if (Shape)
 	{
+		DzModifier *dforceModifier;
 		DzModifierIterator* modIter = &Object->modifierIterator();
 		while (modIter->hasNext())
 		{
@@ -639,6 +640,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 			if (mod_Class.toLower().contains("dforce"))
 			{
 				bDForceSettingsAvailable = true;
+				dforceModifier = modifier;
 				break;
 			}
 		}
@@ -659,22 +661,75 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 				char* buffer = (char*)weights;
 
 				// export to raw file
-				QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
-				QFile rawWeight(CharacterFolder + filename);
-				if (rawWeight.open(QIODevice::WriteOnly))
-				{
-					int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
-					if (bytesWritten != sizeof(weights) * numVerts)
-					{
-						// write error
-						QString errString = rawWeight.errorString();
-						QMessageBox::warning(0, tr("Error"),
-							errString, QMessageBox::Ok);
-					}
-					rawWeight.close();
-				}
+				QString filename = QString("%1-old.raw_dforce_map").arg(Node->getLabel());
+				//QFile rawWeight(CharacterFolder + filename);
+				//if (rawWeight.open(QIODevice::ReadWrite))
+				//{
+				//	int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
+				//	if (bytesWritten != sizeof(weights) * numVerts)
+				//	{
+				//		// write error
+				//		QString errString = rawWeight.errorString();
+				//		QMessageBox::warning(0, tr("Error"),
+				//			errString, QMessageBox::Ok);
+				//	}
+				//	rawWeight.close();
+				//}
 
 			}
+
+			int methodIndex = dforceModifier->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("getInfluenceWeights()"));
+			if (methodIndex != -1)
+			{
+				QMetaMethod method = dforceModifier->metaObject()->method(methodIndex);
+				DzWeightMap *weightMap2;
+				QGenericReturnArgument returnArg(
+					method.typeName(),
+					&weightMap2
+				);
+				int result = method.invoke((QObject*)dforceModifier, returnArg);
+				if (result != -1)
+				{
+					if (weightMap2)
+					{
+						int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+						//unsigned short* weights = weightMap2->getWeights();
+						
+						//// copy weights to output buffer
+						//int byte_length = numVerts * sizeof(unsigned char);
+						//char* buffer = new char[byte_length];
+						//for (int i = 0; i < numVerts; i++)
+						//{
+						//	unsigned short weight = weightMap2->getWeight(i);
+						//	for (int j = 0; j < sizeof(weight); j++)
+						//	{
+						//		buffer[i + j] = ((char*)&weight)[j];
+						//	}
+						//}
+
+						//// export to raw file
+						//QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
+						//QFile rawWeight(CharacterFolder + filename);
+						//if (rawWeight.open(QIODevice::ReadWrite))
+						//{
+						//	int bytesWritten = rawWeight.write(buffer, byte_length);
+						//	if (bytesWritten != byte_length)
+						//	{
+						//		// write error
+						//		QString errString = rawWeight.errorString();
+						//		QMessageBox::warning(0, tr("Error"),
+						//			errString, QMessageBox::Ok);
+						//	}
+						//	rawWeight.close();
+						//}
+
+						//delete(buffer);
+
+					}
+
+				}
+			}
+
 
 			//DzNodeListIterator Iterator = Node->nodeChildrenIterator();
 			//while (Iterator.hasNext())
