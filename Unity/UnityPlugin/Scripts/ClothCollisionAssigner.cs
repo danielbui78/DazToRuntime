@@ -7,7 +7,7 @@ using System;
 
 public class ClothCollisionAssigner : MonoBehaviour
 {
-    [FormerlySerializedAs("m_collider_list")]
+    [Header("Paired Sphere Colliders")]
     public SphereCollider[] m_UpperbodyColliders;
     public SphereCollider[] m_LowerbodyColliders;
 
@@ -19,6 +19,7 @@ public class ClothCollisionAssigner : MonoBehaviour
         public bool m_LowerBody;
     }
 
+    [Header("Cloth Collision Assignments")]
     public ClothConfig[] m_ClothConfigurationList;
 
     private void addCollidersToCloth(SphereCollider[] collider_list, Cloth cloth_component)
@@ -111,25 +112,38 @@ public class ClothCollisionAssigner : MonoBehaviour
 
     }
 
-
-    // Start is called before the first frame update
-    void Start()
+    public void ClearAllAssignments()
     {
         foreach (ClothConfig cloth_config in m_ClothConfigurationList)
         {
             if (cloth_config == null)
                 continue;
-
             // delete existing cloth collisions
             if (cloth_config.m_ClothToManage != null && cloth_config.m_ClothToManage.sphereColliders != null)
                 cloth_config.m_ClothToManage.sphereColliders = null;
+        }
+    }
 
-            // add new collisions
+    public void AssignClothCollisionRigs()
+    {
+        foreach (ClothConfig cloth_config in m_ClothConfigurationList)
+        {
+            if (cloth_config == null)
+                continue;
             if (cloth_config.m_UpperBody)
                 addCollidersToCloth(m_UpperbodyColliders, cloth_config.m_ClothToManage);
             if (cloth_config.m_LowerBody)
                 addCollidersToCloth(m_LowerbodyColliders, cloth_config.m_ClothToManage);
         }
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        ClearAllAssignments();
+
+        AssignClothCollisionRigs();
+
     }
 
     // Update is called once per frame
