@@ -647,92 +647,41 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 		if (bDForceSettingsAvailable)
 		{
-			// 1. check if weightmap modifier present
-			// 2. if not add an undoable weightnode
-			// 3. use weightnode to find weightmap
-			// 4. extract weightmap weights to file --> tied to Shape?
-			// 5. undo any added weightmap modifier
+			//////////////////////////////////////////
+			//// OLD Method for obtaining weightmaps, relying on dForce Weight Modifier Node
+			//////////////////////////////////////////
+			//// 1. check if weightmap modifier present
+			//// 2. if not add an undoable weightnode
+			//// 3. use weightnode to find weightmap
+			//// 4. extract weightmap weights to file --> tied to Shape?
+			//// 5. undo any added weightmap modifier
+			//DzWeightMapPtr weightMap = getWeightMapPtr(Node);
+			//if (weightMap != NULL)
+			//{
+			//	int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+			//	unsigned short* weights = weightMap->getWeights();
+			//	char* buffer = (char*)weights;
+			//	int byte_length = numVerts * sizeof(unsigned short);
+			//	// export to raw file
+			//	QString filename = QString("%1-old.raw_dforce_map.bytes").arg(Node->getLabel());
+			//	QFile rawWeight(CharacterFolder + filename);
+			//	if (rawWeight.open(QIODevice::ReadWrite))
+			//	{
+			//		int bytesWritten = rawWeight.write(buffer, byte_length);
+			//		if (bytesWritten != byte_length)
+			//		{
+			//			// write error
+			//			QString errString = rawWeight.errorString();
+			//			QMessageBox::warning(0, tr("Error"),
+			//				errString, QMessageBox::Ok);
+			//		}
+			//		rawWeight.close();
+			//	}
+			//}
 
-			DzWeightMapPtr weightMap = getWeightMapPtr(Node);
-			if (weightMap != NULL)
-			{
-				int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
-				unsigned short* weights = weightMap->getWeights();
-				char* buffer = (char*)weights;
-				int byte_length = numVerts * sizeof(unsigned short);
-
-				// export to raw file
-				QString filename = QString("%1-old.raw_dforce_map.bytes").arg(Node->getLabel());
-				QFile rawWeight(CharacterFolder + filename);
-				if (rawWeight.open(QIODevice::ReadWrite))
-				{
-					int bytesWritten = rawWeight.write(buffer, byte_length);
-					if (bytesWritten != byte_length)
-					{
-						// write error
-						QString errString = rawWeight.errorString();
-						QMessageBox::warning(0, tr("Error"),
-							errString, QMessageBox::Ok);
-					}
-					rawWeight.close();
-				}
-
-			}
-
-			int methodIndex = dforceModifier->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("getInfluenceWeights()"));
-			if (methodIndex != -1)
-			{
-				QMetaMethod method = dforceModifier->metaObject()->method(methodIndex);
-				DzWeightMap *weightMap2;
-				QGenericReturnArgument returnArg(
-					method.typeName(),
-					&weightMap2
-				);
-				int result = method.invoke((QObject*)dforceModifier, returnArg);
-				if (result != -1)
-				{
-					if (weightMap2)
-					{
-						int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
-						unsigned short* weights = weightMap2->getWeights();
-						char* buffer = (char*)weights;
-						int byte_length = numVerts * sizeof(unsigned short);
-
-						// copy weights to output buffer
-						//char* buffer = new char[byte_length];
-						//for (int i = 0; i < numVerts; i++)
-						//{
-						//	unsigned short weight = weightMap2->getWeight(i);
-						//	for (int j = 0; j < sizeof(weight); j++)
-						//	{
-						//		buffer[i + j] = ((char*)&weight)[j];
-						//	}
-						//}
-
-						// export to raw file
-						QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
-						QFile rawWeight(CharacterFolder + filename);
-						if (rawWeight.open(QIODevice::ReadWrite))
-						{
-							int bytesWritten = rawWeight.write(buffer, byte_length);
-							if (bytesWritten != byte_length)
-							{
-								// write error
-								QString errString = rawWeight.errorString();
-								QMessageBox::warning(0, tr("Error"),
-									errString, QMessageBox::Ok);
-							}
-							rawWeight.close();
-						}
-
-						//delete(buffer);
-
-					}
-
-				}
-			}
-
-
+			////////////////////////////////////////////
+			//// EVEN OLDER Method
+			////////////////////////////////////////////
 			//DzNodeListIterator Iterator = Node->nodeChildrenIterator();
 			//while (Iterator.hasNext())
 			//{
@@ -865,6 +814,48 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 			//
 			//}
 
+			///////////////////////////////////////////////
+			// NEW Method for obtaining weightmaps, grab directly from dForce Modifier Node
+			///////////////////////////////////////////////
+			int methodIndex = dforceModifier->metaObject()->indexOfMethod(QMetaObject::normalizedSignature("getInfluenceWeights()"));
+			if (methodIndex != -1)
+			{
+				QMetaMethod method = dforceModifier->metaObject()->method(methodIndex);
+				DzWeightMap *weightMap;
+				QGenericReturnArgument returnArg(
+					method.typeName(),
+					&weightMap
+				);
+				int result = method.invoke((QObject*)dforceModifier, returnArg);
+				if (result != -1)
+				{
+					if (weightMap)
+					{
+						int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
+						unsigned short* weights = weightMap->getWeights();
+						char* buffer = (char*)weights;
+						int byte_length = numVerts * sizeof(unsigned short);
+
+						// export to raw file
+						QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
+						QFile rawWeight(CharacterFolder + filename);
+						if (rawWeight.open(QIODevice::ReadWrite))
+						{
+							int bytesWritten = rawWeight.write(buffer, byte_length);
+							if (bytesWritten != byte_length)
+							{
+								// write error
+								QString errString = rawWeight.errorString();
+								QMessageBox::warning(0, tr("Error writing raw dforce weightmap. Incorrect number of bytes written."),
+									errString, QMessageBox::Ok);
+							}
+							rawWeight.close();
+						}
+
+					}
+
+				}
+			}
 
 		}
 
@@ -879,6 +870,8 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 }
 
+
+// OLD Method for obtaining weightmap, relying on dForce Weight Modifier Node
 DzWeightMapPtr UnofficialDzUnityAction::getWeightMapPtr(DzNode* Node)
 {
 	// 1. check if weightmap modifier present
