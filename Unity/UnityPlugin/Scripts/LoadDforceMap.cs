@@ -6,6 +6,7 @@ using UnityEngine;
 public class LoadDforceMap : MonoBehaviour
 {
     public TextAsset m_BinaryData;
+    public TextAsset m_TestVertData;
     [SerializeField]
     private SkinnedMeshRenderer m_Skinned;
     [SerializeField]
@@ -577,7 +578,8 @@ public class LoadDforceMap : MonoBehaviour
         /////////////////////////////////////////////////////
         /// Load Raw Weight Map
         /////////////////////////////////////////////////////
-        int numVerts = m_Skinned.sharedMesh.vertexCount;
+        //int numVerts = m_Skinned.sharedMesh.vertexCount;
+        int numVerts = newCoefficients.Length ;
         ushort[] weights = new ushort[numVerts];
         System.Buffer.BlockCopy(m_BinaryData.bytes, 0, weights, 0, numVerts);
 
@@ -585,7 +587,8 @@ public class LoadDforceMap : MonoBehaviour
         //int[] vertex_list = skinned.sharedMesh.GetTriangles(matIndex, false);
         for (int vertex_index = 0; vertex_index < numVerts; vertex_index++)
         {
-            int cloth_index = m_CollapsedVerts.LookupIndex(vertex_index);
+            //int cloth_index = m_CollapsedVerts.LookupIndex(vertex_index);
+            int cloth_index = vertex_index;
             if (cloth_index < 0)
             {
                 Debug.LogError("DFORCE IMPORT: dforce weightmap vertex index has no mapping to cloth index");
@@ -631,6 +634,105 @@ public class LoadDforceMap : MonoBehaviour
         }
 
         m_Cloth.coefficients = newCoefficients;
+
+    }
+
+    struct float3
+    {
+        public float x;
+        public float y;
+        public float z;
+    };
+
+    public void TestVertData()
+    {
+        // get verts
+        Vector3[] unityVerts = m_Cloth.vertices;
+
+        int numVerts = m_Cloth.vertices.Length;
+        float[] dazVertBuffer = new float[numVerts*3];
+        int byte_length = sizeof(float) * numVerts*3;
+        Debug.Log("byte_length = " + byte_length);
+        System.Buffer.BlockCopy(m_TestVertData.bytes, 0, dazVertBuffer, 0, numVerts*3);
+
+        Vector3 unityMax = new Vector3();
+        Vector3 unityMin = new Vector3();
+        Vector3 dazMax = new Vector3();
+        Vector3 dazMin = new Vector3();
+        //bool calcDazBounds = true;
+
+        int i;
+        for (i=0; i < unityVerts.Length; i++)
+        {
+            //Vector3 a_vert = m_Skinned.rootBone.TransformPoint(unityVerts[i]);
+            //Vector3 a_vert = m_Cloth.transform.TransformPoint(unityVerts[i]);
+            Vector3 a_vert = unityVerts[i];
+            a_vert *= 100f;
+
+            // calc bounds for unity verts
+            unityMax.x = (a_vert.x > unityMax.x) ? a_vert.x : unityMax.x;
+            unityMax.y = (a_vert.y > unityMax.y) ? a_vert.y : unityMax.y;
+            unityMax.z = (a_vert.z > unityMax.z) ? a_vert.z : unityMax.z;
+            unityMin.x = (a_vert.x < unityMin.x) ? a_vert.x : unityMin.x;
+            unityMin.y = (a_vert.y < unityMin.y) ? a_vert.y : unityMin.y;
+            unityMin.z = (a_vert.z < unityMin.z) ? a_vert.z : unityMin.z;
+
+            //int j;
+            //for (j=0; j < numVerts; j++)
+            //{
+            //    if (calcDazBounds)
+            //    {
+            //        // calc bounds for unity verts
+            //        dazMax.x = (a_vert.x > dazMax.x) ? a_vert.x : dazMax.x;
+            //        dazMax.y = (a_vert.y > dazMax.y) ? a_vert.y : dazMax.y;
+            //        dazMax.z = (a_vert.z > dazMax.z) ? a_vert.z : dazMax.z;
+            //        dazMin.x = (a_vert.x > dazMin.x) ? a_vert.x : dazMin.x;
+            //        dazMin.y = (a_vert.y > dazMin.y) ? a_vert.y : dazMin.y;
+            //        dazMin.z = (a_vert.z > dazMin.z) ? a_vert.z : dazMin.z;
+
+            //    }
+
+            //    Vector3 b_vert = new Vector3();
+            //    b_vert.x = -dazVertBuffer[(j*3)+0] * 0.01f;
+            //    b_vert.y = dazVertBuffer[(j*3)+1] * 0.01f;
+            //    b_vert.z = dazVertBuffer[(j*3)+2] * 0.01f;
+
+            //    if (Vector3.Distance(a_vert, b_vert) < 0.001f)
+            //    {
+            //        Debug.Log("unity[" + i + "] == daz[" + j + "]");
+            //        break;
+            //    }
+            //}
+            //if (j == numVerts)
+            //{
+            //    Debug.LogError("Could not match skinned[" + i + "] in any vertex of daz[]");
+            //    calcDazBounds = false;
+            //}
+
+        }
+
+        int j;
+        for (j = 0; j < numVerts; j++)
+        {
+            Vector3 a_vert = new Vector3();
+            a_vert.x = dazVertBuffer[(j*3) + 0] * 1f;
+            a_vert.y = dazVertBuffer[(j*3) + 1] * 1f;
+            a_vert.z = dazVertBuffer[(j*3) + 2] * 1f;
+
+            // calc bounds for unity verts
+            dazMax.x = (a_vert.x > dazMax.x) ? a_vert.x : dazMax.x;
+            dazMax.y = (a_vert.y > dazMax.y) ? a_vert.y : dazMax.y;
+            dazMax.z = (a_vert.z > dazMax.z) ? a_vert.z : dazMax.z;
+            dazMin.x = (a_vert.x < dazMin.x) ? a_vert.x : dazMin.x;
+            dazMin.y = (a_vert.y < dazMin.y) ? a_vert.y : dazMin.y;
+            dazMin.z = (a_vert.z < dazMin.z) ? a_vert.z : dazMin.z;
+
+        }
+
+        Debug.Log("unityBounds: (" + unityMin.x + " to " + unityMax.x + ", " + unityMin.y + " to " + unityMax.y + ", " + unityMin.z + " to " + unityMax.z + ")");
+        Debug.Log("dazBounds: (" + dazMin.x + " to " + dazMax.x + ", " + dazMin.y + " to " + dazMax.y + ", " + dazMin.z + " to " + dazMax.z + ")");
+
+        Debug.Log("Done");
 
     }
 
