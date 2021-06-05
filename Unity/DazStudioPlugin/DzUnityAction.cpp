@@ -659,14 +659,15 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 				int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
 				unsigned short* weights = weightMap->getWeights();
 				char* buffer = (char*)weights;
+				int byte_length = numVerts * sizeof(unsigned short);
 
 				// export to raw file
-				QString filename = QString("%1-old.raw_dforce_map").arg(Node->getLabel());
+				QString filename = QString("%1-old.raw_dforce_map.bytes").arg(Node->getLabel());
 				QFile rawWeight(CharacterFolder + filename);
 				if (rawWeight.open(QIODevice::ReadWrite))
 				{
-					int bytesWritten = rawWeight.write(buffer, sizeof(weights) * numVerts);
-					if (bytesWritten != sizeof(weights) * numVerts)
+					int bytesWritten = rawWeight.write(buffer, byte_length);
+					if (bytesWritten != byte_length)
 					{
 						// write error
 						QString errString = rawWeight.errorString();
@@ -694,21 +695,22 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 					{
 						int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
 						unsigned short* weights = weightMap2->getWeights();
-						
+						char* buffer = (char*)weights;
+						int byte_length = numVerts * sizeof(unsigned short);
+
 						// copy weights to output buffer
-						int byte_length = numVerts * sizeof(unsigned char);
-						char* buffer = new char[byte_length];
-						for (int i = 0; i < numVerts; i++)
-						{
-							unsigned short weight = weightMap2->getWeight(i);
-							for (int j = 0; j < sizeof(weight); j++)
-							{
-								buffer[i + j] = ((char*)&weight)[j];
-							}
-						}
+						//char* buffer = new char[byte_length];
+						//for (int i = 0; i < numVerts; i++)
+						//{
+						//	unsigned short weight = weightMap2->getWeight(i);
+						//	for (int j = 0; j < sizeof(weight); j++)
+						//	{
+						//		buffer[i + j] = ((char*)&weight)[j];
+						//	}
+						//}
 
 						// export to raw file
-						QString filename = QString("%1.raw_dforce_map").arg(Node->getLabel());
+						QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
 						QFile rawWeight(CharacterFolder + filename);
 						if (rawWeight.open(QIODevice::ReadWrite))
 						{
@@ -723,7 +725,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 							rawWeight.close();
 						}
 
-						delete(buffer);
+						//delete(buffer);
 
 					}
 
