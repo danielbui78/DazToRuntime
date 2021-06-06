@@ -43,282 +43,6 @@ public class LoadDforceMap : MonoBehaviour
     /////////////////////////////////////////////////////////////////
     // SkinnedMesh vertex index TO Cloth vertex index
     /////////////////////////////////////////////////////////////////
-    class VertexPair
-    {
-        public Vector3 vertex;
-        public int index;
-        const float near_zero = 0.0005f;
-        const float cell_size = 0.001f; // 0.001f == 1 millimeter
-        static int[] hash_primes = { 53, 97, 193 };
-
-        public VertexPair(Vector3 a_vertex, int a_vertex_index)
-        {
-            vertex = a_vertex;
-            index = a_vertex_index;
-        }
-
-        public static int GetCell(float a_float)
-        {
-            int cell = (int)(a_float / cell_size);
-            return cell;
-        }
-
-        public static int CalcHashCode(int a, int b, int c)
-        {
-            int hashcode = a * hash_primes[0] + b * hash_primes[1] + c * hash_primes[2];
-            return hashcode;
-        }
-
-        public static int CalcHashCode(Vector3 a_vertex)
-        {
-            int cell_x = GetCell(a_vertex.x);
-            int cell_y = GetCell(a_vertex.y);
-            int cell_z = GetCell(a_vertex.z);
-
-            int hashcode = CalcHashCode(cell_x, cell_y, cell_z);
-
-            // DEBUG
-            hashcode = 0;
-
-            return hashcode;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashcode = CalcHashCode(vertex);
-            return hashcode;
-        }
-
-        public List<int> GetNeighborhoodHashCodes()
-        {
-            List<int> hashlist = new List<int>();
-            hashlist.Add(GetHashCode());
-
-            int cell_x = GetCell(vertex.x);
-            int cell_y = GetCell(vertex.y);
-            int cell_z = GetCell(vertex.z);
-
-            for (int x = cell_x - 1; x <= cell_x + 1; x++)
-            {
-                for (int y = cell_y - 1; y <= cell_y + 1; y++)
-                {
-                    for (int z = cell_z - 1; z <= cell_z + 1; z++)
-                    {
-                        int hashcode = CalcHashCode(x, y, z);
-                        hashlist.Add(hashcode);
-                    }
-                }
-            }
-
-            return hashlist;
-        }
-
-        public static bool operator ==(VertexPair a, VertexPair b) => a.vertex == b.vertex;
-        //{
-        //    if (Vector3.Distance(a.vertex, b.vertex) <= near_zero)
-        //    { return true; }
-        //    else
-        //    { return false; }
-        //}
-
-        public static bool operator !=(VertexPair a, VertexPair b) => a.vertex != b.vertex;
-        //{
-        //    if (Vector3.Distance(a.vertex, b.vertex) <= near_zero)
-        //    { return false; }
-        //    else
-        //    { return true; }
-        //}
-
-        public override bool Equals(object obj) => this.vertex.Equals(obj as VertexPair);
-
-        public bool Equals(VertexPair a) => this.vertex.Equals(a.vertex);
-        //{
-        //    if (Vector3.Distance(this.vertex, a.vertex) <= near_zero)
-        //    { return true; }
-        //    else
-        //    { return false; }
-        //}
-
-    }
-
-    class VertexLookupTable
-    {
-        private Dictionary<int, List<VertexPair>> m_VertexLookup;
-        private Dictionary<int, List<int>> m_IndexLookupA2B;
-        private Dictionary<int, List<int>> m_IndexLookupB2A;
-        private bool m_IndexLookupComputed;
-
-        public VertexLookupTable()
-        {
-            m_VertexLookup = new Dictionary<int, List<VertexPair>>();
-            m_IndexLookupA2B = new Dictionary<int, List<int>>();
-            m_IndexLookupB2A = new Dictionary<int, List<int>>();
-            m_IndexLookupComputed = false;
-        }
-
-        public int AddVertexPair(VertexPair a_vertexpair)
-        {
-            List<VertexPair> vertex_list;
-            if (m_VertexLookup.TryGetValue(a_vertexpair.GetHashCode(), out vertex_list))
-            {
-                vertex_list.Add(a_vertexpair);
-            }
-            else
-            {
-                m_VertexLookup.Add(a_vertexpair.GetHashCode(), new List<VertexPair>(1) { a_vertexpair });
-            }
-            return a_vertexpair.GetHashCode();
-        }
-
-        public bool FindVertexPair(VertexPair a_vertexpair)
-        {
-            List<VertexPair> vertex_list;
-            if (m_VertexLookup.TryGetValue(a_vertexpair.GetHashCode(), out vertex_list))
-            {
-                foreach (VertexPair b_vertexpair in vertex_list)
-                {
-                    if (a_vertexpair == b_vertexpair)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-
-        }
-
-        public VertexPair GetBestVertexPair(VertexPair a_vertexpair)
-        {
-            VertexPair best_match = new VertexPair(new Vector3(), -1);
-
-            List<VertexPair> vertex_list;
-            if (m_VertexLookup.TryGetValue(a_vertexpair.GetHashCode(), out vertex_list))
-            {
-                float best_distance = float.MaxValue;
-                bool no_matches = true;
-
-                foreach (VertexPair b_vertexpair in vertex_list)
-                {
-                    if (a_vertexpair == b_vertexpair)
-                    {
-                        if (no_matches)
-                        {
-                            no_matches = false;
-                            best_match = b_vertexpair;
-                            best_distance = Vector3.Distance(b_vertexpair.vertex, a_vertexpair.vertex);
-                        }
-                        else
-                        {
-                            float new_distance = Vector3.Distance(b_vertexpair.vertex, a_vertexpair.vertex);
-                            if (new_distance < best_distance)
-                            {
-                                best_match = b_vertexpair;
-                                best_distance = new_distance;
-                            }
-                        }
-                    }
-                }
-
-            }
-            return best_match;
-        }
-
-        public List<VertexPair> GetNeighborhood(VertexPair a_vertexpair)
-        {
-            List<VertexPair> neighborhood = new List<VertexPair>();
-
-            // create hashlist
-            List<int> hashlist = a_vertexpair.GetNeighborhoodHashCodes();
-
-            // foreach hash, get vertexpairs and add to neighborhood
-            foreach (int hashcode in hashlist)
-            {
-                List<VertexPair> neighbors;
-                if (m_VertexLookup.TryGetValue(hashcode, out neighbors))
-                {
-                    neighborhood.AddRange(neighbors);
-                }
-            }
-
-            return neighborhood;
-
-        }
-
-        public bool ComputeIndexLookup(VertexPair[] list_a, VertexPair[] list_b)
-        {
-            // add a to table_a
-            // check b in a ==> a2b and b2a
-
-            foreach (VertexPair a in list_a)
-            {
-                AddVertexPair(a);
-            }
-
-            foreach (VertexPair b in list_b)
-            {
-                // get area (found_a)
-                List<VertexPair> neighborhood_a = GetNeighborhood(b);
-
-                foreach (VertexPair neighbor_a in neighborhood_a)
-                {
-                    // create a2b and b2a
-                    if (neighbor_a == b)
-                    {
-                        int index_a = neighbor_a.index;
-                        int index_b = b.index;
-
-                        // a2b: create all a[*] = b
-                        if (m_IndexLookupA2B.ContainsKey(index_a))
-                        {
-                            m_IndexLookupA2B[index_a].Add(index_b);
-                        }
-                        else
-                        {
-                            m_IndexLookupA2B.Add(index_a, new List<int>(1) { index_b });
-                        }
-
-                        // b2a: create b = a[*]
-                        if (m_IndexLookupB2A.ContainsKey(index_b))
-                        {
-                            m_IndexLookupB2A[index_b].Add(index_a);
-                        }
-                        else
-                        {
-                            m_IndexLookupB2A.Add(index_b, new List<int>(1) { index_a });
-                        }
-                    }
-                }
-
-            }
-            Debug.Log("DFORCE IMPORT: vertex lookup tables computed");
-            return true;
-        }
-
-        public List<int> LookupIndexA2B(int a)
-        {
-            List<int> index_list = new List<int>();
-
-            if (m_IndexLookupComputed && m_IndexLookupA2B.ContainsKey(a))
-            {
-                index_list = m_IndexLookupA2B[a];
-            }
-
-            return index_list;
-        }
-
-        public List<int> LookupIndexB2A(int b)
-        {
-            List<int> index_list = new List<int>();
-
-            if (m_IndexLookupComputed && m_IndexLookupA2B.ContainsKey(b))
-            {
-                index_list = m_IndexLookupB2A[b];
-            }
-
-            return index_list;
-        }
-
-    }
     [System.Serializable]
     class CollapsedVertexArray
     {
@@ -384,25 +108,13 @@ public class LoadDforceMap : MonoBehaviour
             }
 
             m_CollapsedVertices = new Dictionary<int, List<CollapsedVertex>>(a_vertices.Length);
-            //m_CollapsedVertices.Add(0, CollapsedVertex(a_vertices[0], 0));
-            //m_UniqueVertexCount = 1;
             for (int i=0; i < a_vertices.Length; i++)
             {
                 Vector3 a_vert = a_vertices[i];
                 bool vert_is_unique = true;
-                // scan through entire unique array
-                //for (int j=0; j < m_UniqueVertexCount; j++)
-                //{
-                //    CollapsedVertex unique_vertex = m_CollapsedVertices[j];
-                //    if (unique_vertex == a_vert)
-                //    {
-                //        vert_is_unique = false;
-                //        unique_vertex.AddIndex(i);
-                //        break;
-                //    }
-                //}
                 if (m_CollapsedVertices.ContainsKey(a_vert.GetHashCode()))
                 {
+                    // get optimized (hashcode filtered) list of verts, check against each one for uniqueness
                     List<CollapsedVertex> cvert_list = m_CollapsedVertices[a_vert.GetHashCode()];
                     foreach (CollapsedVertex cvert in cvert_list)
                     {
@@ -428,9 +140,6 @@ public class LoadDforceMap : MonoBehaviour
                 }
 
             }
-
-            // resize collapsed array
-            //System.Array.Resize(ref m_CollapsedVertices, m_UniqueVertexCount);
 
             // build lookup tables / Dictionaries
             m_LookupTable = new Dictionary<int, int>(a_vertices.Length);
@@ -463,8 +172,7 @@ public class LoadDforceMap : MonoBehaviour
     /////////////////////////////////////////////////////////////////
     // End: SkinnedMesh vertex index TO Cloth vertex index
     /////////////////////////////////////////////////////////////////
-    
-    //VertexLookupTable m_LookupTable;
+    [SerializeField, HideInInspector]
     CollapsedVertexArray m_CollapsedVerts;
 
     // Start is called before the first frame update
@@ -474,7 +182,6 @@ public class LoadDforceMap : MonoBehaviour
         m_Skinned = parent.GetComponent<SkinnedMeshRenderer>();
         m_Cloth = parent.GetComponent<Cloth>();
 
-        //m_LookupTable = new VertexLookupTable();
         m_SubmeshMeta = new List<SubmeshMeta>();
 
     }
@@ -482,28 +189,6 @@ public class LoadDforceMap : MonoBehaviour
 
     public void GenerateLookupTables()
     {
-//        // compute vertex index lookup tables
-//        VertexPair[] skinned_verts = new VertexPair[m_Skinned.sharedMesh.vertices.Length];
-//        VertexPair[] cloth_verts = new VertexPair[m_Cloth.vertices.Length];
-
-////        Mesh bakedMesh = new Mesh();
-////        m_Skinned.BakeMesh(bakedMesh);
-//        int index = 0;
-//        for (index = 0; index < m_Skinned.sharedMesh.vertices.Length; index++)
-//        {
-//            //Vector3 newPoint = m_Skinned.transform.TransformPoint(m_Skinned.sharedMesh.vertices[index]);
-//            Vector3 newPoint = m_Skinned.sharedMesh.vertices[index];
-//            skinned_verts[index] = new VertexPair(newPoint, index);
-//        }
-
-//        for (index = 0; index < m_Cloth.vertices.Length; index++)
-//        {
-//            Vector3 newPoint = m_Cloth.transform.TransformPoint(m_Cloth.vertices[index]);
-//            cloth_verts[index] = new VertexPair(newPoint, index);
-//        }
-
-//        m_LookupTable.ComputeIndexLookup(skinned_verts, cloth_verts);
-
         m_CollapsedVerts = new CollapsedVertexArray(m_Skinned.sharedMesh.vertices);
 
         if (m_Cloth.vertices.Length == m_CollapsedVerts.Length)
@@ -514,7 +199,6 @@ public class LoadDforceMap : MonoBehaviour
         {
             Debug.LogError("# collapsed verts (" + m_CollapsedVerts.Length + ") != # cloth verts(" + m_Cloth.vertices.Length + ").  Please fix lookup table.");
         }
-
 
     }
 
