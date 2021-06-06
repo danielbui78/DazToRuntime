@@ -13,6 +13,33 @@ public class LoadDforceMap : MonoBehaviour
     private Cloth m_Cloth;
 
 
+    [System.Serializable]
+    class SubmeshMeta
+    {
+        public int vertex_offset;
+        public int vertex_count;
+        public int submesh_index;
+
+        public SubmeshMeta(int offset, int count, int index)
+        {
+            vertex_offset = offset;
+            vertex_count = count;
+            submesh_index = index;
+        }
+
+        public int Start()
+        {
+            return vertex_offset;
+        }
+
+        public int Stop()
+        {
+            return vertex_offset + vertex_count + 1;
+        }
+
+    }
+    List<SubmeshMeta> m_SubmeshMeta;
+
     /////////////////////////////////////////////////////////////////
     // SkinnedMesh vertex index TO Cloth vertex index
     /////////////////////////////////////////////////////////////////
@@ -436,7 +463,7 @@ public class LoadDforceMap : MonoBehaviour
     /////////////////////////////////////////////////////////////////
     // End: SkinnedMesh vertex index TO Cloth vertex index
     /////////////////////////////////////////////////////////////////
-
+    
     //VertexLookupTable m_LookupTable;
     CollapsedVertexArray m_CollapsedVerts;
 
@@ -446,7 +473,9 @@ public class LoadDforceMap : MonoBehaviour
         GameObject parent = GetComponent<Renderer>().gameObject;
         m_Skinned = parent.GetComponent<SkinnedMeshRenderer>();
         m_Cloth = parent.GetComponent<Cloth>();
+
         //m_LookupTable = new VertexLookupTable();
+        m_SubmeshMeta = new List<SubmeshMeta>();
 
     }
 

@@ -84,6 +84,20 @@ public class LoadDforceMapEditor : Editor
             Debug.Log("Load Stepped Gradient.");
         }
 
+        GUILayout.Space(10);
+        if (GUILayout.Button("Generate Lookup Tables"))
+        {
+            loadDforce.GenerateLookupTables();
+            Debug.Log("Generate Lookup Tables Called....");
+        }
+
+        GUILayout.Space(10);
+        if (GUILayout.Button("Run Vertex Data Test"))
+        {
+            loadDforce.TestVertData();
+            Debug.Log("Running Vertex Data Test....");
+        }
+
         m_Object.ApplyModifiedProperties();
     }
 
