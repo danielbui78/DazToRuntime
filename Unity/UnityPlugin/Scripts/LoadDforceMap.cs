@@ -292,23 +292,25 @@ public class LoadDforceMap : MonoBehaviour
         }
 
     }
-
+    [System.Serializable]
     class CollapsedVertexArray
     {
-        private CollapsedVertex[] m_CollapsedVertices;
+        private Dictionary<int, List<CollapsedVertex>> m_CollapsedVertices;
         private int m_UniqueVertexCount;
         private Dictionary<int, int> m_LookupTable;
 
         public class CollapsedVertex
         {
             public Vector3 vertex;
+            public int unique_index;
             public List<int> indexes;
             const float near_zero = 0.0001f; // 0.1 mm
 
-            public CollapsedVertex(Vector3 a_vertex, int index)
+            public CollapsedVertex(Vector3 a_vertex, int index, int a_unique_index)
             {
                 vertex = a_vertex;
                 indexes = new List<int>(1) { index };
+                unique_index = a_unique_index;
             }
 
             public void AddIndex(int index)
@@ -354,54 +356,75 @@ public class LoadDforceMap : MonoBehaviour
                 return;
             }
 
-            m_CollapsedVertices = new CollapsedVertex[a_vertices.Length];
-
-            m_CollapsedVertices[0] = new CollapsedVertex(a_vertices[0], 0);
-            m_UniqueVertexCount = 1;
-            for (int i=1; i < a_vertices.Length; i++)
+            m_CollapsedVertices = new Dictionary<int, List<CollapsedVertex>>(a_vertices.Length);
+            //m_CollapsedVertices.Add(0, CollapsedVertex(a_vertices[0], 0));
+            //m_UniqueVertexCount = 1;
+            for (int i=0; i < a_vertices.Length; i++)
             {
                 Vector3 a_vert = a_vertices[i];
                 bool vert_is_unique = true;
                 // scan through entire unique array
-                for (int j=0; j < m_UniqueVertexCount; j++)
+                //for (int j=0; j < m_UniqueVertexCount; j++)
+                //{
+                //    CollapsedVertex unique_vertex = m_CollapsedVertices[j];
+                //    if (unique_vertex == a_vert)
+                //    {
+                //        vert_is_unique = false;
+                //        unique_vertex.AddIndex(i);
+                //        break;
+                //    }
+                //}
+                if (m_CollapsedVertices.ContainsKey(a_vert.GetHashCode()))
                 {
-                    CollapsedVertex unique_vertex = m_CollapsedVertices[j];
-                    if (unique_vertex == a_vert)
+                    List<CollapsedVertex> cvert_list = m_CollapsedVertices[a_vert.GetHashCode()];
+                    foreach (CollapsedVertex cvert in cvert_list)
                     {
-                        vert_is_unique = false;
-                        unique_vertex.AddIndex(i);
-                        break;
+                        if (cvert == a_vert)
+                        {
+                            vert_is_unique = false;
+                            cvert.AddIndex(i);
+                            break;
+                        }
                     }
+                    if (vert_is_unique)
+                    {
+                        // add to end of unqiue verts array
+                        //m_CollapsedVertices[m_UniqueVertexCount++] = new CollapsedVertex(a_vert, i);
+                        cvert_list.Add(new CollapsedVertex(a_vert, i, m_UniqueVertexCount++));
+                    }
+
                 }
-                if (vert_is_unique)
+                else
                 {
-                    // add to end of unqiue verts array
-                    m_CollapsedVertices[m_UniqueVertexCount++] = new CollapsedVertex(a_vert, i);
+                    // assume unqiue
+                    m_CollapsedVertices.Add(a_vert.GetHashCode(), new List<CollapsedVertex>(1) { new CollapsedVertex(a_vert, i, m_UniqueVertexCount++) });
                 }
 
             }
 
             // resize collapsed array
-            System.Array.Resize(ref m_CollapsedVertices, m_UniqueVertexCount);
+            //System.Array.Resize(ref m_CollapsedVertices, m_UniqueVertexCount);
 
             // build lookup tables / Dictionaries
             m_LookupTable = new Dictionary<int, int>(a_vertices.Length);
-            for (int i=0; i < m_UniqueVertexCount; i++)
+            foreach (List<CollapsedVertex> cvert_list in m_CollapsedVertices.Values)
             {
-                CollapsedVertex cvert = m_CollapsedVertices[i];
-                foreach (int key in cvert.indexes)
+                foreach (CollapsedVertex cvert in cvert_list)
                 {
-                    if (m_LookupTable.ContainsKey(key))
+                    foreach (int key in cvert.indexes)
                     {
-                        m_LookupTable[key] = i;
+                        if (m_LookupTable.ContainsKey(key))
+                        {
+                            m_LookupTable[key] = cvert.unique_index;
+                        }
+                        else
+                        {
+                            m_LookupTable.Add(key, cvert.unique_index);
+                        }
                     }
-                    else
-                    {
-                        m_LookupTable.Add(key, i);
-                    }
+
                 }
             }
-
 
             Debug.Log("Finished CollapsedVertexArray: original Verts=" + a_vertices.Length + ", unique Verts=" + m_UniqueVertexCount);
             return;
