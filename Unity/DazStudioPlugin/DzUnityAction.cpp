@@ -17,13 +17,17 @@
 #include <dzcolorproperty.h>
 #include <dpcimages.h>
 
-#include "DzUnityDialog.h"
-#include "DzUnityAction.h"
-
 #include "QtCore/qmetaobject.h"
 #include "dzmodifier.h"
 #include "dzgeometry.h"
 #include "dzweightmap.h"
+#include "dzfacetshape.h"
+#include "dzfacetmesh.h"
+#include "dzfacegroup.h"
+
+#include "DzUnityDialog.h"
+#include "DzUnityAction.h"
+
 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
@@ -629,7 +633,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 	bool bDForceSettingsAvailable = false;
 
-	if (Shape)
+	if ( Shape && Shape->inherits("DzFacetShape") )
 	{
 		DzModifier *dforceModifier;
 		DzModifierIterator* modIter = &Object->modifierIterator();
@@ -832,33 +836,132 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 					if (weightMap)
 					{
 						int numVerts = Shape->getAssemblyGeometry()->getNumVertices();
-						unsigned short* weights = weightMap->getWeights();
-						char* buffer = (char*)weights;
+						unsigned short* daz_weights = weightMap->getWeights();
 						int byte_length = numVerts * sizeof(unsigned short);
 
-						// export to raw file
-						QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
-						QFile rawWeight(CharacterFolder + filename);
-						if (rawWeight.open(QIODevice::ReadWrite))
+						char* buffer = new char[byte_length];
+						unsigned short* unity_weights = (unsigned short*) buffer;
+
+						// load material groups to remap weights to unity's vertex order
+						DzFacetMesh* facetMesh = dynamic_cast<DzFacetShape*>(Shape)->getFacetMesh();
+						if (facetMesh)
 						{
-							int bytesWritten = rawWeight.write(buffer, byte_length);
-							if (bytesWritten != byte_length)
+							// sanity check
+							if (numVerts != facetMesh->getNumVertices())
 							{
-								// write error
-								QString errString = rawWeight.errorString();
-								QMessageBox::warning(0, tr("Error writing raw dforce weightmap. Incorrect number of bytes written."),
-									errString, QMessageBox::Ok);
+								// throw error if needed
+								dzApp->log("Unofficial DazToUnity Bridge: ERROR Exporting Weight Map to file.");
+								return;
 							}
-							rawWeight.close();
-						}
+							int numMaterials = facetMesh->getNumMaterialGroups();
+							std::list<MaterialGroupExportOrderMetaData> exportQueue;
+							DzFacet* facetPtr = facetMesh->getFacetsPtr();
 
-					}
+							// generate export order queue
+							// first, populate export queue with materialgroups
+							for (int i = 0; i < numMaterials; i++)
+							{
+								DzMaterialFaceGroup* materialGroup = facetMesh->getMaterialGroup(i);
+								int numFaces = materialGroup->count();
+								const int* indexPtr = materialGroup->getIndicesPtr();
+								int offset = facetPtr[indexPtr[0]].m_vertIdx[0];
+								int count = -1;
+								MaterialGroupExportOrderMetaData *metaData = new MaterialGroupExportOrderMetaData(i, offset);
+								exportQueue.push_back(*metaData);
+							}
 
-				}
-			}
+							// sort: uses operator< to order by vertex_offset
+							exportQueue.sort();
 
-		}
+							/////////////////////////////////////////
+							// for building vertex index lookup tables
+							/////////////////////////////////////////
+							int material_vertex_count = 0;
+							int material_vertex_offset = 0;
+							int* DazToUnityLookup = new int[numVerts];
+							for (int i = 0; i < numVerts; i++) { DazToUnityLookup[i] = -1; }
+							int* UnityToDazLookup = new int[numVerts];
+							for (int i = 0; i < numVerts; i++) { UnityToDazLookup[i] = -1; }
 
+							int unity_weightmap_vertexindex = 0;
+							// iterate through sorted material groups...
+							for (std::list<MaterialGroupExportOrderMetaData>::iterator export_iter = exportQueue.begin(); export_iter != exportQueue.end(); export_iter++)
+							{
+								// update the vert_offset for each materialGroup
+								material_vertex_offset = material_vertex_offset + material_vertex_count;
+								material_vertex_count = 0;
+								int check_offset = export_iter->vertex_offset;
+
+								// retrieve material group based on sorted material index list
+								int materialGroupIndex = export_iter->materialIndex;
+								DzMaterialFaceGroup* materialGroup = facetMesh->getMaterialGroup(materialGroupIndex);
+								int numFaces = materialGroup->count();
+								// pointer for faces in materialGroup
+								const int* indexPtr = materialGroup->getIndicesPtr();
+
+								// get each face in materialGroup, then iterate through all vertex indices in the face
+								// copy out weights into buffer using material group's vertex ordering, but cross-referenced with internal vertex array indices
+
+								// get the i-th index into the index array of faces, then retrieve the j-th index into the vertex index array
+								// i is 0 to number of faces (aka facets), j is 0 to number of vertices in the face
+								for (int i = 0; i < numFaces; i++)
+								{
+									int vertsPerFacet = (facetPtr->isQuad()) ? 4 : 3;
+									for (int j = 0; j < vertsPerFacet; j++)
+									{
+										// retrieve vertex index into daz internal vertex array (probably a BST in array format)
+										int vert_index = facetPtr[indexPtr[i]].m_vertIdx[j];
+
+										///////////////////////////////////
+										// NOTE: Since the faces will often share/re-use the same vertex, we need to skip
+										// any vertex that has already been recorded, since we want ONLY unique vertices
+										// in weightmap.  This is done by creating checking back into a DazToUnity vertex index lookup table
+										///////////////////////////////////
+										// unique vertices will not yet be written and have default -1 value
+										if (DazToUnityLookup[vert_index] == -1)
+										{
+											// This vertex is unique, record into the daztounity lookup table and proceed with other operations
+											// to be performend on unqiue verts.
+											DazToUnityLookup[vert_index] = unity_weightmap_vertexindex;
+
+											// use the vertex index to cross-reference to the corresponding weightmap value and copy out to buffer for exporting
+											// (only do this for unique verts)
+											unity_weights[unity_weightmap_vertexindex] = daz_weights[vert_index];
+
+											// Create the unity to daz vertex lookup table (only do this for unique verts)
+											UnityToDazLookup[unity_weightmap_vertexindex] = vert_index;
+
+											// increment the unity weightmap vertex index (only do this for unique verts)
+											unity_weightmap_vertexindex++;
+										}
+
+									} //for (int j = 0; j < vertsPerFace; j++)
+
+								} // for (int i = 0; i < numFaces; i++)
+
+							} // for (std::list<MaterialGroupExportOrderMetaData>::iterator export_iter = exportQueue.begin(); export_iter != exportQueue.end(); export_iter++)
+
+							// export to raw file
+							QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
+							QFile rawWeight(CharacterFolder + filename);
+							if (rawWeight.open(QIODevice::WriteOnly))
+							{
+								int bytesWritten = rawWeight.write(buffer, byte_length);
+								if (bytesWritten != byte_length)
+								{
+									// write error
+									QString errString = rawWeight.errorString();
+									QMessageBox::warning(0, tr("Error writing raw dforce weightmap. Incorrect number of bytes written."),
+										errString, QMessageBox::Ok);
+								}
+								rawWeight.close();
+							}
+
+						} // if (facetMesh) /** facetMesh null? */
+					} // if (weightMap) /** weightmap null? */
+				} // if (result != -1) /** invokeMethod failed? */
+			} // if (methodIndex != -1) /** findMethod failed? */
+		} // if (bDForceSettingsAvailable) /** no dforce data found */
 	} // if (Shape)
 
 	DzNodeListIterator Iterator = Node->nodeChildrenIterator();

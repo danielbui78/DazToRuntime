@@ -14,6 +14,34 @@ class UnofficialDzUnityAction : public UnofficialDzRuntimePluginAction {
 public:
 	 UnofficialDzUnityAction();
 
+	class MaterialGroupExportOrderMetaData
+	{
+	public:
+		int materialIndex;
+		int vertex_offset;
+		int vertex_count;
+
+		MaterialGroupExportOrderMetaData(int a_index, int a_offset)
+		{
+			materialIndex = a_index;
+			vertex_offset = a_offset;
+			vertex_count = -1;
+		}
+
+		bool operator< (MaterialGroupExportOrderMetaData b)
+		{
+			if (vertex_offset < b.vertex_offset)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+	 };
+
 protected:
 	 DzUnitySubdivisionDialog* SubdivisionDialog;
 	 bool InstallUnityFiles;
