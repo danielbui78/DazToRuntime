@@ -625,15 +625,6 @@ namespace Daz3D
                                         cloth.damping = dforceMat.dtuMaterial.Get("Damping").Float;
                                         cloth.friction = dforceMat.dtuMaterial.Get("Friction").Float;
 
-                                        // default values
-                                        //ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[cloth.coefficients.Length];
-                                        //for (int coeff_index = 0; coeff_index < newCoefficients.Length; coeff_index++)
-                                        //{
-                                        //    newCoefficients[coeff_index].maxDistance = 0.0f;
-                                        //    newCoefficients[coeff_index].collisionSphereDistance = 0.005f;
-                                        //}
-                                        //cloth.coefficients = newCoefficients;
-
                                         // fix SkinnedMeshRenderer boundaries bug
                                         skinned.updateWhenOffscreen = true;
 
@@ -661,61 +652,58 @@ namespace Daz3D
                                         cloth = parent.GetComponent<Cloth>();
                                     }
 
-                                    // map the materical's submesh's vertices to the correct "Dynamics Strength"
-                                    float simulation_strength = dforceMat.dtuMaterial.Get("Dynamics Strength").Float;
-                                    Debug.Log("DEBUG INFO: simulation strength: " + simulation_strength);
-                                    // get vertex list for this material's submesh
+                                    // add clothtools to gameobject parent of renderer
+                                    LoadDforceMap clothTools;
+                                    if (parent.GetComponent<LoadDforceMap>() == null)
+                                    {
+                                        clothTools = parent.AddComponent<LoadDforceMap>();
+                                        clothTools.GenerateLookupTables();
+                                    }
+                                    else
+                                    {
+                                        clothTools = parent.GetComponent<LoadDforceMap>();
+                                    }
+
                                     int matIndex = Array.IndexOf(skinned.sharedMaterials, keyMat);
+                                    // get vertex list for this material's submesh
                                     if (matIndex >= 0)
                                     {
+                                        float simulation_strength;
+                                        //// map the materical's submesh's vertices to the correct "Dynamics Strength"
+                                        simulation_strength = dforceMat.dtuMaterial.Get("Dynamics Strength").Float;
+                                        Debug.Log("DEBUG INFO: simulation strength: " + simulation_strength);
+                                        //// DEBUG line to map simulation strength to material index
+                                        //simulation_strength = matIndex;
 
-                                        ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[cloth.coefficients.Length];
-                                        Array.Copy(cloth.coefficients, newCoefficients, newCoefficients.Length);
-
-                                        //UnityEngine.Rendering.SubMeshDescriptor submesh = skinned.sharedMesh.GetSubMesh(matIndex);
-                                        //for (int vertex_index = submesh.firstVertex; vertex_index < submesh.vertexCount; vertex_index++)
-                                        //{
-                                        //    float value = simulation_strength * 0.2f;
-                                        //    newCoefficients[vertex_index].maxDistance = value;
-                                        //}
-
-                                        int[] vertex_list = skinned.sharedMesh.GetTriangles(matIndex, false);
-                                        foreach (int vertex_index in vertex_list)
+                                        //// Tiered scaling function
+                                        float adjusted_simulation_strength;
+                                        //float strength_max = 1.0f;
+                                        //float strength_min = 0.0f;
+                                        float strength_scale_threshold = 0.5f;
+                                        if (simulation_strength <= strength_scale_threshold)
                                         {
-                                            if (vertex_index >= newCoefficients.Length)
-                                            {
-                                                Debug.LogWarning("DFORCE IMPORT: vertex_index for dforce weights is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
-                                                continue;
-                                            }
-                                            float strength_max = 1.0f;
-                                            float strength_min = 0.0f;
-                                            float strength_scale_threshold = 0.5f;
-                                            float adjusted_simulation_strength;
-                                            // tiered scaling
-                                            if (simulation_strength <= strength_scale_threshold)
-                                            {
-                                                // stronger compression of values below threshold
-                                                float scale = 0.075f;
-                                                float offset = 0.2f;
-                                                adjusted_simulation_strength = (simulation_strength - offset) * scale;
-                                            }
-                                            else
-                                            {
-                                                float offset = (strength_scale_threshold - 0.2f) * 0.075f; // offset = (threshold - previous tier's offset) * previous teir's scale
-                                                float scale = 0.2f;
-                                                adjusted_simulation_strength = (simulation_strength - offset)/(1 - offset); // apply offset, then normalize to 1.0
-                                                adjusted_simulation_strength *= scale;
-
-                                            }
-                                            // clamp to 0.0f to 0.2f
-                                            float coeff_min = 0.0f;
-                                            float coeff_max = 0.2f;
-                                            adjusted_simulation_strength = (adjusted_simulation_strength > coeff_min) ? adjusted_simulation_strength : coeff_min;
-                                            adjusted_simulation_strength = (adjusted_simulation_strength < coeff_max) ? adjusted_simulation_strength : coeff_max;
-                                            newCoefficients[vertex_index].maxDistance = adjusted_simulation_strength;
+                                            //// stronger compression of values below threshold
+                                            float scale = 0.075f;
+                                            float offset = 0.2f;
+                                            adjusted_simulation_strength = (simulation_strength - offset) * scale;
                                         }
+                                        else
+                                        {
+                                            float offset = (strength_scale_threshold - 0.2f) * 0.075f; // offset = (threshold - previous tier's offset) * previous teir's scale
+                                            float scale = 0.2f;
+                                            adjusted_simulation_strength = (simulation_strength - offset) / (1 - offset); // apply offset, then normalize to 1.0
+                                            adjusted_simulation_strength *= scale;
+                                        }
+                                        //// clamp to 0.0f to 0.2f
+                                        float coeff_min = 0.0f;
+                                        float coeff_max = 0.2f;
+                                        adjusted_simulation_strength = (adjusted_simulation_strength > coeff_min) ? adjusted_simulation_strength : coeff_min;
+                                        adjusted_simulation_strength = (adjusted_simulation_strength < coeff_max) ? adjusted_simulation_strength : coeff_max;
+                                        //// Debug line for no scaling
+                                        //adjusted_simulation_strength = simulation_strength;
 
-                                        cloth.coefficients = newCoefficients;
+                                        clothTools.SetSubMeshWeights(matIndex, adjusted_simulation_strength);
+
                                     }
 
                                 }
@@ -1156,7 +1144,8 @@ namespace Daz3D
         static void DoStuffToSelectedDTU()
         {
             CreateDTUPrefab(Selection.activeObject);
-            Debug.Log("Selected Transform is on " + Selection.activeTransform.gameObject.name + ".");
+            if (Selection.activeTransform)
+                Debug.Log("Selected Transform is on " + Selection.activeTransform.gameObject.name + ".");
         }
 
         //// Validate the menu item defined by the function above.
