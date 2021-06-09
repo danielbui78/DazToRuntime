@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(LoadDforceMap))]
+[CustomEditor(typeof(ClothTools))]
 [CanEditMultipleObjects]
 
-public class LoadDforceMapEditor : Editor
+public class ClothToolsEditor : Editor
 {
     private SerializedObject m_Object;
 
@@ -17,7 +17,7 @@ public class LoadDforceMapEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        LoadDforceMap loadDforce = (LoadDforceMap)target;
+        ClothTools clothtools = (ClothTools)target;
 
         m_Object.Update();
 
@@ -39,17 +39,17 @@ public class LoadDforceMapEditor : Editor
                 GUILayout.Label(mat.name);
                 if (GUILayout.Button("Clear"))
                 {
-                    loadDforce.ClearSubMeshWeights(matIndex);
+                    clothtools.ClearSubMeshWeights(matIndex);
                     Debug.Log("Clear Material Weights: " + mat.name);
                 }
                 if (GUILayout.Button("Zero"))
                 {
-                    loadDforce.SetSubMeshWeights(matIndex, 0.0f);
+                    clothtools.SetSubMeshWeights(matIndex, 0.0f);
                     Debug.Log("Zero Material Weights: " + mat.name);
                 }
                 if (GUILayout.Button("One"))
                 {
-                    loadDforce.SetSubMeshWeights(matIndex, 1.0f);
+                    clothtools.SetSubMeshWeights(matIndex, 1.0f);
                     Debug.Log("Set Material Weights to 1.0: " + mat.name);
                 }
                 GUILayout.EndHorizontal();
@@ -59,42 +59,42 @@ public class LoadDforceMapEditor : Editor
         GUILayout.Space(10);
         if (GUILayout.Button("Clear Weights"))
         {
-            loadDforce.ClearWeightMap();
+            clothtools.ClearWeightMap();
             Debug.Log("Clear Weights.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Load Weightmap data"))
         {
-            loadDforce.LoadRawWeightMap();
+            clothtools.LoadRawWeightMap();
             Debug.Log("Load Weightmap data.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Load Gradient Pattern"))
         {
-            loadDforce.LoadGradientPattern();
+            clothtools.LoadGradientPattern();
             Debug.Log("Load Gradient Pattern.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Load Stepped Gradient"))
         {
-            loadDforce.LoadSteppedGradient();
+            clothtools.LoadSteppedGradient();
             Debug.Log("Load Stepped Gradient.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Generate Lookup Tables"))
         {
-            loadDforce.GenerateLookupTables();
+            clothtools.GenerateLookupTables();
             Debug.Log("Generate Lookup Tables Called....");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Run Vertex Data Test"))
         {
-            loadDforce.TestVertData();
+            clothtools.TestVertData();
             Debug.Log("Running Vertex Data Test....");
         }
 

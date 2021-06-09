@@ -653,15 +653,15 @@ namespace Daz3D
                                     }
 
                                     // add clothtools to gameobject parent of renderer
-                                    LoadDforceMap clothTools;
-                                    if (parent.GetComponent<LoadDforceMap>() == null)
+                                    ClothTools clothTools;
+                                    if (parent.GetComponent<ClothTools>() == null)
                                     {
-                                        clothTools = parent.AddComponent<LoadDforceMap>();
+                                        clothTools = parent.AddComponent<ClothTools>();
                                         clothTools.GenerateLookupTables();
                                     }
                                     else
                                     {
-                                        clothTools = parent.GetComponent<LoadDforceMap>();
+                                        clothTools = parent.GetComponent<ClothTools>();
                                     }
 
                                     int matIndex = Array.IndexOf(skinned.sharedMaterials, keyMat);

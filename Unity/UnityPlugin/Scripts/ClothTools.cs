@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [ExecuteInEditMode]
-public class LoadDforceMap : MonoBehaviour
+public class ClothTools : MonoBehaviour
 {
     public TextAsset m_BinaryData;
     public TextAsset m_TestVertData;
