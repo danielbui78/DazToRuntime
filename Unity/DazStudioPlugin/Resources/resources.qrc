@@ -11,6 +11,10 @@
 		<file alias="Daz3DInstance.cs">../../UnityPlugin/Scripts/Daz3DInstance.cs</file>
     <file alias="ClothCollisionAssigner.cs">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs</file>
     <file alias="ClothCollisionAssigner.cs.meta">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs.meta</file>
+    <file alias="ClothTools.cs">../../UnityPlugin/Scripts/ClothTools.cs</file>
+    <file alias="ClothTools.cs.meta">../../UnityPlugin/Scripts/ClothTools.cs.meta</file>
+    <file alias="CollapsedVertexArray.cs">../../UnityPlugin/Scripts/CollapsedVertexArray.cs</file>
+    <file alias="CollapsedVertexArray.cs.meta">../../UnityPlugin/Scripts/CollapsedVertexArray.cs.meta</file>
   </qresource>
 	<qresource prefix="/UnofficialDaz/Editor">
 		<file alias="Daz3DBridge.cs">../../UnityPlugin/Scripts/Editor/Daz3DBridge.cs</file>
@@ -19,6 +23,10 @@
 		<file alias="DTUConverter.cs">../../UnityPlugin/Scripts/Editor/DTUConverter.cs</file>
 		<file alias="DazJSONHelper.cs">../../UnityPlugin/Scripts/Editor/DazJSONHelper.cs</file>
     <file alias="DetectRenderPipeline.cs">../../UnityPlugin/Scripts/Editor/DetectRenderPipeline.cs</file>"
+    <file alias="ClothCollisionAssignerEditor.cs">../../UnityPlugin/Scripts/Editor/ClothCollisionAssignerEditor.cs</file>
+    <file alias="ClothCollisionAssignerEditor.cs.meta">../../UnityPlugin/Scripts/Editor/ClothCollisionAssignerEditor.cs.meta</file>
+    <file alias="ClothToolsEditor.cs">../../UnityPlugin/Scripts/Editor/ClothToolsEditor.cs</file>
+    <file alias="ClothToolsEditor.cs.meta">../../UnityPlugin/Scripts/Editor/ClothToolsEditor.cs.meta</file>
 	</qresource>
 	<qresource prefix="/UnofficialDaz/Shaders">
 		<file alias="IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/IrayUberMetal.shadergraph</file>
