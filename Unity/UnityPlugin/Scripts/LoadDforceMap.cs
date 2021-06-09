@@ -16,15 +16,17 @@ public class LoadDforceMap : MonoBehaviour
     [System.Serializable]
     class SubmeshMeta
     {
+        public int submesh_index;
+        public string submesh_name;
         public int vertex_offset;
         public int vertex_count;
-        public int submesh_index;
 
-        public SubmeshMeta(int offset, int count, int index)
+        public SubmeshMeta(int index, string name, int offset, int count)
         {
+            submesh_index = index;
+            submesh_name = name;
             vertex_offset = offset;
             vertex_count = count;
-            submesh_index = index;
         }
 
         public int Start()
@@ -37,143 +39,24 @@ public class LoadDforceMap : MonoBehaviour
             return vertex_offset + vertex_count + 1;
         }
 
+        public bool InSubmesh(int a_index)
+        {
+            if ( a_index >= vertex_offset && a_index <= (vertex_offset+vertex_count) )
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
+    [SerializeField]
     List<SubmeshMeta> m_SubmeshMeta;
 
-    /////////////////////////////////////////////////////////////////
-    // SkinnedMesh vertex index TO Cloth vertex index
-    /////////////////////////////////////////////////////////////////
-    [System.Serializable]
-    class CollapsedVertexArray
-    {
-        private Dictionary<int, List<CollapsedVertex>> m_CollapsedVertices;
-        private int m_UniqueVertexCount;
-        private Dictionary<int, int> m_LookupTable;
-
-        public class CollapsedVertex
-        {
-            public Vector3 vertex;
-            public int unique_index;
-            public List<int> indexes;
-            const float near_zero = 0.0001f; // 0.1 mm
-
-            public CollapsedVertex(Vector3 a_vertex, int index, int a_unique_index)
-            {
-                vertex = a_vertex;
-                indexes = new List<int>(1) { index };
-                unique_index = a_unique_index;
-            }
-
-            public void AddIndex(int index)
-            {
-                indexes.Add(index);
-            }
-
-            public static bool operator ==(CollapsedVertex a, Vector3 b) => a.vertex == b;
-            public static bool operator !=(CollapsedVertex a, Vector3 b) => a.vertex != b;
-
-            public static bool operator ==(CollapsedVertex a, CollapsedVertex b) => a.vertex == b.vertex;
-            public static bool operator !=(CollapsedVertex a, CollapsedVertex b) => a.vertex != b.vertex;
-            public override bool Equals(object obj) => this.vertex.Equals(obj);
-            public override int GetHashCode() => this.vertex.GetHashCode();
-
-        }
-
-        public int Length
-        {
-            get
-            {
-                return m_UniqueVertexCount;
-            }
-        }
-
-        public int LookupIndex(int a_index)
-        {
-            if (m_LookupTable != null)
-            {
-                if (m_LookupTable.ContainsKey(a_index))
-                    return m_LookupTable[a_index];
-            }
-
-            return -1;
-
-        }
-
-        public CollapsedVertexArray(Vector3[] a_vertices)
-        {
-            if (a_vertices.Length <= 0)
-            {
-                m_UniqueVertexCount = -1;
-                return;
-            }
-
-            m_CollapsedVertices = new Dictionary<int, List<CollapsedVertex>>(a_vertices.Length);
-            for (int i=0; i < a_vertices.Length; i++)
-            {
-                Vector3 a_vert = a_vertices[i];
-                bool vert_is_unique = true;
-                if (m_CollapsedVertices.ContainsKey(a_vert.GetHashCode()))
-                {
-                    // get optimized (hashcode filtered) list of verts, check against each one for uniqueness
-                    List<CollapsedVertex> cvert_list = m_CollapsedVertices[a_vert.GetHashCode()];
-                    foreach (CollapsedVertex cvert in cvert_list)
-                    {
-                        if (cvert == a_vert)
-                        {
-                            vert_is_unique = false;
-                            cvert.AddIndex(i);
-                            break;
-                        }
-                    }
-                    if (vert_is_unique)
-                    {
-                        // add to end of unqiue verts array
-                        //m_CollapsedVertices[m_UniqueVertexCount++] = new CollapsedVertex(a_vert, i);
-                        cvert_list.Add(new CollapsedVertex(a_vert, i, m_UniqueVertexCount++));
-                    }
-
-                }
-                else
-                {
-                    // assume unqiue
-                    m_CollapsedVertices.Add(a_vert.GetHashCode(), new List<CollapsedVertex>(1) { new CollapsedVertex(a_vert, i, m_UniqueVertexCount++) });
-                }
-
-            }
-
-            // build lookup tables / Dictionaries
-            m_LookupTable = new Dictionary<int, int>(a_vertices.Length);
-            foreach (List<CollapsedVertex> cvert_list in m_CollapsedVertices.Values)
-            {
-                foreach (CollapsedVertex cvert in cvert_list)
-                {
-                    foreach (int key in cvert.indexes)
-                    {
-                        if (m_LookupTable.ContainsKey(key))
-                        {
-                            m_LookupTable[key] = cvert.unique_index;
-                        }
-                        else
-                        {
-                            m_LookupTable.Add(key, cvert.unique_index);
-                        }
-                    }
-
-                }
-            }
-
-            Debug.Log("Finished CollapsedVertexArray: original Verts=" + a_vertices.Length + ", unique Verts=" + m_UniqueVertexCount);
-            return;
-
-        }
-
-    }
-
-    /////////////////////////////////////////////////////////////////
-    // End: SkinnedMesh vertex index TO Cloth vertex index
-    /////////////////////////////////////////////////////////////////
-    [SerializeField, HideInInspector]
-    CollapsedVertexArray m_CollapsedVerts;
+    [HideInInspector]
+    public CollapsedVertexArray m_CollapsedVerts;
 
     // Start is called before the first frame update
     void OnEnable()
@@ -182,10 +65,7 @@ public class LoadDforceMap : MonoBehaviour
         m_Skinned = parent.GetComponent<SkinnedMeshRenderer>();
         m_Cloth = parent.GetComponent<Cloth>();
 
-        m_SubmeshMeta = new List<SubmeshMeta>();
-
     }
-
 
     public void GenerateLookupTables()
     {
@@ -200,12 +80,25 @@ public class LoadDforceMap : MonoBehaviour
             Debug.LogError("# collapsed verts (" + m_CollapsedVerts.Length + ") != # cloth verts(" + m_Cloth.vertices.Length + ").  Please fix lookup table.");
         }
 
+        // create submesh meta
+        m_SubmeshMeta = new List<SubmeshMeta>();
+        for (int i = 0; i <  m_Skinned.sharedMesh.subMeshCount; i++)
+        {
+            var submesh = m_Skinned.sharedMesh.GetSubMesh(i);
+            string submesh_name = submesh.ToString();
+            if (m_Skinned.sharedMaterials.Length == m_Skinned.sharedMesh.subMeshCount)
+            {
+                submesh_name = m_Skinned.sharedMaterials[i].name;
+            }
+            m_SubmeshMeta.Add(new SubmeshMeta(i, submesh_name, submesh.firstVertex, submesh.vertexCount));
+        }
+
     }
 
 
     public void SetSubMeshWeights(int submesh_index, float weight_value)
     {
-        if (m_Cloth == null)
+        if (m_Cloth == null || m_CollapsedVerts == null)
             return;
 
         if (submesh_index > m_Skinned.sharedMesh.subMeshCount)
@@ -221,7 +114,8 @@ public class LoadDforceMap : MonoBehaviour
         for (int vertex_index = submesh.firstVertex; vertex_index < (submesh.firstVertex + submesh.vertexCount); vertex_index++)
         {
             int cloth_vertex = m_CollapsedVerts.LookupIndex(vertex_index);
-            newCoefficients[cloth_vertex].maxDistance = weight_value;
+            if (cloth_vertex != -1)
+                newCoefficients[cloth_vertex].maxDistance = weight_value;
 
         }
 
@@ -304,13 +198,6 @@ public class LoadDforceMap : MonoBehaviour
         ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[m_Cloth.coefficients.Length];
         System.Array.Copy(m_Cloth.coefficients, newCoefficients, newCoefficients.Length);
 
-        //UnityEngine.Rendering.SubMeshDescriptor submesh = skinned.sharedMesh.GetSubMesh(matIndex);
-        //for (int vertex_index = submesh.firstVertex; vertex_index < submesh.vertexCount; vertex_index++)
-        //{
-        //    float value = simulation_strength * 0.2f;
-        //    newCoefficients[vertex_index].maxDistance = value;
-        //}
-
         /////////////////////////////////////////////////////
         /// Load Raw Weight Map
         /////////////////////////////////////////////////////
@@ -325,19 +212,34 @@ public class LoadDforceMap : MonoBehaviour
         {
             //int cloth_index = m_CollapsedVerts.LookupIndex(vertex_index);
             int cloth_index = vertex_index;
-            if (cloth_index < 0)
-            {
-                Debug.LogError("DFORCE IMPORT: dforce weightmap vertex index has no mapping to cloth index");
-                continue;
-            }
             if (cloth_index >= newCoefficients.Length)
             {
-                Debug.LogWarning("DFORCE IMPORT: cloth_corrected_index for dforce weights is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
-                continue;
+                Debug.LogError("DFORCE IMPORT: cloth_index is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
+                break;
             }
 
+            //if (m_SubmeshMeta[2].InSubmesh(cloth_index))
+            //{
+            //    cloth_index -= m_SubmeshMeta[2].vertex_offset;
+            //}
+            //else if (m_SubmeshMeta[3].InSubmesh(cloth_index))
+            //{
+            //    cloth_index -= m_SubmeshMeta[2].vertex_offset;
+            //}
+            //else if (m_SubmeshMeta[0].InSubmesh(cloth_index))
+            //{
+            //    cloth_index += (m_SubmeshMeta[2].vertex_count + m_SubmeshMeta[3].vertex_count);
+            //}
+            //else if (m_SubmeshMeta[1].InSubmesh(cloth_index))
+            //{
+            //    cloth_index += (m_SubmeshMeta[2].vertex_count + m_SubmeshMeta[3].vertex_count);
+            //}
+
+
             simulation_strength = (float) weights[vertex_index] / ushort.MaxValue;
-//            simulation_strength = 0.5f;
+
+            //// DEBUG TESTING: set zero value (red) to maxvalue(black)
+            //if (simulation_strength == 0) simulation_strength = float.MaxValue;
 
             //float strength_max = 1.0f;
             //float strength_min = 0.0f;
@@ -373,13 +275,6 @@ public class LoadDforceMap : MonoBehaviour
 
     }
 
-    struct float3
-    {
-        public float x;
-        public float y;
-        public float z;
-    };
-
     public void TestVertData()
     {
         // get verts
@@ -395,14 +290,13 @@ public class LoadDforceMap : MonoBehaviour
         Vector3 unityMin = new Vector3();
         Vector3 dazMax = new Vector3();
         Vector3 dazMin = new Vector3();
-        //bool calcDazBounds = true;
 
         int i;
         for (i=0; i < unityVerts.Length; i++)
         {
-            //Vector3 a_vert = m_Skinned.rootBone.TransformPoint(unityVerts[i]);
-            //Vector3 a_vert = m_Cloth.transform.TransformPoint(unityVerts[i]);
-            Vector3 a_vert = unityVerts[i];
+            Vector3 a_vert = m_Skinned.rootBone.TransformPoint(unityVerts[i]);
+//            Vector3 a_vert = m_Cloth.transform.TransformPoint(unityVerts[i]);
+//            Vector3 a_vert = unityVerts[i];
             a_vert *= 100f;
 
             // calc bounds for unity verts
@@ -416,23 +310,10 @@ public class LoadDforceMap : MonoBehaviour
             //int j;
             //for (j=0; j < numVerts; j++)
             //{
-            //    if (calcDazBounds)
-            //    {
-            //        // calc bounds for unity verts
-            //        dazMax.x = (a_vert.x > dazMax.x) ? a_vert.x : dazMax.x;
-            //        dazMax.y = (a_vert.y > dazMax.y) ? a_vert.y : dazMax.y;
-            //        dazMax.z = (a_vert.z > dazMax.z) ? a_vert.z : dazMax.z;
-            //        dazMin.x = (a_vert.x > dazMin.x) ? a_vert.x : dazMin.x;
-            //        dazMin.y = (a_vert.y > dazMin.y) ? a_vert.y : dazMin.y;
-            //        dazMin.z = (a_vert.z > dazMin.z) ? a_vert.z : dazMin.z;
-
-            //    }
-
             //    Vector3 b_vert = new Vector3();
             //    b_vert.x = -dazVertBuffer[(j*3)+0] * 0.01f;
             //    b_vert.y = dazVertBuffer[(j*3)+1] * 0.01f;
             //    b_vert.z = dazVertBuffer[(j*3)+2] * 0.01f;
-
             //    if (Vector3.Distance(a_vert, b_vert) < 0.001f)
             //    {
             //        Debug.Log("unity[" + i + "] == daz[" + j + "]");
@@ -451,10 +332,9 @@ public class LoadDforceMap : MonoBehaviour
         for (j = 0; j < numVerts; j++)
         {
             Vector3 a_vert = new Vector3();
-            a_vert.x = dazVertBuffer[(j*3) + 0] * 1f;
-            a_vert.y = dazVertBuffer[(j*3) + 1] * 1f;
-            a_vert.z = dazVertBuffer[(j*3) + 2] * 1f;
-
+            a_vert.y = dazVertBuffer[(j * 3) + 0] * 0.95830578062345271389800693281935f;
+            a_vert.x = dazVertBuffer[(j * 3) + 1] * 0.7561518763918325407088556644264f;
+            a_vert.z = dazVertBuffer[(j * 3) + 2] * 1.1470080563670463526164516598318f + 14.86038f;
             // calc bounds for unity verts
             dazMax.x = (a_vert.x > dazMax.x) ? a_vert.x : dazMax.x;
             dazMax.y = (a_vert.y > dazMax.y) ? a_vert.y : dazMax.y;
@@ -462,11 +342,9 @@ public class LoadDforceMap : MonoBehaviour
             dazMin.x = (a_vert.x < dazMin.x) ? a_vert.x : dazMin.x;
             dazMin.y = (a_vert.y < dazMin.y) ? a_vert.y : dazMin.y;
             dazMin.z = (a_vert.z < dazMin.z) ? a_vert.z : dazMin.z;
-
         }
-
-        Debug.Log("unityBounds: (" + unityMin.x + " to " + unityMax.x + ", " + unityMin.y + " to " + unityMax.y + ", " + unityMin.z + " to " + unityMax.z + ")");
-        Debug.Log("dazBounds: (" + dazMin.x + " to " + dazMax.x + ", " + dazMin.y + " to " + dazMax.y + ", " + dazMin.z + " to " + dazMax.z + ")");
+        Debug.Log("unityBounds: (" + unityMin.x + " to " + unityMax.x + " [" + (unityMax.x - unityMin.x) + "], " + unityMin.y + " to " + unityMax.y + " [" + (unityMax.y - unityMin.y) + "], " + unityMin.z + " to " + unityMax.z + " [" + (unityMax.z - unityMin.z) + "])");
+        Debug.Log("dazBounds: (" + dazMin.x + " to " + dazMax.x + " [" + (dazMax.x - dazMin.x) + "], " + dazMin.y + " to " + dazMax.y + " [" + (dazMax.y - dazMin.y) + "], " + dazMin.z + " to " + dazMax.z + " [" + (dazMax.z - dazMin.z) + "])");
 
         Debug.Log("Done");
 
