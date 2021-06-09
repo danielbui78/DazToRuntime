@@ -109,14 +109,23 @@ public class LoadDforceMap : MonoBehaviour
 
         ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[m_Cloth.coefficients.Length];
         System.Array.Copy(m_Cloth.coefficients, newCoefficients, newCoefficients.Length);
-        UnityEngine.Rendering.SubMeshDescriptor submesh = m_Skinned.sharedMesh.GetSubMesh(submesh_index);
 
-        for (int vertex_index = submesh.firstVertex; vertex_index < (submesh.firstVertex + submesh.vertexCount); vertex_index++)
+        //var submesh = m_Skinned.sharedMesh.GetSubMesh(submesh_index);
+        //for (int vertex_index = submesh.firstVertex; vertex_index < (submesh.firstVertex + submesh.vertexCount); vertex_index++)
+        //{
+        //    int cloth_vertex = m_CollapsedVerts.LookupIndex(vertex_index);
+        //    if (cloth_vertex != -1)
+        //        newCoefficients[cloth_vertex].maxDistance = weight_value;
+        //}
+
+        var triangle_vertindex_array = m_Skinned.sharedMesh.GetTriangles(submesh_index);
+        foreach (int vertex_index in triangle_vertindex_array)
         {
             int cloth_vertex = m_CollapsedVerts.LookupIndex(vertex_index);
             if (cloth_vertex != -1)
                 newCoefficients[cloth_vertex].maxDistance = weight_value;
-
+            else
+                Debug.LogError("DFORCE IMPORT (LoadDforceMap::SetSubmeshWeights()): submesh vertex index lookup did not return valid result for cloth vertex index.");
         }
 
         m_Cloth.coefficients = newCoefficients;
