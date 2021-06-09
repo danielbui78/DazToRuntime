@@ -926,7 +926,8 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 											// use the vertex index to cross-reference to the corresponding weightmap value and copy out to buffer for exporting
 											// (only do this for unique verts)
-											unity_weights[unity_weightmap_vertexindex] = daz_weights[vert_index];
+											unity_weights[unity_weightmap_vertexindex] = weightMap->getWeight(vert_index);
+											//unity_weights[unity_weightmap_vertexindex] = daz_weights[vert_index];
 
 											// Create the unity to daz vertex lookup table (only do this for unique verts)
 											UnityToDazLookup[unity_weightmap_vertexindex] = vert_index;
