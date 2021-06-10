@@ -2,16 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode]
+[RequireComponent(typeof(Cloth))]
+//[ExecuteInEditMode]
 public class ClothTools : MonoBehaviour
 {
-    public TextAsset m_BinaryData;
-    public TextAsset m_TestVertData;
-    [SerializeField]
-    private SkinnedMeshRenderer m_Skinned;
-    [SerializeField]
-    private Cloth m_Cloth;
-
+    public SkinnedMeshRenderer m_Skinned;
+    public Cloth m_Cloth;
 
     [System.Serializable]
     class SubmeshMeta
@@ -52,19 +48,22 @@ public class ClothTools : MonoBehaviour
         }
 
     }
-    [SerializeField]
-    List<SubmeshMeta> m_SubmeshMeta;
+    [SerializeField, HideInInspector]
+    private List<SubmeshMeta> m_SubmeshMeta;
 
-    [HideInInspector]
+    //[SerializeField, HideInInspector]
     public CollapsedVertexArray m_CollapsedVerts;
 
-    // Start is called before the first frame update
-    void OnEnable()
-    {
-        GameObject parent = GetComponent<Renderer>().gameObject;
-        m_Skinned = parent.GetComponent<SkinnedMeshRenderer>();
-        m_Cloth = parent.GetComponent<Cloth>();
+    public TextAsset m_BinaryData;
+    [HideInInspector]
+    public TextAsset m_TestVertData;
 
+    void Reset()
+    {
+        m_Skinned = GetComponent<SkinnedMeshRenderer>();
+        m_Cloth = GetComponent<Cloth>();
+        m_CollapsedVerts = null;
+        GenerateLookupTables();
     }
 
     public void GenerateLookupTables()
@@ -73,11 +72,11 @@ public class ClothTools : MonoBehaviour
 
         if (m_Cloth.vertices.Length == m_CollapsedVerts.Length)
         {
-            Debug.Log("collapsed == cloth. Ready for weightmap transfer.");
+            //Debug.Log("collapsed == cloth. Ready for weightmap transfer.");
         }
         else
         {
-            Debug.LogError("# collapsed verts (" + m_CollapsedVerts.Length + ") != # cloth verts(" + m_Cloth.vertices.Length + ").  Please fix lookup table.");
+            Debug.LogError("ClothTools.GenerateLookupTables() ERROR: # collapsed verts (" + m_CollapsedVerts.Length + ") != # cloth verts(" + m_Cloth.vertices.Length + ").  Please fix lookup table.");
         }
 
         // create submesh meta
@@ -98,12 +97,15 @@ public class ClothTools : MonoBehaviour
 
     public void SetSubMeshWeights(int submesh_index, float weight_value)
     {
-        if (m_Cloth == null || m_CollapsedVerts == null)
-            return;
+        if (m_CollapsedVerts == null || m_CollapsedVerts.Length <= 0)
+        {
+            Debug.Log("ClothTools.SetSubMeshWeights(): Lookup tables were reset. Regenerating...");
+            GenerateLookupTables();
+        }
 
         if (submesh_index > m_Skinned.sharedMesh.subMeshCount)
         {
-            Debug.LogError("LoadDforceMap::SetSubMeshWeight(): invalid submesh_index=" + submesh_index);
+            Debug.LogError("ClothTools.SetSubMeshWeight(): invalid submesh_index=" + submesh_index);
             return;
         }
 
@@ -119,13 +121,22 @@ public class ClothTools : MonoBehaviour
         //}
 
         var triangle_vertindex_array = m_Skinned.sharedMesh.GetTriangles(submesh_index);
+        bool errorOnce = false;
         foreach (int vertex_index in triangle_vertindex_array)
         {
             int cloth_vertex = m_CollapsedVerts.LookupIndex(vertex_index);
             if (cloth_vertex != -1)
+            {
                 newCoefficients[cloth_vertex].maxDistance = weight_value;
+            }
             else
-                Debug.LogError("DFORCE IMPORT (LoadDforceMap::SetSubmeshWeights()): submesh vertex index lookup did not return valid result for cloth vertex index.");
+            {
+                if (errorOnce == false)
+                {
+                    errorOnce = true;
+                    Debug.LogError("ClothTools.SetSubmeshWeights(): submesh[" + submesh_index + "] vertex index lookup did not return valid result for cloth vertex index. ");
+                }
+            }
         }
 
         m_Cloth.coefficients = newCoefficients;
@@ -223,7 +234,7 @@ public class ClothTools : MonoBehaviour
             int cloth_index = vertex_index;
             if (cloth_index >= newCoefficients.Length)
             {
-                Debug.LogError("DFORCE IMPORT: cloth_index is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
+                Debug.LogError("ClothTools.LoadRawWeightMap(): cloth_index is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
                 break;
             }
 

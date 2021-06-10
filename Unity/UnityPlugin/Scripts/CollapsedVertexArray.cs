@@ -8,10 +8,9 @@ using UnityEngine;
 [System.Serializable]
 public class CollapsedVertexArray
 {
+    private Dictionary<int, int> m_LookupTable;
     private Dictionary<int, List<CollapsedVertex>> m_CollapsedVertices;
     private int m_UniqueVertexCount;
-    [SerializeField, HideInInspector]
-    private Dictionary<int, int> m_LookupTable;
 
     public class CollapsedVertex
     {
@@ -45,6 +44,17 @@ public class CollapsedVertexArray
     {
         get
         {
+            if (m_LookupTable == null || m_LookupTable.Count == 0)
+            {
+                //Debug.LogError("CollapsedVertexArray.Length: m_LookupTable is null");
+                return -1;
+            }
+
+            if (m_LookupTable.Count < m_UniqueVertexCount)
+            {
+                Debug.LogWarning("mLookupTable.Count[" + m_LookupTable.Count + "] may not contain all unique vertices [" + m_UniqueVertexCount + "]");
+            }
+
             return m_UniqueVertexCount;
         }
     }
@@ -113,7 +123,11 @@ public class CollapsedVertexArray
                 {
                     if (m_LookupTable.ContainsKey(key))
                     {
-                        m_LookupTable[key] = cvert.unique_index;
+                        if (m_LookupTable[key] != cvert.unique_index)
+                        {
+                            Debug.LogWarning("CollapsedVertexArray: lookup table generator is overwriting unique index with another value");
+                            m_LookupTable[key] = cvert.unique_index;
+                        }
                     }
                     else
                     {
@@ -124,7 +138,7 @@ public class CollapsedVertexArray
             }
         }
 
-        Debug.Log("Finished CollapsedVertexArray: original Verts=" + a_vertices.Length + ", unique Verts=" + m_UniqueVertexCount);
+        //Debug.Log("Finished CollapsedVertexArray: original Verts=" + a_vertices.Length + ", unique Verts=" + m_UniqueVertexCount);
         return;
 
     }

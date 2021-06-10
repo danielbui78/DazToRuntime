@@ -8,23 +8,23 @@ using UnityEditor;
 
 public class ClothToolsEditor : Editor
 {
-    private SerializedObject m_Object;
+    //private SerializedObject m_Object;
 
-    public void OnEnable()
-    {
-        m_Object = new SerializedObject(target);
-    }
+    //public void OnEnable()
+    //{
+    //    m_Object = new SerializedObject(target);
+    //}
 
     public override void OnInspectorGUI()
     {
         ClothTools clothtools = (ClothTools)target;
 
-        m_Object.Update();
+        //m_Object.Update();
 
         GUILayout.Label("**Load dForce Weight Map**", EditorStyles.boldLabel);
         GUILayout.Space(10);
 
-        base.OnInspectorGUI();
+        DrawDefaultInspector();
 
         GUILayout.Space(10);
         GameObject parent = Selection.activeGameObject;
@@ -40,65 +40,66 @@ public class ClothToolsEditor : Editor
                 if (GUILayout.Button("Clear"))
                 {
                     clothtools.ClearSubMeshWeights(matIndex);
-                    Debug.Log("Clear Material Weights: " + mat.name);
+                    //Debug.Log("Clear Material Weights: " + mat.name);
                 }
                 if (GUILayout.Button("Zero"))
                 {
                     clothtools.SetSubMeshWeights(matIndex, 0.0f);
-                    Debug.Log("Zero Material Weights: " + mat.name);
+                    //Debug.Log("Zero Material Weights: " + mat.name);
                 }
                 if (GUILayout.Button("One"))
                 {
                     clothtools.SetSubMeshWeights(matIndex, 1.0f);
-                    Debug.Log("Set Material Weights to 1.0: " + mat.name);
+                    //Debug.Log("Set Material Weights to 1.0: " + mat.name);
                 }
                 GUILayout.EndHorizontal();
             }
         }
 
         GUILayout.Space(10);
-        if (GUILayout.Button("Clear Weights"))
+        if (GUILayout.Button("Clear All Weights"))
         {
+            Undo.RecordObject(clothtools.m_Cloth, "Clear All Weights");
             clothtools.ClearWeightMap();
-            Debug.Log("Clear Weights.");
+            //Debug.Log("Clear Weights.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Load Weightmap data"))
         {
             clothtools.LoadRawWeightMap();
-            Debug.Log("Load Weightmap data.");
+            //Debug.Log("Load Weightmap data.");
         }
 
         GUILayout.Space(10);
         if (GUILayout.Button("Load Gradient Pattern"))
         {
             clothtools.LoadGradientPattern();
-            Debug.Log("Load Gradient Pattern.");
+            //Debug.Log("Load Gradient Pattern.");
         }
 
-        GUILayout.Space(10);
-        if (GUILayout.Button("Load Stepped Gradient"))
-        {
-            clothtools.LoadSteppedGradient();
-            Debug.Log("Load Stepped Gradient.");
-        }
+        //GUILayout.Space(10);
+        //if (GUILayout.Button("Load Stepped Gradient"))
+        //{
+        //    clothtools.LoadSteppedGradient();
+        //    //Debug.Log("Load Stepped Gradient.");
+        //}
 
-        GUILayout.Space(10);
-        if (GUILayout.Button("Generate Lookup Tables"))
-        {
-            clothtools.GenerateLookupTables();
-            Debug.Log("Generate Lookup Tables Called....");
-        }
+        //GUILayout.Space(10);
+        //if (GUILayout.Button("Generate Lookup Tables"))
+        //{
+        //    clothtools.GenerateLookupTables();
+        //    //Debug.Log("Generate Lookup Tables Called....");
+        //}
 
-        GUILayout.Space(10);
-        if (GUILayout.Button("Run Vertex Data Test"))
-        {
-            clothtools.TestVertData();
-            Debug.Log("Running Vertex Data Test....");
-        }
+        //GUILayout.Space(10);
+        //if (GUILayout.Button("Run Vertex Data Test"))
+        //{
+        //    clothtools.TestVertData();
+        //    //Debug.Log("Running Vertex Data Test....");
+        //}
 
-        m_Object.ApplyModifiedProperties();
+        //m_Object.ApplyModifiedProperties();
     }
 
 }
