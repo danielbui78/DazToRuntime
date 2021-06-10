@@ -190,7 +190,18 @@ namespace Daz3D
         }
 
 
+        private static bool IsRenderPipelineDetected()
+        {
+#if !USING_HDRP && !USING_URP && !USING_BUILTIN
+            ImportEventRecord record = new ImportEventRecord();
+            EventQueue.Enqueue(record);
+            record.AddToken("Please wait while RenderPipeline is detected...");
 
+            return false;
+#else
+            return true;
+#endif
+        }
 
         private static IEnumerator ImportRoutine(string dtuPath, string fbxPath)
         {
@@ -200,6 +211,8 @@ namespace Daz3D
 
             Daz3DBridge.Progress = .03f;
                 yield return new WaitForEndOfFrame();
+
+            IsRenderPipelineDetected();
     
             _map = new MaterialMap(dtuPath);
             _dforceMap = new DForceMaterialMap(dtuPath);

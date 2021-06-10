@@ -50,13 +50,13 @@ namespace Daz3D
         {  
             _instance = (Daz3DBridge)GetWindow(typeof(Daz3DBridge));
 #if USING_HDRP
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge - HDRP");
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - HDRP");
 #elif USING_URP
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge - URP");
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - URP");
 #elif USING_BUILTIN
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge - Built-In Rendering");
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - Built-In Rendering");
 #else
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge - RenderPipeline Not Detected");
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - RenderPipeline Not Detected");
 #endif
         }
 

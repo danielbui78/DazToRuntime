@@ -24,12 +24,10 @@ public class ClothToolsEditor : Editor
         m_Object.Update();
 
         GUILayout.Space(10);
-        GUILayout.Label("**Load dForce Weight Map**", EditorStyles.boldLabel);
-        GUILayout.Space(10);
+        GUILayout.Label("Set Max Distance for Material Group:", EditorStyles.whiteLargeLabel);
 
         //DrawDefaultInspector();
 
-        GUILayout.Space(10);
         SkinnedMeshRenderer skinned = clothtools.gameObject.GetComponent<SkinnedMeshRenderer>();
         int numMaterials = skinned.sharedMaterials.Length;
         if (floatArray == null)
@@ -48,25 +46,36 @@ public class ClothToolsEditor : Editor
 
 //                GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
-                GUILayout.Label(mat.name);
+                //GUILayout.Label(mat.name);
+                floatArray[matIndex] = EditorGUILayout.Slider(mat.name,floatArray[matIndex], 0f, 0.2f);
+
+                //if (GUILayout.Button("Zero"))
+                //{
+                //    clothtools.SetSubMeshWeights(matIndex, 0.0f);
+                //    //Debug.Log("Zero Material Weights: " + mat.name);
+                //}
+                //if (GUILayout.Button("One"))
+                //{
+                //    clothtools.SetSubMeshWeights(matIndex, 1.0f);
+                //    //Debug.Log("Set Material Weights to 1.0: " + mat.name);
+                //}
+                if (GUILayout.Button("Set"))
+                {
+                    clothtools.SetSubMeshWeights(matIndex, floatArray[matIndex]);
+                    floatArray[matIndex] = 0f;
+                    //Debug.Log("Clear Material Weights: " + mat.name);
+                }
                 if (GUILayout.Button("Clear"))
                 {
                     clothtools.ClearSubMeshWeights(matIndex);
+                    floatArray[matIndex] = 0f;
                     //Debug.Log("Clear Material Weights: " + mat.name);
                 }
-                if (GUILayout.Button("Zero"))
-                {
-                    clothtools.SetSubMeshWeights(matIndex, 0.0f);
-                    //Debug.Log("Zero Material Weights: " + mat.name);
-                }
-                if (GUILayout.Button("One"))
-                {
-                    clothtools.SetSubMeshWeights(matIndex, 1.0f);
-                    //Debug.Log("Set Material Weights to 1.0: " + mat.name);
-                }
+                //floatArray[matIndex] = EditorGUILayout.TextField(floatArray[matIndex]);
+
                 GUILayout.EndHorizontal();
-                floatArray[matIndex] = GUILayout.HorizontalSlider(floatArray[matIndex], 0, 1.0f);
-                GUILayout.Space(20);
+
+                //GUILayout.Space(5);
             }
         }
 
@@ -91,14 +100,13 @@ public class ClothToolsEditor : Editor
                     clothtools.ImportWeightMap(path);
                 }
 
-
             }
 
             //clothtools.LoadRawWeightMap();
             ////Debug.Log("Load Weightmap data.");
         }
 
-        GUILayout.Space(10);
+        //GUILayout.Space(10);
         if (GUILayout.Button("Save Weightmap data"))
         {
             var path = EditorUtility.SaveFilePanel(
@@ -116,14 +124,14 @@ public class ClothToolsEditor : Editor
 
         }
 
-        GUILayout.Space(10);
+        //GUILayout.Space(10);
         if (GUILayout.Button("Load Gradient Pattern"))
         {
             clothtools.LoadGradientPattern();
             //Debug.Log("Load Gradient Pattern.");
         }
 
-        GUILayout.Space(10);
+        //GUILayout.Space(10);
         if (GUILayout.Button("Clear All Weights"))
         {
             //Undo.RecordObject(clothtools.m_Cloth, "Clear All Weights");
