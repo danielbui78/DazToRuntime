@@ -116,7 +116,8 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 mainLayout->addRow("Enable Morphs", morphsLayout);
 	 mainLayout->addRow("Enable Subdivision", subdivisionLayout);
 	 mainLayout->addRow("Unity Assets Folder", assetsFolderLayout);
-	 mainLayout->addRow("Install Unity Files", installUnityFilesCheckBox);
+	 installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+	 mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
 	 connect(installUnityFilesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleInstallUnityFilesCheckBoxChange(int)));
 	 addLayout(mainLayout);
 #ifdef FBXOPTIONS
@@ -151,11 +152,15 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 			  // deselect install unity files
 			  settings->setValue("InstallUnityFiles", false);
 			  installUnityFilesCheckBox->setChecked(false);
+			  // rename label to show "Overwrite"
+			  installOrOverwriteUnityFilesLabel->setText(tr("Overwrite Unity Files"));
 		  }
 		  else
 		  {
 			  settings->setValue("InstallUnityFiles", true);
 			  installUnityFilesCheckBox->setChecked(true);
+			  // rename label to show "Install"
+			  installOrOverwriteUnityFilesLabel->setText(tr("Install Unity Files"));
 		  }
 
 	 }
@@ -178,13 +183,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 		  showFbxDialogCheckBox->setChecked(settings->value("ShowFBXDialog").toBool());
 	 }
 #endif
-	 // DB (2021-05-15): installUnityFiles is now handled by existence of "Assets/Daz3D" subfolder
-	 //if (!settings->value("InstallUnityFiles").isNull())
-	 //{
-		//  installUnityFilesCheckBox->setChecked(settings->value("InstallUnityFiles").toBool());
-	 //}
-	 //else
-		//  installUnityFilesCheckBox->setChecked(true);
+
 
 	 // Set Defaults
 	 DzNode* Selection = dzScene->getPrimarySelection();
@@ -255,11 +254,15 @@ void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 					// deselect install unity files
 					settings->setValue("InstallUnityFiles", false);
 					installUnityFilesCheckBox->setChecked(false);
+					// rename label to show "Overwrite"
+					installOrOverwriteUnityFilesLabel->setText(tr("Overwrite Unity Files"));
 				}
 				else
 				{
 					settings->setValue("InstallUnityFiles", true);
 					installUnityFilesCheckBox->setChecked(true);
+					// rename label to show "Install"
+					installOrOverwriteUnityFilesLabel->setText(tr("Install Unity Files"));
 				}
 
 				assetsFolderEdit->setText(directoryName);

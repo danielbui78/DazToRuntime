@@ -8,6 +8,7 @@ class QLineEdit;
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
+class QLabel;
 
 class UnofficialDzUnityDialog : public DzBasicDialog {
 	Q_OBJECT
@@ -33,6 +34,7 @@ public:
 #ifdef FBXOPTIONS
 	QCheckBox* showFbxDialogCheckBox;
 #endif
+	QLabel* installOrOverwriteUnityFilesLabel;
 	QCheckBox* installUnityFilesCheckBox;
 
 	// Pass so the DazTRoUnityAction can access it from the morph dialog
