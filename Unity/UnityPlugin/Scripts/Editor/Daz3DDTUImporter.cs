@@ -190,6 +190,8 @@ namespace Daz3D
 
         private static IEnumerator ImportRoutine(string dtuPath, string fbxPath)
         {
+            Daz3DBridge.ShowWindow();
+
             Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History;//force into history mode during import
 
             Daz3DBridge.Progress = .03f;
