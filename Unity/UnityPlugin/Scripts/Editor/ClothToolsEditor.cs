@@ -59,16 +59,25 @@ public class ClothToolsEditor : Editor
         GUILayout.Space(10);
         if (GUILayout.Button("Load Weightmap data"))
         {
-            string path = EditorUtility.OpenFilePanel(
+            string path = EditorUtility.OpenFilePanelWithFilters(
                 "Load Weightmap data",
                 "Assets/Daz3D",
-                "unity_weightmap.bytes");
+                new string[] { "Unity Weight Maps", "unity_weightmap.bytes", "DForce Weight maps", "dforce_weightmap.bytes", "All files", "*"});
             if (path.Length != 0)
             {
-//                var fileContent = File.ReadAllBytes(path);
-//                texture.LoadImage(fileContent);
-                Debug.Log("DEBUG: load from file: " + path);
-                clothtools.LoadWeightMap(path);
+                if (path.Contains(".unity_weightmap.bytes"))
+                {
+                    //Debug.Log("DEBUG: load from file: " + path);
+                    clothtools.LoadWeightMap(path);
+                }
+
+                if (path.Contains("dforce_weightmap.bytes"))
+                {
+                    //Debug.Log("DEBUG: import from file: " + path);
+                    clothtools.ImportWeightMap(path);
+                }
+
+
             }
 
             //clothtools.LoadRawWeightMap();
@@ -78,9 +87,6 @@ public class ClothToolsEditor : Editor
         GUILayout.Space(10);
         if (GUILayout.Button("Save Weightmap data"))
         {
-            //clothtools.LoadRawWeightMap();
-            //Debug.Log("Load Weightmap data.");
-
             var path = EditorUtility.SaveFilePanel(
                 "Save Weightmap data",
                 "Assets/Daz3D",
@@ -89,11 +95,8 @@ public class ClothToolsEditor : Editor
 
             if (path.Length != 0)
             {
-                //var pngData = texture.EncodeToPNG();
-                //if (pngData != null)
-                //    File.WriteAllBytes(path, pngData);
                 path = path.Replace(".unity_weightmap.bytes", "") + ".unity_weightmap.bytes";
-                Debug.Log("DEBUG: write to file: " + path);
+                //Debug.Log("DEBUG: write to file: " + path);
                 clothtools.SaveWeightMap(path);
             }
 

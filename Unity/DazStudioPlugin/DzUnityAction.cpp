@@ -942,8 +942,8 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 
 							} // for (std::list<MaterialGroupExportOrderMetaData>::iterator export_iter = exportQueue.begin(); export_iter != exportQueue.end(); export_iter++)
 
-							// export to raw file
-							QString filename = QString("%1.raw_dforce_map.bytes").arg(Node->getLabel());
+							// export to dforce_weightmap file
+							QString filename = QString("%1.dforce_weightmap.bytes").arg(Node->getLabel());
 							QFile rawWeight(CharacterFolder + filename);
 							if (rawWeight.open(QIODevice::WriteOnly))
 							{
@@ -952,7 +952,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 								{
 									// write error
 									QString errString = rawWeight.errorString();
-									QMessageBox::warning(0, tr("Error writing raw dforce weightmap. Incorrect number of bytes written."),
+									QMessageBox::warning(0, tr("Error writing dforce weightmap. Incorrect number of bytes written."),
 										errString, QMessageBox::Ok);
 								}
 								rawWeight.close();
