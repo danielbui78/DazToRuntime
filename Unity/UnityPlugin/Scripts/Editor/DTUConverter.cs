@@ -2416,8 +2416,8 @@ namespace Daz3D
 		/// <summary>
 		/// Parses the DTU file and converts all materials and textures if dirty, will place next to DTU file
 		/// </summary>
-		[MenuItem("Assets/Daz3D/Extract materials")]
-		[MenuItem("Daz3D/Extract materials from selected DTU")]
+		[MenuItem("Daz3D/Extract materials from selected DTU", false, 102)]
+		[MenuItem("Assets/Daz3D/Extract materials", false, 102)]
 		public static void MenuItemConvert()
 		{
 			var activeObject = Selection.activeObject;

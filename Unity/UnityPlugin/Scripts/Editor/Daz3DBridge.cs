@@ -41,7 +41,7 @@ namespace Daz3D
         }
 
         private static Daz3DBridge _instance;
-        [MenuItem("Daz3D/Open Daz3DBridge window")]
+        [MenuItem("Daz3D/Open Daz3DBridge window", false, 0)]
         public static void ShowWindow()
         {
             ObtainInstance();

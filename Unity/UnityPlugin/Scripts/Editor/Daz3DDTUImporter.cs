@@ -96,7 +96,7 @@ namespace Daz3D
             }
         }
 
-        [MenuItem("Daz3D/Create Unity Prefab from selected DTU")]
+        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", false, 101)]
         public static void MenuItemConvert()
         {
             var activeObject = Selection.activeObject;
@@ -107,9 +107,9 @@ namespace Daz3D
 
         }
 
+        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", true)]
         [MenuItem("Daz3D/Extract materials from selected DTU", true)]
         [MenuItem("Assets/Daz3D/Create Unity Prefab", true)]
-        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", true)]
         [MenuItem("Assets/Daz3D/Extract materials", true)]
         public static bool ValidateDTUSelected()
         {
@@ -1140,7 +1140,7 @@ namespace Daz3D
         // Add a menu item named "Log Selected Transform Name" to MyMenu in the menu bar.
         // We use a second function to validate the menu item
         // so it will only be enabled if we have a transform selected.
-        [MenuItem("Assets/Daz3D/Create Unity Prefab")]
+        [MenuItem("Assets/Daz3D/Create Unity Prefab", false, 101)]
         static void DoStuffToSelectedDTU()
         {
             CreateDTUPrefab(Selection.activeObject);
