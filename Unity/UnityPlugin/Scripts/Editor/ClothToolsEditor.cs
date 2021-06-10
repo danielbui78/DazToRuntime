@@ -9,6 +9,7 @@ using UnityEditor;
 public class ClothToolsEditor : Editor
 {
     private SerializedObject m_Object;
+    private float[] floatArray;
 
     public void OnEnable()
     {
@@ -22,19 +23,30 @@ public class ClothToolsEditor : Editor
 
         m_Object.Update();
 
+        GUILayout.Space(10);
         GUILayout.Label("**Load dForce Weight Map**", EditorStyles.boldLabel);
         GUILayout.Space(10);
 
-        DrawDefaultInspector();
+        //DrawDefaultInspector();
 
         GUILayout.Space(10);
         SkinnedMeshRenderer skinned = clothtools.gameObject.GetComponent<SkinnedMeshRenderer>();
+        int numMaterials = skinned.sharedMaterials.Length;
+        if (floatArray == null)
+        {
+            floatArray = new float[numMaterials];
+        }
+        else if (floatArray.Length != numMaterials)
+        {
+            System.Array.Resize(ref floatArray, numMaterials);
+        }
         foreach (Material mat in skinned.sharedMaterials)
         {
             if (mat)
             {
                 int matIndex = System.Array.IndexOf(skinned.sharedMaterials, mat);
 
+//                GUILayout.Space(10);
                 GUILayout.BeginHorizontal();
                 GUILayout.Label(mat.name);
                 if (GUILayout.Button("Clear"))
@@ -53,6 +65,8 @@ public class ClothToolsEditor : Editor
                     //Debug.Log("Set Material Weights to 1.0: " + mat.name);
                 }
                 GUILayout.EndHorizontal();
+                floatArray[matIndex] = GUILayout.HorizontalSlider(floatArray[matIndex], 0, 1.0f);
+                GUILayout.Space(20);
             }
         }
 

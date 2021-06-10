@@ -56,6 +56,7 @@ public class ClothTools : MonoBehaviour
     [SerializeField, HideInInspector]
     private CollapsedVertexArray m_CollapsedVerts;
 
+    [HideInInspector]
     public TextAsset m_BinaryData;
     [HideInInspector]
     public TextAsset m_TestVertData;
