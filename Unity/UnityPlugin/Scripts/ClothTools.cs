@@ -6,7 +6,9 @@ using UnityEngine;
 //[ExecuteInEditMode]
 public class ClothTools : MonoBehaviour
 {
+    [SerializeField, HideInInspector]
     public SkinnedMeshRenderer m_Skinned;
+    [SerializeField, HideInInspector]
     public Cloth m_Cloth;
 
     [System.Serializable]
@@ -51,8 +53,8 @@ public class ClothTools : MonoBehaviour
     [SerializeField, HideInInspector]
     private List<SubmeshMeta> m_SubmeshMeta;
 
-    //[SerializeField, HideInInspector]
-    public CollapsedVertexArray m_CollapsedVerts;
+    [SerializeField, HideInInspector]
+    private CollapsedVertexArray m_CollapsedVerts;
 
     public TextAsset m_BinaryData;
     [HideInInspector]
@@ -99,7 +101,7 @@ public class ClothTools : MonoBehaviour
     {
         if (m_CollapsedVerts == null || m_CollapsedVerts.Length <= 0)
         {
-            Debug.Log("ClothTools.SetSubMeshWeights(): Lookup tables were reset. Regenerating...");
+            //Debug.Log("ClothTools.SetSubMeshWeights(): Lookup tables were reset. Regenerating...");
             GenerateLookupTables();
         }
 

@@ -57,17 +57,16 @@ public class ClothToolsEditor : Editor
         }
 
         GUILayout.Space(10);
-        if (GUILayout.Button("Clear All Weights"))
-        {
-            Undo.RecordObject(clothtools.m_Cloth, "Clear All Weights");
-            clothtools.ClearWeightMap();
-            //Debug.Log("Clear Weights.");
-        }
-
-        GUILayout.Space(10);
         if (GUILayout.Button("Load Weightmap data"))
         {
             clothtools.LoadRawWeightMap();
+            //Debug.Log("Load Weightmap data.");
+        }
+
+        GUILayout.Space(10);
+        if (GUILayout.Button("Save Weightmap data"))
+        {
+            //clothtools.LoadRawWeightMap();
             //Debug.Log("Load Weightmap data.");
         }
 
@@ -76,6 +75,14 @@ public class ClothToolsEditor : Editor
         {
             clothtools.LoadGradientPattern();
             //Debug.Log("Load Gradient Pattern.");
+        }
+
+        GUILayout.Space(10);
+        if (GUILayout.Button("Clear All Weights"))
+        {
+            //Undo.RecordObject(clothtools.m_Cloth, "Clear All Weights");
+            clothtools.ClearWeightMap();
+            //Debug.Log("Clear Weights.");
         }
 
         //GUILayout.Space(10);
