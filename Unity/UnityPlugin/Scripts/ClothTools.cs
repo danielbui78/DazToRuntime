@@ -213,50 +213,73 @@ public class ClothTools : MonoBehaviour
     }
 
 
-    public void LoadRawWeightMap()
+    public void SaveWeightMap(string filename)
     {
-        GameObject workingInstance = this.gameObject;
+        ClothSkinningCoefficient[] outCoefficients = new ClothSkinningCoefficient[m_Cloth.coefficients.Length];
+        System.Array.Copy(m_Cloth.coefficients, outCoefficients, outCoefficients.Length);
+        int numVerts = outCoefficients.Length;
+        float[] weights = new float[numVerts];
+        int numBytes = sizeof(float) * numVerts;
+        byte[] binaryBuffer = new byte[numBytes];
 
+        for (int i=0; i < numVerts; i++)
+        {
+            weights[i] = outCoefficients[i].maxDistance;
+        }
+
+        System.Buffer.BlockCopy(weights, 0, binaryBuffer, 0, numBytes);
+        System.IO.File.WriteAllBytes(filename, binaryBuffer);
+
+    }
+
+    public void LoadWeightMap(string filename)
+    {
         ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[m_Cloth.coefficients.Length];
         System.Array.Copy(m_Cloth.coefficients, newCoefficients, newCoefficients.Length);
 
         /////////////////////////////////////////////////////
         /// Load Raw Weight Map
         /////////////////////////////////////////////////////
-        //int numVerts = m_Skinned.sharedMesh.vertexCount;
+        int numVerts = newCoefficients.Length;
+        float[] weights = new float[numVerts];
+        int numBytes = sizeof(float) * numVerts;
+
+        byte[] binaryBuffer = System.IO.File.ReadAllBytes(filename);
+        System.Buffer.BlockCopy(binaryBuffer, 0, weights, 0, numBytes);
+
+        for (int i=0; i < numVerts; i++)
+        {
+            newCoefficients[i].maxDistance = weights[i];
+        }
+
+        m_Cloth.coefficients = newCoefficients;
+
+    }
+
+    public void ImportWeightMap(string filename)
+    {
+        ClothSkinningCoefficient[] newCoefficients = new ClothSkinningCoefficient[m_Cloth.coefficients.Length];
+        System.Array.Copy(m_Cloth.coefficients, newCoefficients, newCoefficients.Length);
+
+        /////////////////////////////////////////////////////
+        /// Load Raw Weight Map
+        /////////////////////////////////////////////////////
         int numVerts = newCoefficients.Length ;
         ushort[] weights = new ushort[numVerts];
-        System.Buffer.BlockCopy(m_BinaryData.bytes, 0, weights, 0, numVerts);
+        int numBytes = sizeof(ushort) * numVerts;
+
+        byte[] binaryBuffer = System.IO.File.ReadAllBytes(filename);
+        System.Buffer.BlockCopy(binaryBuffer, 0, weights, 0, numBytes);
 
         float simulation_strength = 0.0f;
-        //int[] vertex_list = skinned.sharedMesh.GetTriangles(matIndex, false);
         for (int vertex_index = 0; vertex_index < numVerts; vertex_index++)
         {
-            //int cloth_index = m_CollapsedVerts.LookupIndex(vertex_index);
             int cloth_index = vertex_index;
             if (cloth_index >= newCoefficients.Length)
             {
                 Debug.LogError("ClothTools.LoadRawWeightMap(): cloth_index is greater than coefficient array: " + vertex_index + " vs " + newCoefficients.Length);
                 break;
             }
-
-            //if (m_SubmeshMeta[2].InSubmesh(cloth_index))
-            //{
-            //    cloth_index -= m_SubmeshMeta[2].vertex_offset;
-            //}
-            //else if (m_SubmeshMeta[3].InSubmesh(cloth_index))
-            //{
-            //    cloth_index -= m_SubmeshMeta[2].vertex_offset;
-            //}
-            //else if (m_SubmeshMeta[0].InSubmesh(cloth_index))
-            //{
-            //    cloth_index += (m_SubmeshMeta[2].vertex_count + m_SubmeshMeta[3].vertex_count);
-            //}
-            //else if (m_SubmeshMeta[1].InSubmesh(cloth_index))
-            //{
-            //    cloth_index += (m_SubmeshMeta[2].vertex_count + m_SubmeshMeta[3].vertex_count);
-            //}
-
 
             simulation_strength = (float) weights[vertex_index] / ushort.MaxValue;
 

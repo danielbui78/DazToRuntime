@@ -8,18 +8,19 @@ using UnityEditor;
 
 public class ClothToolsEditor : Editor
 {
-    //private SerializedObject m_Object;
+    private SerializedObject m_Object;
 
-    //public void OnEnable()
-    //{
-    //    m_Object = new SerializedObject(target);
-    //}
+    public void OnEnable()
+    {
+        m_Object = new SerializedObject(target);
+    }
 
     public override void OnInspectorGUI()
     {
-        ClothTools clothtools = (ClothTools)target;
+        //ClothTools clothtools = (ClothTools)target;
+        ClothTools clothtools = (ClothTools) m_Object.targetObject;
 
-        //m_Object.Update();
+        m_Object.Update();
 
         GUILayout.Label("**Load dForce Weight Map**", EditorStyles.boldLabel);
         GUILayout.Space(10);
@@ -27,8 +28,7 @@ public class ClothToolsEditor : Editor
         DrawDefaultInspector();
 
         GUILayout.Space(10);
-        GameObject parent = Selection.activeGameObject;
-        SkinnedMeshRenderer skinned = parent.GetComponent<SkinnedMeshRenderer>();
+        SkinnedMeshRenderer skinned = clothtools.gameObject.GetComponent<SkinnedMeshRenderer>();
         foreach (Material mat in skinned.sharedMaterials)
         {
             if (mat)
@@ -59,8 +59,20 @@ public class ClothToolsEditor : Editor
         GUILayout.Space(10);
         if (GUILayout.Button("Load Weightmap data"))
         {
-            clothtools.LoadRawWeightMap();
-            //Debug.Log("Load Weightmap data.");
+            string path = EditorUtility.OpenFilePanel(
+                "Load Weightmap data",
+                "Assets/Daz3D",
+                "unity_weightmap.bytes");
+            if (path.Length != 0)
+            {
+//                var fileContent = File.ReadAllBytes(path);
+//                texture.LoadImage(fileContent);
+                Debug.Log("DEBUG: load from file: " + path);
+                clothtools.LoadWeightMap(path);
+            }
+
+            //clothtools.LoadRawWeightMap();
+            ////Debug.Log("Load Weightmap data.");
         }
 
         GUILayout.Space(10);
@@ -68,6 +80,23 @@ public class ClothToolsEditor : Editor
         {
             //clothtools.LoadRawWeightMap();
             //Debug.Log("Load Weightmap data.");
+
+            var path = EditorUtility.SaveFilePanel(
+                "Save Weightmap data",
+                "Assets/Daz3D",
+                clothtools.gameObject.name,
+                "unity_weightmap.bytes");
+
+            if (path.Length != 0)
+            {
+                //var pngData = texture.EncodeToPNG();
+                //if (pngData != null)
+                //    File.WriteAllBytes(path, pngData);
+                path = path.Replace(".unity_weightmap.bytes", "") + ".unity_weightmap.bytes";
+                Debug.Log("DEBUG: write to file: " + path);
+                clothtools.SaveWeightMap(path);
+            }
+
         }
 
         GUILayout.Space(10);
@@ -106,7 +135,7 @@ public class ClothToolsEditor : Editor
         //    //Debug.Log("Running Vertex Data Test....");
         //}
 
-        //m_Object.ApplyModifiedProperties();
+        m_Object.ApplyModifiedProperties();
     }
 
 }
