@@ -212,7 +212,12 @@ namespace Daz3D
             Daz3DBridge.Progress = .03f;
                 yield return new WaitForEndOfFrame();
 
-            IsRenderPipelineDetected();
+            if (IsRenderPipelineDetected() == false)
+            {
+                // go to project folder of dtuPath
+                EditorUtility.FocusProjectWindow();
+                Selection.activeObject = AssetDatabase.LoadAssetAtPath(dtuPath);
+            }
     
             _map = new MaterialMap(dtuPath);
             _dforceMap = new DForceMaterialMap(dtuPath);
