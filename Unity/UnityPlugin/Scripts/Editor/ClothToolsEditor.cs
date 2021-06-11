@@ -132,6 +132,15 @@ public class ClothToolsEditor : Editor
         }
 
         //GUILayout.Space(10);
+        if (GUILayout.Button("Zero All Weights"))
+        {
+            for (int i=0; i < skinned.sharedMaterials.Length; i++)
+            {
+                clothtools.SetSubMeshWeights(i, 0f);
+            }
+        }
+
+        //GUILayout.Space(10);
         if (GUILayout.Button("Clear All Weights"))
         {
             //Undo.RecordObject(clothtools.m_Cloth, "Clear All Weights");
