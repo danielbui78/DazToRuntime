@@ -60,13 +60,47 @@ namespace Daz3D
 #endif
         }
 
-        void Update()
+        void OnEnable()
         {
+#if USING_HDRP || USING_URP || USING_BUILTIN
             if (DetectRP_RunOnce == false)
             {
-                DetectRenderPipeline.RunOnce();
                 DetectRP_RunOnce = true;
+
+                // check for to_load file
+                if (System.IO.File.Exists("Assets/Daz3D/Resources/dtu_toload.txt"))
+                {
+                    byte[] byteBuffer = System.IO.File.ReadAllBytes("Assets/Daz3D/Resources/dtu_toload.txt");
+                    if (byteBuffer != null || byteBuffer.Length > 0)
+                    {
+                        string dtuPath = System.Text.Encoding.UTF8.GetString(byteBuffer);
+
+                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt");
+                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt.meta");
+
+                        if (System.IO.File.Exists(dtuPath))
+                        {
+                            //Debug.LogError("Found file: [" + dtuPath + "] " + dtuPath.Length);
+                            if (dtuPath.Contains(".dtu"))
+                            {
+                                var fbxPath = dtuPath.Replace(".dtu", ".fbx");
+                                Daz3DDTUImporter.Import(dtuPath, fbxPath);
+                            }
+                        }
+                        else
+                        {
+                            //Debug.LogError("File NOT found: [" + dtuPath + "] " + dtuPath.Length);
+                        }
+                    }
+
+                }
+
             }
+#endif
+        }
+
+        void Update()
+        {
 
             if (_needsRepaint)
             {

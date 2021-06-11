@@ -190,7 +190,7 @@ namespace Daz3D
         }
 
 
-        private static bool IsRenderPipelineDetected()
+        public static bool IsRenderPipelineDetected()
         {
 #if !USING_HDRP && !USING_URP && !USING_BUILTIN
             ImportEventRecord record = new ImportEventRecord();
@@ -205,6 +205,9 @@ namespace Daz3D
 
         private static IEnumerator ImportRoutine(string dtuPath, string fbxPath)
         {
+            //DEBUG
+            //Debug.LogError("dtuPath = [" + dtuPath + "] " + dtuPath.Length);
+
             Daz3DBridge.ShowWindow();
 
             Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History;//force into history mode during import
@@ -214,11 +217,15 @@ namespace Daz3D
 
             if (IsRenderPipelineDetected() == false)
             {
-                // go to project folder of dtuPath
-                EditorUtility.FocusProjectWindow();
-                Selection.activeObject = AssetDatabase.LoadAssetAtPath(dtuPath);
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(dtuPath);
+                System.IO.File.WriteAllBytes("Assets/Daz3D/Resources/dtu_toload.txt", buffer);
+                
+                yield return new WaitForEndOfFrame();
+
+                DetectRenderPipeline.RunOnce();
+
             }
-    
+
             _map = new MaterialMap(dtuPath);
             _dforceMap = new DForceMaterialMap(dtuPath);
 
