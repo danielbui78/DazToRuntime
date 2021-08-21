@@ -61,7 +61,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 int btnMinWidth = style()->pixelMetric(DZ_PM_ButtonMinWidth);
 
 	 // Set the dialog title
-	 setWindowTitle(tr("Daz To Unity"));
+	 setWindowTitle(tr("Unofficial Daz To Unity"));
 
 	 QFormLayout* mainLayout = new QFormLayout(this);
 	 QFormLayout* advancedLayout = new QFormLayout(this);
