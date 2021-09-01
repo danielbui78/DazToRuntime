@@ -850,7 +850,7 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 							if (numVerts != facetMesh->getNumVertices())
 							{
 								// throw error if needed
-								dzApp->log("Unofficial DazToUnity Bridge: ERROR Exporting Weight Map to file.");
+								dzApp->log("Unofficial DTU Bridge: ERROR Exporting Weight Map to file.");
 								return;
 							}
 							int numMaterials = facetMesh->getNumMaterialGroups();

@@ -31,7 +31,7 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME "UnofficialDazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME "UnofficialDTU"
 
 
 UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
@@ -53,7 +53,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 #endif
 	 installUnityFilesCheckBox = NULL;
 
-	 settings = new QSettings("Daz 3D", "UnofficialDazToUnity");
+	 settings = new QSettings("UnofficialDTU", "UnofficialDTU");
 
 	 // Declarations
 	 int margin = style()->pixelMetric(DZ_PM_GeneralMargin);
@@ -61,7 +61,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 int btnMinWidth = style()->pixelMetric(DZ_PM_ButtonMinWidth);
 
 	 // Set the dialog title
-	 setWindowTitle(tr("Unofficial Daz To Unity"));
+	 setWindowTitle(tr("Unofficial DTU Bridge"));
 
 	 QFormLayout* mainLayout = new QFormLayout(this);
 	 QFormLayout* advancedLayout = new QFormLayout(this);
@@ -138,8 +138,8 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 // Help
 	 assetNameEdit->setWhatsThis("This is the name the asset will use in Unity.");
 	 assetTypeCombo->setWhatsThis("Skeletal Mesh for something with moving parts, like a character\nStatic Mesh for things like props\nAnimation for a character animation.");
-	 assetsFolderEdit->setWhatsThis("Unity Assets folder. DazToUnity will collect the assets in a subfolder under this folder.");
-	 assetsFolderButton->setWhatsThis("Unity Assets folder. DazToUnity will collect the assets in a subfolder under this folder.");
+	 assetsFolderEdit->setWhatsThis("Unity Assets folder. DazStudio assets will be exported into a subfolder inside this folder.");
+	 assetsFolderButton->setWhatsThis("Unity Assets folder. DazStudio assets will be exported into a subfolder inside this folder.");
 
 	 // Load Settings
 	 if (!settings->value("AssetsPath").isNull())
@@ -166,7 +166,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 }
 	 else
 	 {
-		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDazToUnity";
+		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDTU";
 		  assetsFolderEdit->setText(DefaultPath);
 	 }
 	 if (!settings->value("MorphsEnabled").isNull())

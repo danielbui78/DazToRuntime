@@ -42,7 +42,7 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDTU"
 
 
 DzUnityMorphSelectionDialog* DzUnityMorphSelectionDialog::singleton = nullptr;
@@ -76,7 +76,7 @@ DzUnityMorphSelectionDialog::DzUnityMorphSelectionDialog(QWidget *parent) :
 	setWindowTitle(tr("Select Morphs"));
 
 	// Setup folder
-	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDazToUnity" + QDir::separator() + "Presets";
+	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDTU" + QDir::separator() + "Presets";
 
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
