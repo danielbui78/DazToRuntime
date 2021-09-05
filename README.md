@@ -1,4 +1,5 @@
 Unofficial DTU Bridge version 1.0
+=================================
 
 This is an unofficial update project for the opensource Daz To Unity Bridge released by Daz3D.  It contains a number of bugfixes and feature additions not yet incorporated in the official Daz To Unity project.
 
@@ -24,6 +25,13 @@ Known Issues:
 - Cloth physics colliders are not yet resized to Daz figures.
 - Daz dForce weight maps are not yet converted properly to Unity Cloth physics weight maps.
 
+Installation Instructions:
+==========================
+The "unofficialdzunitybridge_v1_0.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial Daz To Unity. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.
+
+Alternatively, you can install the "Unofficial_Daz3D_Bridge_v1_0.unitypackage" by drag-and-dropping it into the Project pane of the Unity Editor window, if you want to install it without using the DazStudio plugin.
+
+You do Not need to do both.
 
 To Test dForce Clothing to Unity Cloth Physics support:
 =======================================================
