@@ -15,6 +15,8 @@ namespace Daz3D
     /// </summary>
     public class Daz3DBridge : EditorWindow
     {
+        public static bool DetectRP_RunOnce = false;
+        
         private Vector2 _scrollPos;
         //Tuple<UnityEngine.Object, Texture> thumbnail = null;
         public static readonly Color ThemedColor = new Color(.7f, 1f, .8f);
@@ -39,7 +41,7 @@ namespace Daz3D
         }
 
         private static Daz3DBridge _instance;
-        [MenuItem("Daz3D/Open Daz3DBridge window")]
+        [MenuItem("Daz3D/Open DazToUnity Bridge window", false, 0)]
         public static void ShowWindow()
         {
             ObtainInstance();
@@ -47,11 +49,60 @@ namespace Daz3D
         private static void ObtainInstance() 
         {  
             _instance = (Daz3DBridge)GetWindow(typeof(Daz3DBridge));
-            _instance.titleContent = new GUIContent("Daz to Unity Bridge");
+#if USING_HDRP
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - HDRP");
+#elif USING_URP
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - URP");
+#elif USING_BUILTIN
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - Built-In Rendering");
+#else
+            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - RenderPipeline Not Detected");
+            CurrentToolbarMode = ToolbarMode.Options;            
+#endif
+        }
+
+        void OnEnable()
+        {
+#if USING_HDRP || USING_URP || USING_BUILTIN
+            if (DetectRP_RunOnce == false)
+            {
+                DetectRP_RunOnce = true;
+
+                // check for to_load file
+                if (System.IO.File.Exists("Assets/Daz3D/Resources/dtu_toload.txt"))
+                {
+                    byte[] byteBuffer = System.IO.File.ReadAllBytes("Assets/Daz3D/Resources/dtu_toload.txt");
+                    if (byteBuffer != null || byteBuffer.Length > 0)
+                    {
+                        string dtuPath = System.Text.Encoding.UTF8.GetString(byteBuffer);
+
+                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt");
+                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt.meta");
+
+                        if (System.IO.File.Exists(dtuPath))
+                        {
+                            //Debug.LogError("Found file: [" + dtuPath + "] " + dtuPath.Length);
+                            if (dtuPath.Contains(".dtu"))
+                            {
+                                var fbxPath = dtuPath.Replace(".dtu", ".fbx");
+                                Daz3DDTUImporter.Import(dtuPath, fbxPath);
+                            }
+                        }
+                        else
+                        {
+                            //Debug.LogError("File NOT found: [" + dtuPath + "] " + dtuPath.Length);
+                        }
+                    }
+
+                }
+
+            }
+#endif
         }
 
         void Update()
         {
+
             if (_needsRepaint)
             {
                 _needsRepaint = false;
@@ -89,7 +140,7 @@ namespace Daz3D
             GUILayout.BeginHorizontal();
 
             if (masthead == null)
-                masthead = Resources.Load<Texture>("Daz_Combined_Small");
+                masthead = Resources.Load<Texture>("UnofficialDTU_Logo_TextOnly");
 
             GUILayout.FlexibleSpace();
             GUILayout.Label(masthead, GUILayout.Height(100));
@@ -195,10 +246,25 @@ namespace Daz3D
             Daz3DDTUImporter.ReplaceSceneInstances = GUILayout.Toggle(Daz3DDTUImporter.ReplaceSceneInstances, "Replace instances of Unity Prefab in active scene(s)", bigStyle);
             Daz3DDTUImporter.AutomateMecanimAvatarMappings = GUILayout.Toggle(Daz3DDTUImporter.AutomateMecanimAvatarMappings, "Automatically setup the Mecanim Avatar", bigStyle);
             Daz3DDTUImporter.ReplaceMaterials = GUILayout.Toggle(Daz3DDTUImporter.ReplaceMaterials, "Replace FBX materials with high quality Daz-shader materials", bigStyle);
+            Daz3DDTUImporter.EnableDForceSupport = GUILayout.Toggle(Daz3DDTUImporter.EnableDForceSupport, "Enable dForce support (experimental)", bigStyle);
 
             GUILayout.Space(12);
             if (GUILayout.Button("Reset All", GUILayout.Width(100)))
                 Daz3DDTUImporter.ResetOptions();
+
+            GUILayout.Space(12);
+#if USING_HDRP
+            GUILayout.TextArea("Unofficial DTU Configured for HDRP");
+#elif USING_URP
+            GUILayout.TextArea("Unofficial DTU Configured for URP");
+#elif USING_BUILTIN
+            GUILayout.TextArea("Unofficial DTU Configured for Built-In Rendering");
+#else
+            GUILayout.TextArea("No Renderpipeline configured.  Press Redetect RenderPipeline to configure now.");
+#endif
+            GUILayout.Space(12);
+            if (GUILayout.Button("Redetect RenderPipeline", GUILayout.Width(200)))
+                DetectRenderPipeline.RunOnce();
 
             GUILayout.EndVertical();
 

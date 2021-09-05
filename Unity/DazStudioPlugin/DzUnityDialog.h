@@ -8,16 +8,17 @@ class QLineEdit;
 class QCheckBox;
 class QComboBox;
 class QGroupBox;
+class QLabel;
 
-class DzUnityDialog : public DzBasicDialog {
+class UnofficialDzUnityDialog : public DzBasicDialog {
 	Q_OBJECT
 public:
 
 	/** Constructor **/
-	 DzUnityDialog(QWidget *parent);
+	 UnofficialDzUnityDialog(QWidget *parent);
 
 	/** Destructor **/
-	virtual ~DzUnityDialog() {}
+	virtual ~UnofficialDzUnityDialog() {}
 
 	QLineEdit* assetNameEdit;
 	QLineEdit* projectEdit;
@@ -33,6 +34,7 @@ public:
 #ifdef FBXOPTIONS
 	QCheckBox* showFbxDialogCheckBox;
 #endif
+	QLabel* installOrOverwriteUnityFilesLabel;
 	QCheckBox* installUnityFilesCheckBox;
 
 	// Pass so the DazTRoUnityAction can access it from the morph dialog
@@ -52,6 +54,7 @@ private slots:
 	void HandleShowFbxDialogCheckBoxChange(int state);
 #endif
 	void HandleInstallUnityFilesCheckBoxChange(int state);
+	void HandleAssetTypeComboChange(int state);
 
 private:
 	QSettings* settings;

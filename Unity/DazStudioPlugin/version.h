@@ -1,7 +1,7 @@
 #pragma once
 #include "dzversion.h"
 
-// Version number for DazToUnity
+// Version number for UnofficialDTU
 #define PLUGIN_MAJOR	1
 #define PLUGIN_MINOR	0
 #define PLUGIN_REV		0

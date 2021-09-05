@@ -6,12 +6,17 @@
 #include "QtCore/qfile.h"
 #include "QtCore/qtextstream.h"
 
-class DzRuntimePluginAction : public DzAction {
+class UnofficialDzRuntimePluginAction : public DzAction {
 	 Q_OBJECT
 public:
 
-	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
-	 virtual ~DzRuntimePluginAction();
+	 UnofficialDzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
+	 virtual ~UnofficialDzRuntimePluginAction();
+
+// DB (2021-05-24): hybrid C++/script system
+signals:
+	void ScriptReturn(QObject* obj);
+	void ScriptReturn(bool result);
 
 protected:
 	 QString CharacterName;
@@ -39,4 +44,12 @@ protected:
 	 // Need to temporarily rename surfaces if there is a name collision
 	 void RenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames);
 	 void UndoRenameDuplicateMaterials(DzNode* Node, QList<QString>& MaterialNames, QMap<DzMaterial*, QString>& OriginalMaterialNames);
+	 
+// DB (2021-05-24): hybrid C++/script system
+	 static QObject* m_ScriptReturn_Object;
+	 static int m_ScriptReturn_ReturnCode;
+private slots:
+	void HandleScriptReturn(QObject* obj);
+	void HandleScriptReturn(bool result);
+
 };

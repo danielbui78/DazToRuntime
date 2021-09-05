@@ -31,10 +31,10 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME "DazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME "UnofficialDTU"
 
 
-DzUnityDialog::DzUnityDialog(QWidget* parent) :
+UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 DzBasicDialog(parent, DAZ_TO_UNITY_PLUGIN_NAME)
 {
 	 assetNameEdit = NULL;
@@ -53,7 +53,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 #endif
 	 installUnityFilesCheckBox = NULL;
 
-	 settings = new QSettings("Daz 3D", "DazToUnity");
+	 settings = new QSettings("UnofficialDTU", "UnofficialDTU");
 
 	 // Declarations
 	 int margin = style()->pixelMetric(DZ_PM_GeneralMargin);
@@ -61,7 +61,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 int btnMinWidth = style()->pixelMetric(DZ_PM_ButtonMinWidth);
 
 	 // Set the dialog title
-	 setWindowTitle(tr("Daz To Unity"));
+	 setWindowTitle(tr("Unofficial DTU Bridge"));
 
 	 QFormLayout* mainLayout = new QFormLayout(this);
 	 QFormLayout* advancedLayout = new QFormLayout(this);
@@ -85,6 +85,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 assetTypeCombo->addItem("Static Mesh");
 	 assetTypeCombo->addItem("Animation");
 	 //assetTypeCombo->addItem("Pose");
+	 connect(assetTypeCombo, SIGNAL(activated(int)), this, SLOT(HandleAssetTypeComboChange(int)));
 
 	 // Morphs
 	 QHBoxLayout* morphsLayout = new QHBoxLayout(this);
@@ -115,7 +116,8 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 mainLayout->addRow("Enable Morphs", morphsLayout);
 	 mainLayout->addRow("Enable Subdivision", subdivisionLayout);
 	 mainLayout->addRow("Unity Assets Folder", assetsFolderLayout);
-	 mainLayout->addRow("Install Unity Files", installUnityFilesCheckBox);
+	 installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+	 mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
 	 connect(installUnityFilesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleInstallUnityFilesCheckBoxChange(int)));
 	 addLayout(mainLayout);
 #ifdef FBXOPTIONS
@@ -136,17 +138,35 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 // Help
 	 assetNameEdit->setWhatsThis("This is the name the asset will use in Unity.");
 	 assetTypeCombo->setWhatsThis("Skeletal Mesh for something with moving parts, like a character\nStatic Mesh for things like props\nAnimation for a character animation.");
-	 assetsFolderEdit->setWhatsThis("Unity Assets folder. DazToUnity will collect the assets in a subfolder under this folder.");
-	 assetsFolderButton->setWhatsThis("Unity Assets folder. DazToUnity will collect the assets in a subfolder under this folder.");
+	 assetsFolderEdit->setWhatsThis("Unity Assets folder. DazStudio assets will be exported into a subfolder inside this folder.");
+	 assetsFolderButton->setWhatsThis("Unity Assets folder. DazStudio assets will be exported into a subfolder inside this folder.");
 
 	 // Load Settings
 	 if (!settings->value("AssetsPath").isNull())
 	 {
-		  assetsFolderEdit->setText(settings->value("AssetsPath").toString());
+		 // DB (2021-05-15): check AssetsPath folder and set InstallUnityFiles if Daz3D subfolder does not exist
+		 QString directoryName = settings->value("AssetsPath").toString();
+		  assetsFolderEdit->setText(directoryName);
+		  if (QDir(directoryName + QDir::separator() + "Daz3D").exists())
+		  {
+			  // deselect install unity files
+			  settings->setValue("InstallUnityFiles", false);
+			  installUnityFilesCheckBox->setChecked(false);
+			  // rename label to show "Overwrite"
+			  installOrOverwriteUnityFilesLabel->setText(tr("Overwrite Unity Files"));
+		  }
+		  else
+		  {
+			  settings->setValue("InstallUnityFiles", true);
+			  installUnityFilesCheckBox->setChecked(true);
+			  // rename label to show "Install"
+			  installOrOverwriteUnityFilesLabel->setText(tr("Install Unity Files"));
+		  }
+
 	 }
 	 else
 	 {
-		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DazToUnity";
+		  QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDTU";
 		  assetsFolderEdit->setText(DefaultPath);
 	 }
 	 if (!settings->value("MorphsEnabled").isNull())
@@ -163,12 +183,7 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 		  showFbxDialogCheckBox->setChecked(settings->value("ShowFBXDialog").toBool());
 	 }
 #endif
-	 if (!settings->value("InstallUnityFiles").isNull())
-	 {
-		  installUnityFilesCheckBox->setChecked(settings->value("InstallUnityFiles").toBool());
-	 }
-	 else
-		  installUnityFilesCheckBox->setChecked(true);
+
 
 	 // Set Defaults
 	 DzNode* Selection = dzScene->getPrimarySelection();
@@ -192,10 +207,16 @@ DzUnityDialog::DzUnityDialog(QWidget* parent) :
 	 }
 }
 
-void DzUnityDialog::HandleSelectAssetsFolderButton()
+void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 {
-	 QString directoryName = QFileDialog::getExistingDirectory(this, tr("Choose Directory"),
-		  "/home",
+	 // DB (2021-05-15): prepopulate with existing folder string
+	 QString directoryName = "/home";
+	 if (!settings->value("AssetsPath").isNull())
+	 {
+		 directoryName = settings->value("AssetsPath").toString();
+	 }
+	 directoryName = QFileDialog::getExistingDirectory(this, tr("Choose Directory"),
+		  directoryName,
 		  QFileDialog::ShowDirsOnly
 		  | QFileDialog::DontResolveSymlinks);
 
@@ -227,13 +248,30 @@ void DzUnityDialog::HandleSelectAssetsFolderButton()
 					 return;
 				}
 
+				// DB (2021-05-15): Check for presence of Daz3D folder, and set installUnityFiles if not present
+				if ( QDir(directoryName + QDir::separator() + "Daz3D").exists() )
+				{
+					// deselect install unity files
+					settings->setValue("InstallUnityFiles", false);
+					installUnityFilesCheckBox->setChecked(false);
+					// rename label to show "Overwrite"
+					installOrOverwriteUnityFilesLabel->setText(tr("Overwrite Unity Files"));
+				}
+				else
+				{
+					settings->setValue("InstallUnityFiles", true);
+					installUnityFilesCheckBox->setChecked(true);
+					// rename label to show "Install"
+					installOrOverwriteUnityFilesLabel->setText(tr("Install Unity Files"));
+				}
+
 				assetsFolderEdit->setText(directoryName);
 				settings->setValue("AssetsPath", directoryName);
 		  }
 	 }
 }
 
-void DzUnityDialog::HandleChooseMorphsButton()
+void UnofficialDzUnityDialog::HandleChooseMorphsButton()
 {
 	 DzUnityMorphSelectionDialog* dlg = DzUnityMorphSelectionDialog::Get(this);
 	 dlg->exec();
@@ -241,37 +279,90 @@ void DzUnityDialog::HandleChooseMorphsButton()
 	 morphMapping = dlg->GetMorphRenaming();
 }
 
-void DzUnityDialog::HandleChooseSubdivisionsButton()
+void UnofficialDzUnityDialog::HandleChooseSubdivisionsButton()
 {
 	 DzUnitySubdivisionDialog* dlg = DzUnitySubdivisionDialog::Get(this);
 	 dlg->exec();
 }
 
-QString DzUnityDialog::GetMorphString()
+QString UnofficialDzUnityDialog::GetMorphString()
 {
 	 morphMapping = DzUnityMorphSelectionDialog::Get(this)->GetMorphRenaming();
 	 return DzUnityMorphSelectionDialog::Get(this)->GetMorphString();
 }
 
-void DzUnityDialog::HandleMorphsCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleMorphsCheckBoxChange(int state)
 {
 	 settings->setValue("MorphsEnabled", state == Qt::Checked);
 }
 
-void DzUnityDialog::HandleSubdivisionCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleSubdivisionCheckBoxChange(int state)
 {
 	 settings->setValue("SubdivisionEnabled", state == Qt::Checked);
 }
 
 #ifdef FBXOPTIONS
-void DzUnityDialog::HandleShowFbxDialogCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleShowFbxDialogCheckBoxChange(int state)
 {
 	 settings->setValue("ShowFBXDialog", state == Qt::Checked);
 }
 #endif
 
-void DzUnityDialog::HandleInstallUnityFilesCheckBoxChange(int state)
+void UnofficialDzUnityDialog::HandleInstallUnityFilesCheckBoxChange(int state)
 {
 	 settings->setValue("InstallUnityFiles", state == Qt::Checked);
 }
+
+void UnofficialDzUnityDialog::HandleAssetTypeComboChange(int state)
+{
+	QString assetNameString = assetNameEdit->text();
+
+	// enable/disable Morphs and Subdivision only if Skeletal selected
+	if (assetTypeCombo->currentText() != "Skeletal Mesh")
+	{
+		morphsEnabledCheckBox->setChecked(false);
+		subdivisionEnabledCheckBox->setChecked(false);
+	}
+
+	// if "Animation", change assetname
+	if (assetTypeCombo->currentText() == "Animation")
+	{
+		// check assetname is in @anim[0000] format
+		if ( !assetNameString.contains("@") || assetNameString.contains(QRegExp("@anim[0-9]*") ) )
+		{
+			// extract true assetName and recompose animString
+			assetNameString = assetNameString.left(assetNameString.indexOf("@"));
+			// get importfolder using corrected assetNameString
+			QString importFolderPath = settings->value("AssetsPath").toString() + QDir::separator() + "Daz3D" + QDir::separator() + assetNameString + QDir::separator();
+
+			// create anim filepath
+			uint animCounter = 0;
+			QString animString = assetNameString + QString("@anim%1").arg(animCounter, 4, 10, QChar('0'));
+			QString filePath = importFolderPath + animString + ".fbx";
+
+			// if anim file exists, then increment anim filename counter
+			while (QFileInfo(filePath).exists())
+			{
+				if (++animCounter > 9999)
+				{
+					break;
+				}
+				animString = assetNameString + QString("@anim%1").arg(animCounter, 4, 10, QChar('0'));
+				filePath = importFolderPath + animString + ".fbx";
+			}
+			assetNameEdit->setText(animString);
+		}
+
+	}
+	else
+	{
+		// remove @anim if present
+		if (assetNameString.contains("@")) {
+			assetNameString = assetNameString.left(assetNameString.indexOf("@"));
+		}
+		assetNameEdit->setText(assetNameString);
+	}
+
+}
+
 #include "moc_DzUnityDialog.cpp"

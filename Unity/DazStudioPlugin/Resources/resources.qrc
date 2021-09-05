@@ -1,20 +1,34 @@
 <!DOCTYPE RCC>
 <RCC version="1.0">
-	<qresource prefix="/Images">
+  <qresource prefix="/UnofficialDaz/dsa">
+    <file alias="ScriptFunctionFindSimulationSettingsProvider.dsa">ScriptFunctionFindSimulationSettingsProvider.dsa</file>
+  </qresource>
+    <qresource prefix="/UnofficialDaz/Images">
 		<file alias="icon">Images/Icon.png</file>
 	</qresource>
-	<qresource prefix="/Scripts">
+	<qresource prefix="/UnofficialDaz/Scripts">
 		<file alias="Utilities.cs">../../UnityPlugin/Scripts/Utilities.cs</file>
 		<file alias="Daz3DInstance.cs">../../UnityPlugin/Scripts/Daz3DInstance.cs</file>
-	</qresource>
-	<qresource prefix="/Editor">
+    <file alias="ClothCollisionAssigner.cs">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs</file>
+    <file alias="ClothCollisionAssigner.cs.meta">../../UnityPlugin/Scripts/ClothCollisionAssigner.cs.meta</file>
+    <file alias="ClothTools.cs">../../UnityPlugin/Scripts/ClothTools.cs</file>
+    <file alias="ClothTools.cs.meta">../../UnityPlugin/Scripts/ClothTools.cs.meta</file>
+    <file alias="CollapsedVertexArray.cs">../../UnityPlugin/Scripts/CollapsedVertexArray.cs</file>
+    <file alias="CollapsedVertexArray.cs.meta">../../UnityPlugin/Scripts/CollapsedVertexArray.cs.meta</file>
+  </qresource>
+	<qresource prefix="/UnofficialDaz/Editor">
 		<file alias="Daz3DBridge.cs">../../UnityPlugin/Scripts/Editor/Daz3DBridge.cs</file>
 		<file alias="Daz3DDTUImporter.cs">../../UnityPlugin/Scripts/Editor/Daz3DDTUImporter.cs</file>
 		<file alias="DazCoroutine.cs">../../UnityPlugin/Scripts/Editor/DazCoroutine.cs</file>
 		<file alias="DTUConverter.cs">../../UnityPlugin/Scripts/Editor/DTUConverter.cs</file>
 		<file alias="DazJSONHelper.cs">../../UnityPlugin/Scripts/Editor/DazJSONHelper.cs</file>
+    <file alias="DetectRenderPipeline.cs">../../UnityPlugin/Scripts/Editor/DetectRenderPipeline.cs</file>"
+    <file alias="ClothCollisionAssignerEditor.cs">../../UnityPlugin/Scripts/Editor/ClothCollisionAssignerEditor.cs</file>
+    <file alias="ClothCollisionAssignerEditor.cs.meta">../../UnityPlugin/Scripts/Editor/ClothCollisionAssignerEditor.cs.meta</file>
+    <file alias="ClothToolsEditor.cs">../../UnityPlugin/Scripts/Editor/ClothToolsEditor.cs</file>
+    <file alias="ClothToolsEditor.cs.meta">../../UnityPlugin/Scripts/Editor/ClothToolsEditor.cs.meta</file>
 	</qresource>
-	<qresource prefix="/Shaders">
+	<qresource prefix="/UnofficialDaz/Shaders">
 		<file alias="IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/IrayUberMetal.shadergraph</file>
 		<file alias="IrayUberMetal.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberMetal.shadergraph.meta</file>
 		<file alias="IrayUberSpec.shadergraph">../../UnityPlugin/Shaders/IrayUberSpec.shadergraph</file>
@@ -27,24 +41,58 @@
 		<file alias="Wet.shadergraph.meta">../../UnityPlugin/Shaders/Wet.shadergraph.meta</file>
 		<file alias="Invisible.shader">../../UnityPlugin/Shaders/Invisible.shader</file>
 		<file alias="Invisible.shader.meta">../../UnityPlugin/Shaders/Invisible.shader.meta</file>
-	</qresource>
-	<qresource prefix="/ShaderHelpers">
-		<file alias="GetLighDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
-		<file alias="GetLighDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
+    <file alias="Built-In Hair.shader">../../UnityPlugin/Shaders/Built-In Hair.shader</file>
+    <file alias="Built-In Hair.shader.meta">../../UnityPlugin/Shaders/Built-In Hair.shader.meta</file>
+    <file alias="Built-In Wet.shader">../../UnityPlugin/Shaders/Built-In Wet.shader</file>
+    <file alias="Built-In Wet.shader.meta">../../UnityPlugin/Shaders/Built-In Wet.shader.meta</file>
+    <file alias="Built-In IrayUberSkin.shader">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader</file>
+    <file alias="Built-In IrayUberSkin.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSkin.shader.meta</file>
+    <file alias="Built-In IrayUberSpec.shader">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader</file>
+    <file alias="Built-In IrayUberSpec.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberSpec.shader.meta</file>
+    <file alias="Built-In IrayUberMetal.shader">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader</file>
+    <file alias="Built-In IrayUberMetal.shader.meta">../../UnityPlugin/Shaders/Built-In IrayUberMetal.shader.meta</file>
+    <file alias="URP Hair.shadergraph">../../UnityPlugin/Shaders/URP Hair.shadergraph</file>
+    <file alias="URP Hair.shadergraph.meta">../../UnityPlugin/Shaders/URP Hair.shadergraph.meta</file>
+    <file alias="URP Wet.shadergraph">../../UnityPlugin/Shaders/URP Wet.shadergraph</file>
+    <file alias="URP Wet.shadergraph.meta">../../UnityPlugin/Shaders/URP Wet.shadergraph.meta</file>
+    <file alias="URP IrayUberSkin.shadergraph">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph</file>
+    <file alias="URP IrayUberSkin.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberSkin.shadergraph.meta</file>
+    <file alias="URP IrayUberSpec.shadergraph">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph</file>
+    <file alias="URP IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph.meta</file>
+    <file alias="URP IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph</file>
+    <file alias="URP IrayUberMetal.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph.meta</file>
+  </qresource>
+  <qresource prefix="/UnofficialDaz/ShaderCGInc">
+    <file alias="DazStandardCore.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc</file>
+    <file alias="DazStandardCore.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc.meta</file>
+    <file alias="DazStandardCoreForward.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc</file>
+    <file alias="DazStandardCoreForward.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardCoreForward.cginc.meta</file>
+    <file alias="DazStandardInput.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc</file>
+    <file alias="DazStandardInput.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardInput.cginc.meta</file>
+    <file alias="DazStandardMeta.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc</file>
+    <file alias="DazStandardMeta.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardMeta.cginc.meta</file>
+    <file alias="DazStandardShadow.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc</file>
+    <file alias="DazStandardShadow.cginc.meta">../../UnityPlugin/Shaders/CGInc/DazStandardShadow.cginc.meta</file>
+  </qresource>
+  <qresource prefix="/UnofficialDaz/ShaderHelpers">
+		<file alias="GetLightDirection.hlsl">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl</file>
+		<file alias="GetLightDirection.hlsl.meta">../../UnityPlugin/Shaders/Helpers/GetLightDirection.hlsl.meta</file>
 		<file alias="LightDirection.shadersubgraph">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph</file>
 		<file alias="LightDirection.shadersubgraph.meta">../../UnityPlugin/Shaders/Helpers/LightDirection.shadersubgraph.meta</file>
-	</qresource>
-	<qresource prefix="/Vendors">
+  </qresource>
+	<qresource prefix="/UnofficialDaz/Vendors">
 		<file alias="SimpleJSON.cs">../../UnityPlugin/Vendors/SimpleJSON.cs</file>
 	</qresource>
-	<qresource prefix="/DiffusionProfiles">
+	<qresource prefix="/UnofficialDaz/DiffusionProfiles">
 		<file alias="IrayUberSkinDiffusionProfile.asset">../../UnityPlugin/DiffusionProfiles/IrayUberSkinDiffusionProfile.asset</file>
 		<file alias="IrayUberSkinDiffusionProfile.asset.meta">../../UnityPlugin/DiffusionProfiles/GenericDiffusionProfile.asset.meta</file>
 	</qresource>
-	<qresource prefix="/Resources">
-		<file alias="Daz_Combined_Small.png">../../UnityPlugin/Resources/Daz_Combined_Small.png</file>
-		<file alias="Daz_Combined_Small.png.meta">../../UnityPlugin/Resources/Daz_Combined_Small.png.meta</file>
+	<qresource prefix="/UnofficialDaz/Resources">
+		<file alias="UnofficialDTU_Logo_TextOnly.png">../../UnityPlugin/Resources/UnofficialDTU_Logo_TextOnly.png</file>
+		<file alias="UnofficialDTU_Logo_TextOnly.png.meta">../../UnityPlugin/Resources/UnofficialDTU_Logo_TextOnly.png.meta</file>
 		<file alias="ReadMe.txt">../../UnityPlugin/Resources/ReadMe.txt</file>
 		<file alias="ReadMe.txt.meta">../../UnityPlugin/Resources/ReadMe.txt.meta</file>
-	</qresource>
+    <file alias="G8F Collision Rig.prefab">../../UnityPlugin/Resources/G8F Collision Rig.prefab</file>
+    <file alias="G8F Collision Rig.prefab.meta">../../UnityPlugin/Resources/G8F Collision Rig.prefab.meta</file>
+  </qresource>
 </RCC>

@@ -47,7 +47,7 @@
 /*****************************
 Local definitions
 *****************************/
-#define DAZ_TO_UNITY_PLUGIN_NAME		"DazToUnity"
+#define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDTU"
 
 
 DzUnitySubdivisionDialog* DzUnitySubdivisionDialog::singleton = nullptr;
@@ -57,15 +57,12 @@ DzUnitySubdivisionDialog::DzUnitySubdivisionDialog(QWidget *parent) :
 	DzBasicDialog(parent, DAZ_TO_UNITY_PLUGIN_NAME)
 {
 	 subdivisionItemsGrid = NULL;
-	//settings = new QSettings("Code Wizards", "DazToUnity");
-
-
 
 	// Set the dialog title 
 	setWindowTitle(tr("Choose Subdivision Levels"));
 
 	// Setup folder
-	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DazToUnity" + QDir::separator() + "Presets";
+	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "UnofficialDTU" + QDir::separator() + "Presets";
 
 
 	QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -229,6 +226,12 @@ void DzUnitySubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled
 					QString propName = property->getName();
 					if (propName == "SubDIALevel" && numericProperty)
 					{
+						// DB 2021-09-02: Record data to Unlock/Undo changes
+						UndoData undo_data;
+						undo_data.originalLockState = numericProperty->isLocked();
+						undo_data.originalValue = numericProperty->getDoubleValue();
+						UndoSubdivisionOverrides.insert(numericProperty, undo_data);
+
 						numericProperty->lock(false);
 						if (subdivisionEnabled)
 						{
@@ -248,6 +251,26 @@ void DzUnitySubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled
 		}
 	}
 }
+
+// DB 2021-09-02: Unlock/Undo Subdivision Property Changes
+void DzUnitySubdivisionDialog::UnlockSubdivisionProperties(bool subdivisionEnabled)
+{
+	QMap<DzProperty*, UndoData>::iterator undoIterator = UndoSubdivisionOverrides.begin();
+	while (undoIterator != UndoSubdivisionOverrides.end())
+	{
+		DzNumericProperty* numericProperty = qobject_cast<DzNumericProperty*>(undoIterator.key());
+		if (numericProperty)
+		{
+			UndoData undo_data = undoIterator.value();
+			numericProperty->lock(false);
+			numericProperty->setDoubleValue(undo_data.originalValue);
+			numericProperty->lock(undo_data.originalLockState);
+		}
+		undoIterator++;
+	}
+
+}
+
 
 void DzUnitySubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 {

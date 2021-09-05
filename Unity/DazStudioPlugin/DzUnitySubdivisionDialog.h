@@ -40,6 +40,8 @@ public:
 	QGridLayout* subdivisionItemsGrid;
 
 	void LockSubdivisionProperties(bool subdivisionEnabled);
+	void UnlockSubdivisionProperties(bool subdivisionEnabled);
+
 	void WriteSubdivisions(DzJsonWriter& Writer);
 	DzNode* FindObject(DzNode* Node, QString Name);
 
@@ -58,6 +60,13 @@ private:
 	QList<QComboBox*> SubdivisionCombos;
 
 	QMap<QString, int> SubdivisionLevels;
+
+	struct UndoData
+	{
+		bool originalLockState;
+		double originalValue;
+	};
+	QMap<DzProperty*, UndoData> UndoSubdivisionOverrides;
 
 	static DzUnitySubdivisionDialog* singleton;
 };

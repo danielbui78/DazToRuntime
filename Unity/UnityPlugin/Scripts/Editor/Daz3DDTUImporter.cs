@@ -13,12 +13,12 @@ namespace Daz3D
     [ScriptedImporter(1, "dtu", 0x7FFFFFFF)]
     public class Daz3DDTUImporter : ScriptedImporter
     {
-
         public static bool AutoImportDTUChanges = true;
         public static bool GenerateUnityPrefab = true;
         public static bool ReplaceSceneInstances = true;
         public static bool AutomateMecanimAvatarMappings = true;
         public static bool ReplaceMaterials = true;
+        public static bool EnableDForceSupport = false;
         public static void ResetOptions()
         {
             AutoImportDTUChanges = true;
@@ -26,9 +26,8 @@ namespace Daz3D
             ReplaceSceneInstances = true;
             AutomateMecanimAvatarMappings = true;
             ReplaceMaterials = true;
+            EnableDForceSupport = false;
         }
-
-
 
         [Serializable]
         public class ImportEventRecord
@@ -55,6 +54,8 @@ namespace Daz3D
         public static Queue<ImportEventRecord> EventQueue = new Queue<ImportEventRecord>();
         private static Dictionary<string, Material> s_StandardMaterialCollection = new Dictionary<string, Material>();
         private static MaterialMap _map = null;
+        // DB (2021-05-25): dforceImport
+        private static DForceMaterialMap _dforceMap = null;
         private const bool ENDLINE = true;
         
         public static void EmptyEventQueue()
@@ -85,7 +86,11 @@ namespace Daz3D
                 record.Unfold = false;
         }
 
-
+        /// <summary>
+        /// Method called by Unity Editor when ImportAsset event occurs.  
+        /// This will probably be the first DTU Brudge code which is executed
+        /// when the DTU Bridge is first installed into Unity.
+        /// </summary>
         public override void OnImportAsset(AssetImportContext ctx)
         {
             if (AutoImportDTUChanges)
@@ -97,7 +102,7 @@ namespace Daz3D
             }
         }
 
-        [MenuItem("Daz3D/Create Unity Prefab from selected DTU")]
+        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", false, 101)]
         public static void MenuItemConvert()
         {
             var activeObject = Selection.activeObject;
@@ -108,9 +113,9 @@ namespace Daz3D
 
         }
 
+        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", true)]
         [MenuItem("Daz3D/Extract materials from selected DTU", true)]
         [MenuItem("Assets/Daz3D/Create Unity Prefab", true)]
-        [MenuItem("Daz3D/Create Unity Prefab from selected DTU", true)]
         [MenuItem("Assets/Daz3D/Extract materials", true)]
         public static bool ValidateDTUSelected()
         {
@@ -140,6 +145,46 @@ namespace Daz3D
         }
 
 
+        public class DForceMaterial
+        {
+            public DForceMaterial(DTUMaterial dtuMat) 
+            {
+                name = dtuMat.MaterialName;
+                dtuMaterial = dtuMat;
+            }
+
+            public string name;
+            public DTUMaterial dtuMaterial;
+
+/*
+            public static bool operator ==(Object x, Object y);
+            public static bool operator !=(Object x, Object y);
+            public static implicit operator bool(Object exists);
+*/
+
+        }
+
+        public class DForceMaterialMap
+        {
+            public DForceMaterialMap(string path)
+            {
+                Path = path;
+            }
+
+            public void AddMaterial(DForceMaterial dforceMat)
+            {
+                if (dforceMat == null)
+                {
+                    return;
+                }
+                if (!Map.ContainsKey(dforceMat.name))
+                    Map.Add(dforceMat.name, dforceMat);
+            }
+            public string Path { get; set; }
+            public Dictionary<string, DForceMaterial> Map = new Dictionary<string, DForceMaterial>();
+
+        }
+
 
         public static void Import(string dtuPath, string fbxPath)
         {
@@ -147,16 +192,46 @@ namespace Daz3D
         }
 
 
+        public static bool IsRenderPipelineDetected()
+        {
+#if !USING_HDRP && !USING_URP && !USING_BUILTIN
+            ImportEventRecord record = new ImportEventRecord();
+            EventQueue.Enqueue(record);
+            record.AddToken("DTU Bridge must autodetect a RenderPipeline in order to continue.\nThis will involve updating Symbol Definitions and will trigger \nUnity Editor to recompile all scripts.");
 
+            return false;
+#else
+            return true;
+#endif
+        }
 
         private static IEnumerator ImportRoutine(string dtuPath, string fbxPath)
         {
-            Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History;//force into history mode during import
+            //DEBUG
+            //Debug.LogError("dtuPath = [" + dtuPath + "] " + dtuPath.Length);
+
+            Daz3DBridge.ShowWindow();
+
+            Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History; //force into history mode during import
 
             Daz3DBridge.Progress = .03f;
                 yield return new WaitForEndOfFrame();
-    
+
+            if (IsRenderPipelineDetected() == false)
+            {
+                // DB: Write path of asset to be imported in temporary file,
+                //     this will be restored and continued after global script recompilation takes place.
+                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(dtuPath);
+                System.IO.File.WriteAllBytes("Assets/Daz3D/Resources/dtu_toload.txt", buffer);
+                
+                yield return new WaitForEndOfFrame();
+
+                DetectRenderPipeline.RunOnce();
+
+            }
+
             _map = new MaterialMap(dtuPath);
+            _dforceMap = new DForceMaterialMap(dtuPath);
 
             while (!IrayShadersReady())
                 yield return new WaitForEndOfFrame();
@@ -166,7 +241,22 @@ namespace Daz3D
             while (routine.MoveNext())
                 yield return new WaitForEndOfFrame();
 
+            if (dtu.AssetType == "Animation")
+            {
+                Daz3DBridge.Progress = 0;
+                _map = null;
+                _dforceMap = null;
+                yield break;
+            }
+
             //ImportDTU(dtuPath);
+            if (dtu.AssetType == null)
+            {
+                Daz3DBridge.Progress = 0;
+                _map = null;
+                _dforceMap = null;
+                yield break;
+            }
 
             DazFigurePlatform platform = DiscoverFigurePlatform(dtu);
 
@@ -180,10 +270,13 @@ namespace Daz3D
                 yield return new WaitForEndOfFrame();
 
             _map = null;
+            _dforceMap = null;
 
             Daz3DBridge.Progress = 0;
 
-            
+            // DB 2021-09-02: Show DTUImport complete dialog
+            EditorUtility.DisplayDialog("DTU Bridge Import", "Import Completed for " + dtuPath, "OK");
+
             yield break;
         }
 
@@ -202,6 +295,8 @@ namespace Daz3D
 
         private static bool IrayShadersReady()
         {
+
+#if USING_HDRP || USING_URP || USING_BUILTIN
             if (
                 Shader.Find(DTU_Constants.shaderNameMetal) == null ||
                 Shader.Find(DTU_Constants.shaderNameSpecular) == null ||
@@ -214,54 +309,70 @@ namespace Daz3D
             }
 
             return true;
+#else
+            return false;
+#endif
         }
 
+        //// unused blocking method
+        //public static void ImportDTU(string path)
+        //{
+        //    Debug.Log("ImportDTU for " + path);
 
-        public static void ImportDTU(string path)
-        {
-            Debug.Log("ImportDTU for " + path);
+        //    FoldAll();
 
-            FoldAll();
+        //    ImportEventRecord record = new ImportEventRecord();
+        //    EventQueue.Enqueue(record);
 
-            ImportEventRecord record = new ImportEventRecord();
-            EventQueue.Enqueue(record);
+        //    var dtu = DTUConverter.ParseDTUFile(path);
 
-            var dtu = DTUConverter.ParseDTUFile(path);
+        //    var dtuObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
 
-            var dtuObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
+        //    // DB (2021-05-15): skip anim DTU
+        //    if (dtu.AssetType == "Animation")
+        //    {
+        //        record.AddToken("Skipping prefab creation for animation DTU file: " + path);
+        //        return;
+        //    }
 
-            record.AddToken("Imported DTU file: " + path);
-            record.AddToken(dtuObject.name, dtuObject, ENDLINE);
+        //    record.AddToken("Imported DTU file: " + path);
+        //    record.AddToken(dtuObject.name, dtuObject, ENDLINE);
 
-            //UnityEngine.Debug.Log("DTU: " + dtu.AssetName + " contains: " + dtu.Materials.Count + " materials");
+        //    //UnityEngine.Debug.Log("DTU: " + dtu.AssetName + " contains: " + dtu.Materials.Count + " materials");
 
-            record.AddToken("Generated materials: ");
-            foreach (var dtuMat in dtu.Materials)
-            {
-                var material = dtu.ConvertToUnity(dtuMat);
-                _map.AddMaterial(material);
+        //    record.AddToken("Generated materials: ");
+        //    foreach (var dtuMat in dtu.Materials)
+        //    {
+        //        var material = dtu.ConvertToUnity(dtuMat);
+        //        _map.AddMaterial(material);
 
-                record.AddToken(material.name, material);
-            }
-            record.AddToken(" based on DTU file.", null, ENDLINE);
+        //        // DB (2021-05-25): DForce import
+        //        if (dtu.IsDTUMaterialDForceEnabled(dtuMat))
+        //        {
+        //            _dforceMap.AddMaterial(new DForceMaterial(dtuMat));
+        //        }
+
+        //        record.AddToken(material.name, material);
+        //    }
+        //    record.AddToken(" based on DTU file.", null, ENDLINE);
 
 
-            Daz3DBridge bridge = EditorWindow.GetWindow(typeof(Daz3DBridge)) as Daz3DBridge;
-            if (bridge == null)
-            {
-                var consoleType = Type.GetType("ConsoleWindow,UnityEditor.dll");
-                bridge = EditorWindow.CreateWindow<Daz3DBridge>(new[] { consoleType });
-            }
+        //    Daz3DBridge bridge = EditorWindow.GetWindow(typeof(Daz3DBridge)) as Daz3DBridge;
+        //    if (bridge == null)
+        //    {
+        //        var consoleType = Type.GetType("ConsoleWindow,UnityEditor.dll");
+        //        bridge = EditorWindow.CreateWindow<Daz3DBridge>(new[] { consoleType });
+        //    }
 
-            bridge?.Focus();
+        //    bridge?.Focus();
 
-            //just a safeguard to keep the history data at a managable size (100 records)
-            while (EventQueue.Count > 100)
-            {
-                EventQueue.Dequeue();
-            }
+        //    //just a safeguard to keep the history data at a managable size (100 records)
+        //    while (EventQueue.Count > 100)
+        //    {
+        //        EventQueue.Dequeue();
+        //    }
 
-        }
+        //}
 
 
         
@@ -275,6 +386,15 @@ namespace Daz3D
             EventQueue.Enqueue(record);
 
             var dtu = DTUConverter.ParseDTUFile(path);
+
+            // DB (2021-05-15): skip DTU import if animation
+            if (dtu.AssetType == "Animation")
+            {
+                record.AddToken("Skipping prefab creation for animation DTU file: " + path);
+                Daz3DBridge.Progress = 0;
+                yield break;
+            }
+
             dtuOut(dtu);
 
             var dtuObject = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(path);
@@ -293,6 +413,12 @@ namespace Daz3D
                 var dtuMat = dtu.Materials[i];
                 var material = dtu.ConvertToUnity(dtuMat);
                 _map.AddMaterial(material);
+
+                // DB (2021-05-25): DForce import
+                if (dtu.IsDTUMaterialDForceEnabled(dtuMat))
+                {
+                    _dforceMap.AddMaterial(new DForceMaterial(dtuMat));
+                }
 
                 record.AddToken(material.name, material);
 
@@ -493,67 +619,199 @@ namespace Daz3D
 
                     if (renderer.name.ToLower().Contains("eyelashes"))
                         renderer.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
-                    foreach (var keyMat in renderer.sharedMaterials)
+                    // DB (2021-05-07): SANITY CHECK
+                    if (renderer.sharedMaterials == null)
                     {
-                        var key = keyMat.name;
-
-                        key = Daz3D.Utilities.ScrubKey(key);
-
-                        Material nuMat = null;
-
-                        if (_map != null && _map.Map.ContainsKey(key))
+                        Debug.LogError("DB (2021-05-07), ERROR: GeneratePrefabFromFBX(): sharedMaterials is null!");
+                    }
+                    else
+                    {
+                        foreach (var keyMat in renderer.sharedMaterials)
                         {
-                            nuMat = _map.Map[key];// the preferred uber/iRay based material generated by the DTUConverter
-                        }
-                        else if (s_StandardMaterialCollection.ContainsKey(key))
-                        {
-                            nuMat = new Material(s_StandardMaterialCollection[key]);
-                            //FixupStandardBasedMaterial(ref nuMat, fbxPrefab, keyMat.name, data);
-                        }
-                        else
-                        {
-                            var shader = Shader.Find("HDRP/Lit");
-
-                            if (shader == null)
+                            // DB (2021-05-07): SANITY CHECK
+                            if (keyMat == null)
                             {
-                                Debug.LogWarning("couldn't find HDRP/Lit shader");
+                                Debug.LogError("DB (2021-05-07), ERROR: keyMat is NULL");
                                 continue;
                             }
+                            var key = keyMat.name;
 
-                            nuMat = new Material(shader);
-                            nuMat.CopyPropertiesFromMaterial(keyMat);
+                            key = Daz3D.Utilities.ScrubKey(key);
 
-                            // just copy the textures, colors and scalars that are appropriate given the base material type
-                            //DazMaterialPropertiesInfo info = new DazMaterialPropertiesInfo();
-                            //CustomizeMaterial(ref nuMat, info);
+                            Material nuMat = null;
 
-                            var matPath = Path.GetDirectoryName(modelPath);
-                            matPath = Path.Combine(matPath, fbxPrefab.name + "Daz3D_Materials");
-                            matPath = AssetDatabase.GenerateUniqueAssetPath(matPath);
+                            if (_map != null && _map.Map.ContainsKey(key))
+                            {
+                                nuMat = _map.Map[key];// the preferred uber/iRay based material generated by the DTUConverter
 
-                            if (!Directory.Exists(matPath))
-                                Directory.CreateDirectory(matPath);
+                                // DB (2021-05-25): dForce import
+                                if (_dforceMap.Map.ContainsKey(key))
+                                {
+                                    if (EnableDForceSupport)
+                                        ImportDforceToPrefab(key, renderer, workingInstance, keyMat);
 
-                            //Debug.Log("obj path " + path);
-                            AssetDatabase.CreateAsset(nuMat, matPath + "/Daz3D_" + keyMat.name + ".mat");
+                                    //DForceMaterial dforceMat = _dforceMap.Map[key];
+                                    //GameObject parent = renderer.gameObject;
+                                    //SkinnedMeshRenderer skinned = parent.GetComponent<SkinnedMeshRenderer>();
+                                    //Cloth cloth;
+
+                                    //// add Unity Cloth Physics component to gameobject parent of the renderer
+                                    //if (parent.GetComponent<Cloth>() == null)
+                                    //{
+                                    //    cloth = parent.AddComponent<Cloth>();
+                                    //    // assign values from dtuMat
+                                    //    cloth.stretchingStiffness = dforceMat.dtuMaterial.Get("Stretch Stiffness").Float;
+                                    //    cloth.bendingStiffness = dforceMat.dtuMaterial.Get("Bend Stiffness").Float;
+                                    //    cloth.damping = dforceMat.dtuMaterial.Get("Damping").Float;
+                                    //    cloth.friction = dforceMat.dtuMaterial.Get("Friction").Float;
+
+                                    //    // fix SkinnedMeshRenderer boundaries bug
+                                    //    skinned.updateWhenOffscreen = true;
+
+                                    //    // Add G8F cloth collision rig
+                                    //    var searchResult = workingInstance.transform.Find("Cloth Collision Rig");
+                                    //    GameObject collision_instance = (searchResult != null) ? searchResult.gameObject : null;
+                                    //    if (collision_instance == null)
+                                    //    {
+                                    //        GameObject collision_prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Daz3D/Resources/G8F Collision Rig.prefab");
+                                    //        collision_instance = Instantiate<GameObject>(collision_prefab);
+                                    //        collision_instance.name = "Cloth Collision Rig";
+                                    //        collision_instance.transform.parent = workingInstance.transform;
+                                    //        // merge cloth collision rig to figure root bone
+                                    //        collision_instance.GetComponent<ClothCollisionAssigner>().mergeRig(skinned.rootBone);
+                                    //    }
+                                    //    ClothCollisionAssigner.ClothConfig clothConfig = new ClothCollisionAssigner.ClothConfig();
+                                    //    clothConfig.m_ClothToManage = cloth;
+                                    //    clothConfig.m_UpperBody = true;
+                                    //    clothConfig.m_LowerBody = true;
+                                    //    collision_instance.GetComponent<ClothCollisionAssigner>().addClothConfig(clothConfig);
+
+                                    //}
+                                    //else
+                                    //{
+                                    //    cloth = parent.GetComponent<Cloth>();
+                                    //}
+
+                                    //// add clothtools to gameobject parent of renderer
+                                    //ClothTools clothTools;
+                                    //if (parent.GetComponent<ClothTools>() == null)
+                                    //{
+                                    //    clothTools = parent.AddComponent<ClothTools>();
+                                    //    clothTools.GenerateLookupTables();
+                                    //}
+                                    //else
+                                    //{
+                                    //    clothTools = parent.GetComponent<ClothTools>();
+                                    //}
+
+                                    //int matIndex = Array.IndexOf(skinned.sharedMaterials, keyMat);
+                                    //// get vertex list for this material's submesh
+                                    //if (matIndex >= 0)
+                                    //{
+                                    //    float simulation_strength;
+                                    //    //// map the materical's submesh's vertices to the correct "Dynamics Strength"
+                                    //    simulation_strength = dforceMat.dtuMaterial.Get("Dynamics Strength").Float;
+                                    //    Debug.Log("DEBUG INFO: simulation strength: " + simulation_strength);
+                                    //    //// DEBUG line to map simulation strength to material index
+                                    //    //simulation_strength = matIndex;
+
+                                    //    //// Tiered scaling function
+                                    //    float adjusted_simulation_strength;
+                                    //    //float strength_max = 1.0f;
+                                    //    //float strength_min = 0.0f;
+                                    //    float strength_scale_threshold = 0.5f;
+                                    //    if (simulation_strength <= strength_scale_threshold)
+                                    //    {
+                                    //        //// stronger compression of values below threshold
+                                    //        float scale = 0.075f;
+                                    //        float offset = 0.2f;
+                                    //        adjusted_simulation_strength = (simulation_strength - offset) * scale;
+                                    //    }
+                                    //    else
+                                    //    {
+                                    //        float offset = (strength_scale_threshold - 0.2f) * 0.075f; // offset = (threshold - previous tier's offset) * previous teir's scale
+                                    //        float scale = 0.2f;
+                                    //        adjusted_simulation_strength = (simulation_strength - offset) / (1 - offset); // apply offset, then normalize to 1.0
+                                    //        adjusted_simulation_strength *= scale;
+                                    //    }
+                                    //    //// clamp to 0.0f to 0.2f
+                                    //    float coeff_min = 0.0f;
+                                    //    float coeff_max = 0.2f;
+                                    //    adjusted_simulation_strength = (adjusted_simulation_strength > coeff_min) ? adjusted_simulation_strength : coeff_min;
+                                    //    adjusted_simulation_strength = (adjusted_simulation_strength < coeff_max) ? adjusted_simulation_strength : coeff_max;
+                                    //    //// Debug line for no scaling
+                                    //    //adjusted_simulation_strength = simulation_strength;
+
+                                    //    clothTools.SetSubMeshWeights(matIndex, adjusted_simulation_strength);
+
+                                    //}
+
+                                }
+
+                            }
+                            else if (s_StandardMaterialCollection.ContainsKey(key))
+                            {
+                                nuMat = new Material(s_StandardMaterialCollection[key]);
+                                //FixupStandardBasedMaterial(ref nuMat, fbxPrefab, keyMat.name, data);
+                            }
+                            else
+                            {
+                                var shader = Shader.Find("HDRP/Lit");
+
+                                if (shader == null)
+                                {
+                                    Debug.LogWarning("couldn't find HDRP/Lit shader");
+                                    continue;
+                                }
+
+                                nuMat = new Material(shader);
+                                nuMat.CopyPropertiesFromMaterial(keyMat);
+
+                                // just copy the textures, colors and scalars that are appropriate given the base material type
+                                //DazMaterialPropertiesInfo info = new DazMaterialPropertiesInfo();
+                                //CustomizeMaterial(ref nuMat, info);
+
+                                var matPath = Path.GetDirectoryName(modelPath);
+                                matPath = Path.Combine(matPath, fbxPrefab.name + "Daz3D_Materials");
+                                matPath = AssetDatabase.GenerateUniqueAssetPath(matPath);
+
+                                if (!Directory.Exists(matPath))
+                                    Directory.CreateDirectory(matPath);
+
+                                //Debug.Log("obj path " + path);
+                                AssetDatabase.CreateAsset(nuMat, matPath + "/Daz3D_" + keyMat.name + ".mat");
+
+                            }
+
+                            dict.Add(keyMat, nuMat);
 
                         }
 
-                        dict.Add(keyMat, nuMat);
+                        //remap the meshes in the fbx prefab to the value materials in dict
+                        var count = renderer.sharedMaterials.Length;
+                        var copy = new Material[count]; //makes a copy
+                        for (int i = 0; i < count; i++)
+                        {
+                            var key = renderer.sharedMaterials[i];
+                            // DB (2021-05-07): SANITY CHECK
+                            if (key == null || !dict.ContainsKey(key))
+                            {
+                                Debug.LogError("DB (2021-05-07), ERROR: GeneratePrefabFromFBX(): sharedMaterials[" + i + "] (" + renderer.sharedMaterials + ") returned invalid key.");
+                                if (key != null)
+                                    Debug.LogError(" part 2: key==" + key);
+                                else
+                                    Debug.LogError(" part 2: key==null");
+                            }
+                            else
+                            {
+                                Debug.Log("remapping: " + renderer.sharedMaterials[i].name + " to " + dict[key].name);
+                                copy[i] = dict[key];//fill copy
+                            }
+                        }
+
+                        renderer.sharedMaterials = copy;//overwrite sharedMaterials, because set indexer assigns to a copy
 
                     }
-
-                    //remap the meshes in the fbx prefab to the value materials in dict
-                    var count = renderer.sharedMaterials.Length;
-                    var copy = new Material[count]; //makes a copy
-                    for (int i = 0; i < count; i++)
-                    {
-                        var key = renderer.sharedMaterials[i];
-                        //Debug.Log("remapping: " + renderer.sharedMaterials[i].name + " to " + dict[key].name);
-                        copy[i] = dict[key];//fill copy
-                    }
-
-                    renderer.sharedMaterials = copy;//overwrite sharedMaterials, because set indexer assigns to a copy
 
                 }
             }
@@ -626,6 +884,132 @@ namespace Daz3D
             Selection.activeGameObject = resultingInstance;
         }
 
+        private static void ImportDforceToPrefab(string key, Renderer renderer, GameObject workingInstance, Material keyMat)
+        {
+            DForceMaterial dforceMat = _dforceMap.Map[key];
+            GameObject parent = renderer.gameObject;
+            SkinnedMeshRenderer skinned = parent.GetComponent<SkinnedMeshRenderer>();
+            Cloth cloth;
+
+            string valueLower = key.ToLower();
+            string assetNameLower = parent.name.ToLower();
+            string matNameLower = keyMat.name.ToLower();
+            if (
+                valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair")
+                || valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache")
+                || valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard")
+            )
+            {
+                // TODO: implement dForce hair support
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() dForce hair is currently not supported: " + parent.name);
+                return;
+            }
+
+            if (skinned == null)
+            {
+                // TODO: check if regular mesh renderer and upgrade if appropriate
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() gameojbect unsupported: it does not have a skinned mesh renderer: " + parent.name);
+                return;
+            }
+            else if (skinned.sharedMesh.vertexCount > 40000)
+            {
+                int numverts = skinned.sharedMesh.vertexCount;
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() gameojbect unsupported: too many vertices: " + parent.name + " (" + numverts.ToString() + ")");
+                return;
+
+            }
+
+            // add Unity Cloth Physics component to gameobject parent of the renderer
+            if (parent.GetComponent<Cloth>() == null)
+            {
+                cloth = parent.AddComponent<Cloth>();
+                // assign values from dtuMat
+                cloth.stretchingStiffness = dforceMat.dtuMaterial.Get("Stretch Stiffness").Float;
+                cloth.bendingStiffness = dforceMat.dtuMaterial.Get("Bend Stiffness").Float;
+                cloth.damping = dforceMat.dtuMaterial.Get("Damping").Float;
+                cloth.friction = dforceMat.dtuMaterial.Get("Friction").Float;
+
+                // fix SkinnedMeshRenderer boundaries bug
+                skinned.updateWhenOffscreen = true;
+
+                // Add G8F cloth collision rig
+                var searchResult = workingInstance.transform.Find("Cloth Collision Rig");
+                GameObject collision_instance = (searchResult != null) ? searchResult.gameObject : null;
+                if (collision_instance == null)
+                {
+                    GameObject collision_prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Daz3D/Resources/G8F Collision Rig.prefab");
+                    collision_instance = Instantiate<GameObject>(collision_prefab);
+                    collision_instance.name = "Cloth Collision Rig";
+                    collision_instance.transform.parent = workingInstance.transform;
+                    // merge cloth collision rig to figure root bone
+                    collision_instance.GetComponent<ClothCollisionAssigner>().mergeRig(skinned.rootBone);
+                }
+                ClothCollisionAssigner.ClothConfig clothConfig = new ClothCollisionAssigner.ClothConfig();
+                clothConfig.m_ClothToManage = cloth;
+                clothConfig.m_UpperBody = true;
+                clothConfig.m_LowerBody = true;
+                collision_instance.GetComponent<ClothCollisionAssigner>().addClothConfig(clothConfig);
+
+            }
+            else
+            {
+                cloth = parent.GetComponent<Cloth>();
+            }
+
+            // add clothtools to gameobject parent of renderer
+            ClothTools clothTools;
+            if (parent.GetComponent<ClothTools>() == null)
+            {
+                clothTools = parent.AddComponent<ClothTools>();
+                clothTools.GenerateLookupTables();
+            }
+            else
+            {
+                clothTools = parent.GetComponent<ClothTools>();
+            }
+
+            int matIndex = Array.IndexOf(skinned.sharedMaterials, keyMat);
+            // get vertex list for this material's submesh
+            if (matIndex >= 0)
+            {
+                float simulation_strength;
+                //// map the materical's submesh's vertices to the correct "Dynamics Strength"
+                simulation_strength = dforceMat.dtuMaterial.Get("Dynamics Strength").Float;
+                Debug.Log("DEBUG INFO: simulation strength: " + simulation_strength);
+                //// DEBUG line to map simulation strength to material index
+                //simulation_strength = matIndex;
+
+                //// Tiered scaling function
+                float adjusted_simulation_strength;
+                //float strength_max = 1.0f;
+                //float strength_min = 0.0f;
+                float strength_scale_threshold = 0.5f;
+                if (simulation_strength <= strength_scale_threshold)
+                {
+                    //// stronger compression of values below threshold
+                    float scale = 0.075f;
+                    float offset = 0.2f;
+                    adjusted_simulation_strength = (simulation_strength - offset) * scale;
+                }
+                else
+                {
+                    float offset = (strength_scale_threshold - 0.2f) * 0.075f; // offset = (threshold - previous tier's offset) * previous teir's scale
+                    float scale = 0.2f;
+                    adjusted_simulation_strength = (simulation_strength - offset) / (1 - offset); // apply offset, then normalize to 1.0
+                    adjusted_simulation_strength *= scale;
+                }
+                //// clamp to 0.0f to 0.2f
+                float coeff_min = 0.0f;
+                float coeff_max = 0.2f;
+                adjusted_simulation_strength = (adjusted_simulation_strength > coeff_min) ? adjusted_simulation_strength : coeff_min;
+                adjusted_simulation_strength = (adjusted_simulation_strength < coeff_max) ? adjusted_simulation_strength : coeff_max;
+                //// Debug line for no scaling
+                //adjusted_simulation_strength = simulation_strength;
+
+                clothTools.SetSubMeshWeights(matIndex, adjusted_simulation_strength);
+
+            }
+        }
 
 
         private static void DescribeHumanJointsForFigure(ref HumanDescription description, DazFigurePlatform figure)
@@ -922,11 +1306,12 @@ namespace Daz3D
         // Add a menu item named "Log Selected Transform Name" to MyMenu in the menu bar.
         // We use a second function to validate the menu item
         // so it will only be enabled if we have a transform selected.
-        [MenuItem("Assets/Daz3D/Create Unity Prefab")]
+        [MenuItem("Assets/Daz3D/Create Unity Prefab", false, 101)]
         static void DoStuffToSelectedDTU()
         {
             CreateDTUPrefab(Selection.activeObject);
-            Debug.Log("Selected Transform is on " + Selection.activeTransform.gameObject.name + ".");
+            if (Selection.activeTransform)
+                Debug.Log("Selected Transform is on " + Selection.activeTransform.gameObject.name + ".");
         }
 
         //// Validate the menu item defined by the function above.
