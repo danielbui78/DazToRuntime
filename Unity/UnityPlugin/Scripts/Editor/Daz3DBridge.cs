@@ -41,7 +41,7 @@ namespace Daz3D
         }
 
         private static Daz3DBridge _instance;
-        [MenuItem("Daz3D/Open Daz3DBridge window", false, 0)]
+        [MenuItem("Daz3D/Open DazToUnity Bridge window", false, 0)]
         public static void ShowWindow()
         {
             ObtainInstance();
@@ -57,6 +57,7 @@ namespace Daz3D
             _instance.titleContent = new GUIContent("Unofficial DTU Bridge - Built-In Rendering");
 #else
             _instance.titleContent = new GUIContent("Unofficial DTU Bridge - RenderPipeline Not Detected");
+            CurrentToolbarMode = ToolbarMode.Options;            
 #endif
         }
 
@@ -139,7 +140,7 @@ namespace Daz3D
             GUILayout.BeginHorizontal();
 
             if (masthead == null)
-                masthead = Resources.Load<Texture>("Daz_Combined_Small");
+                masthead = Resources.Load<Texture>("UnofficialDTU_Logo_TextOnly");
 
             GUILayout.FlexibleSpace();
             GUILayout.Label(masthead, GUILayout.Height(100));
@@ -245,6 +246,7 @@ namespace Daz3D
             Daz3DDTUImporter.ReplaceSceneInstances = GUILayout.Toggle(Daz3DDTUImporter.ReplaceSceneInstances, "Replace instances of Unity Prefab in active scene(s)", bigStyle);
             Daz3DDTUImporter.AutomateMecanimAvatarMappings = GUILayout.Toggle(Daz3DDTUImporter.AutomateMecanimAvatarMappings, "Automatically setup the Mecanim Avatar", bigStyle);
             Daz3DDTUImporter.ReplaceMaterials = GUILayout.Toggle(Daz3DDTUImporter.ReplaceMaterials, "Replace FBX materials with high quality Daz-shader materials", bigStyle);
+            Daz3DDTUImporter.EnableDForceSupport = GUILayout.Toggle(Daz3DDTUImporter.EnableDForceSupport, "Enable dForce support (experimental)", bigStyle);
 
             GUILayout.Space(12);
             if (GUILayout.Button("Reset All", GUILayout.Width(100)))
@@ -252,13 +254,13 @@ namespace Daz3D
 
             GUILayout.Space(12);
 #if USING_HDRP
-            GUILayout.TextArea("DazToUnity Configured for HDRP");
+            GUILayout.TextArea("Unofficial DTU Configured for HDRP");
 #elif USING_URP
-            GUILayout.TextArea("DazToUnity Configured for URP");
+            GUILayout.TextArea("Unofficial DTU Configured for URP");
 #elif USING_BUILTIN
-            GUILayout.TextArea("DazToUnity Configured for Built-In Rendering");
+            GUILayout.TextArea("Unofficial DTU Configured for Built-In Rendering");
 #else
-            GUILayout.TextArea("DazToUnity - No Renderpipeline configured.  Press Redetect RenderPipeline to configure now.");
+            GUILayout.TextArea("No Renderpipeline configured.  Press Redetect RenderPipeline to configure now.");
 #endif
             GUILayout.Space(12);
             if (GUILayout.Button("Redetect RenderPipeline", GUILayout.Width(200)))

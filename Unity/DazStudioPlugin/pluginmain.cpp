@@ -5,7 +5,7 @@
 #include "DzUnityAction.h"
 #include "DzUnityDialog.h"
 
-DZ_PLUGIN_DEFINITION("UnofficialDTU");
+DZ_PLUGIN_DEFINITION("Unofficial DTU Bridge");
 
 DZ_PLUGIN_AUTHOR("danielbui78");
 

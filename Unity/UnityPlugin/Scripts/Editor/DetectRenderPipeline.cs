@@ -118,10 +118,44 @@ public static class DetectRenderPipeline
 		newSymbolsString = CleanPreprocessorDirectives(newSymbolsString);
 		newSymbolsString = DetectAndSetSymbolString(newSymbolsString);
 
+		string renderPipelineString = "Built-In Pipeline";
+		if (IsHDRPInstalled())
+			renderPipelineString = "HDRP";
+		else if (IsURPInstalled())
+			renderPipelineString = "URP";
+
 //		Debug.Log("OldString=" + oldSymbolsString + ", NewString=" + newSymbolsString);
 		if (oldSymbolsString != newSymbolsString)
         {
-			CommitDefinedSymbols(newSymbolsString);
+			// DB: 2021-08-31, showmodal to ask to change defined symbols, warn that it will take time (minutes)
+			// 1. DISPLAY DETECTED RP, ASK TO COMMIT, WARN OPERATION WILL TAKE TIME (MINUTES)
+			// 2. IF YES, DO COMMIT
+			// 3. IF NO, RESET VALUES SO DETECTION CAN BE RUN LATER...
+			// OPTIONAL: IMPORT ASSETS WITH DEFAULT SHADER?
+			Daz3D.Daz3DBridge.CurrentToolbarMode = Daz3D.Daz3DBridge.ToolbarMode.Options;
+			string dtu_detectrp_message = "Detected [" + renderPipelineString + "]\n\nDTU Bridge must update symbol definitions to continue the Import Procedure.  This may take a few minutes.  " +
+				"You may Cancel now, and rerun the renderpipeline detection process from the DTU Bridge at another time.";
+			bool bUpdateSymbols = EditorUtility.DisplayDialog("Unofficial DTU RenderPipeline Detection", dtu_detectrp_message, "Update Symbol Definitions Now", "Cancel and Redetect RenderPipeline Later");
+			if (bUpdateSymbols)
+            {
+				Daz3D.Daz3DBridge.CurrentToolbarMode = Daz3D.Daz3DBridge.ToolbarMode.History;
+				CommitDefinedSymbols(newSymbolsString);
+				Daz3D.Daz3DDTUImporter.ImportEventRecord record = new Daz3D.Daz3DDTUImporter.ImportEventRecord();
+				Daz3D.Daz3DDTUImporter.EventQueue.Enqueue(record);
+				record.AddToken("Updating Symbol Definitions.\nThis will trigger Unity Editor to recompile all scripts and may take several minutes...");
+			}
+			else
+            {
+				Daz3D.Daz3DDTUImporter.ImportEventRecord record = new Daz3D.Daz3DDTUImporter.ImportEventRecord();
+				Daz3D.Daz3DDTUImporter.EventQueue.Enqueue(record);
+				record.AddToken("Autodetection cancelled.\nPlease click the \"Detect RenderPipeline\" button \nin the Options tab to continue import procedure.");
+			}
+
+		}
+        else
+        {
+			string dtu_detectrp_message = "Detected [" + renderPipelineString + "]\n\nNo changes need to be made to Symbol Definitions.";
+			EditorUtility.DisplayDialog("Unofficial DTU RenderPipeline Detection", dtu_detectrp_message, "OK");
 		}
 
 	}

@@ -88,8 +88,8 @@
 		<file alias="IrayUberSkinDiffusionProfile.asset.meta">../../UnityPlugin/DiffusionProfiles/GenericDiffusionProfile.asset.meta</file>
 	</qresource>
 	<qresource prefix="/UnofficialDaz/Resources">
-		<file alias="Daz_Combined_Small.png">../../UnityPlugin/Resources/Daz_Combined_Small.png</file>
-		<file alias="Daz_Combined_Small.png.meta">../../UnityPlugin/Resources/Daz_Combined_Small.png.meta</file>
+		<file alias="UnofficialDTU_Logo_TextOnly.png">../../UnityPlugin/Resources/UnofficialDTU_Logo_TextOnly.png</file>
+		<file alias="UnofficialDTU_Logo_TextOnly.png.meta">../../UnityPlugin/Resources/UnofficialDTU_Logo_TextOnly.png.meta</file>
 		<file alias="ReadMe.txt">../../UnityPlugin/Resources/ReadMe.txt</file>
 		<file alias="ReadMe.txt.meta">../../UnityPlugin/Resources/ReadMe.txt.meta</file>
     <file alias="G8F Collision Rig.prefab">../../UnityPlugin/Resources/G8F Collision Rig.prefab</file>

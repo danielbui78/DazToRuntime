@@ -18,6 +18,7 @@ namespace Daz3D
         public static bool ReplaceSceneInstances = true;
         public static bool AutomateMecanimAvatarMappings = true;
         public static bool ReplaceMaterials = true;
+        public static bool EnableDForceSupport = false;
         public static void ResetOptions()
         {
             AutoImportDTUChanges = true;
@@ -25,6 +26,7 @@ namespace Daz3D
             ReplaceSceneInstances = true;
             AutomateMecanimAvatarMappings = true;
             ReplaceMaterials = true;
+            EnableDForceSupport = false;
         }
 
         [Serializable]
@@ -195,7 +197,7 @@ namespace Daz3D
 #if !USING_HDRP && !USING_URP && !USING_BUILTIN
             ImportEventRecord record = new ImportEventRecord();
             EventQueue.Enqueue(record);
-            record.AddToken("Please wait while RenderPipeline is detected...");
+            record.AddToken("DTU Bridge must autodetect a RenderPipeline in order to continue.\nThis will involve updating Symbol Definitions and will trigger \nUnity Editor to recompile all scripts.");
 
             return false;
 #else
@@ -210,13 +212,15 @@ namespace Daz3D
 
             Daz3DBridge.ShowWindow();
 
-            Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History;//force into history mode during import
+            Daz3DBridge.CurrentToolbarMode = Daz3DBridge.ToolbarMode.History; //force into history mode during import
 
             Daz3DBridge.Progress = .03f;
                 yield return new WaitForEndOfFrame();
 
             if (IsRenderPipelineDetected() == false)
             {
+                // DB: Write path of asset to be imported in temporary file,
+                //     this will be restored and continued after global script recompilation takes place.
                 byte[] buffer = System.Text.Encoding.UTF8.GetBytes(dtuPath);
                 System.IO.File.WriteAllBytes("Assets/Daz3D/Resources/dtu_toload.txt", buffer);
                 
@@ -270,7 +274,9 @@ namespace Daz3D
 
             Daz3DBridge.Progress = 0;
 
-            
+            // DB 2021-09-02: Show DTUImport complete dialog
+            EditorUtility.DisplayDialog("DTU Bridge Import", "Import Completed for " + dtuPath, "OK");
+
             yield break;
         }
 
@@ -641,7 +647,8 @@ namespace Daz3D
                                 // DB (2021-05-25): dForce import
                                 if (_dforceMap.Map.ContainsKey(key))
                                 {
-                                    ImportDforceToPrefab(key, renderer, workingInstance, keyMat);
+                                    if (EnableDForceSupport)
+                                        ImportDforceToPrefab(key, renderer, workingInstance, keyMat);
 
                                     //DForceMaterial dforceMat = _dforceMap.Map[key];
                                     //GameObject parent = renderer.gameObject;

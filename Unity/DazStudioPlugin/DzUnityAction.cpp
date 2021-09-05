@@ -30,7 +30,7 @@
 
 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
-	 UnofficialDzRuntimePluginAction(tr("&Unofficial Daz to Unity"), tr("Send the selected node to Unity."))
+	 UnofficialDzRuntimePluginAction(tr("&Unofficial DTU (Daz To Unity)"), tr("Send the selected node to Unity."))
 {
 	 SubdivisionDialog = nullptr;
 	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
@@ -93,9 +93,19 @@ void UnofficialDzUnityAction::executeAction()
 
 		  Export();
 
+		  // DB 2021-09-02: Unlock and Undo subdivision changes
+		  SubdivisionDialog->UnlockSubdivisionProperties(ExportSubdivisions);
+
 		  //Rename the textures folder
 		  QDir textureDir(CharacterFolder + "\\" + CharacterName + ".images");
 		  textureDir.rename(CharacterFolder + "\\" + CharacterName + ".images", CharacterFolder + "\\Textures");
+
+		  // DB 2021-09-02: messagebox "Export Complete"
+		  //QMessageBox msgBox;
+		  //msgBox.setText(tr("Unofficial DTU Bridge export from Daz Studio complete. Please switch to Unity to continue."));
+		  //msgBox.exec();
+		  QMessageBox::information(0, "Unofficial DTU Bridge", tr("Export phase from Daz Studio complete. Please switch to Unity to begin Import phase."), QMessageBox::Ok);
+
 	 }
 }
 
