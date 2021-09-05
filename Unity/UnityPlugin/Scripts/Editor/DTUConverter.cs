@@ -169,7 +169,7 @@ namespace Daz3D
 			var assetNameLower = dtuMaterial.AssetName.ToLower();
 			var valueLower = dtuMaterial.Value.ToLower();
 
-			if(matNameLower.Contains("cornea") || matNameLower.Contains("eyemoisture") || matNameLower.Contains("eyereflection"))
+			if(matNameLower.Contains("cornea") || matNameLower.Contains("eyemoisture") || matNameLower.Contains("eyereflection") || matNameLower.Contains("tear"))
 			{
 				return true;
 			}
