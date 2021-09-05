@@ -226,6 +226,12 @@ void DzUnitySubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled
 					QString propName = property->getName();
 					if (propName == "SubDIALevel" && numericProperty)
 					{
+						// DB 2021-09-02: Record data to Unlock/Undo changes
+						UndoData undo_data;
+						undo_data.originalLockState = numericProperty->isLocked();
+						undo_data.originalValue = numericProperty->getDoubleValue();
+						UndoSubdivisionOverrides.insert(numericProperty, undo_data);
+
 						numericProperty->lock(false);
 						if (subdivisionEnabled)
 						{
@@ -245,6 +251,26 @@ void DzUnitySubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled
 		}
 	}
 }
+
+// DB 2021-09-02: Unlock/Undo Subdivision Property Changes
+void DzUnitySubdivisionDialog::UnlockSubdivisionProperties(bool subdivisionEnabled)
+{
+	QMap<DzProperty*, UndoData>::iterator undoIterator = UndoSubdivisionOverrides.begin();
+	while (undoIterator != UndoSubdivisionOverrides.end())
+	{
+		DzNumericProperty* numericProperty = qobject_cast<DzNumericProperty*>(undoIterator.key());
+		if (numericProperty)
+		{
+			UndoData undo_data = undoIterator.value();
+			numericProperty->lock(false);
+			numericProperty->setDoubleValue(undo_data.originalValue);
+			numericProperty->lock(undo_data.originalLockState);
+		}
+		undoIterator++;
+	}
+
+}
+
 
 void DzUnitySubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 {
