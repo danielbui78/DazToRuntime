@@ -891,6 +891,34 @@ namespace Daz3D
             SkinnedMeshRenderer skinned = parent.GetComponent<SkinnedMeshRenderer>();
             Cloth cloth;
 
+            string valueLower = key.ToLower();
+            string assetNameLower = parent.name.ToLower();
+            string matNameLower = keyMat.name.ToLower();
+            if (
+                valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair")
+                || valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache")
+                || valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard")
+            )
+            {
+                // TODO: implement dForce hair support
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() dForce hair is currently not supported: " + parent.name);
+                return;
+            }
+
+            if (skinned == null)
+            {
+                // TODO: check if regular mesh renderer and upgrade if appropriate
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() gameojbect unsupported: it does not have a skinned mesh renderer: " + parent.name);
+                return;
+            }
+            else if (skinned.sharedMesh.vertexCount > 40000)
+            {
+                int numverts = skinned.sharedMesh.vertexCount;
+                Debug.LogWarning("Unofficial DTU: ImportDforceToPrefab() gameojbect unsupported: too many vertices: " + parent.name + " (" + numverts.ToString() + ")");
+                return;
+
+            }
+
             // add Unity Cloth Physics component to gameobject parent of the renderer
             if (parent.GetComponent<Cloth>() == null)
             {
