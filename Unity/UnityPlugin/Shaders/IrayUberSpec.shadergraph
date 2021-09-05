@@ -22,13 +22,13 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"7ee29264-c279-4bdf-9850-d8dabf51c503\"\n    },\n    \"m_Name\": \"Metallic\",\n    \"m_DefaultReferenceName\": \"Vector1_444B0FB0\",\n    \"m_OverrideReferenceName\": \"_Metallic\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"7ee29264-c279-4bdf-9850-d8dabf51c503\"\n    },\n    \"m_Name\": \"Metallic\",\n    \"m_DefaultReferenceName\": \"Vector1_444B0FB0\",\n    \"m_OverrideReferenceName\": \"_Metallic\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8be670ef-22a5-4d64-b3f2-3c33c978c1c6\"\n    },\n    \"m_Name\": \"MetallicMap\",\n    \"m_DefaultReferenceName\": \"Texture2D_2459B472\",\n    \"m_OverrideReferenceName\": \"_MetallicMap\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"m_SerializedTexture\": \"{\\\"texture\\\":{\\\"instanceID\\\":0}}\",\n        \"m_Guid\": \"\"\n    },\n    \"m_Modifiable\": true,\n    \"m_DefaultType\": 0\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8be670ef-22a5-4d64-b3f2-3c33c978c1c6\"\n    },\n    \"m_Name\": \"MetallicMap\",\n    \"m_DefaultReferenceName\": \"Texture2D_2459B472\",\n    \"m_OverrideReferenceName\": \"_MetallicMap\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"m_SerializedTexture\": \"{\\\"texture\\\":{\\\"instanceID\\\":0}}\",\n        \"m_Guid\": \"\"\n    },\n    \"m_Modifiable\": true,\n    \"m_DefaultType\": 0\n}"
         },
         {
             "typeInfo": {
@@ -46,13 +46,13 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"5df66cd3-399b-4010-8516-8bfc489fa5ed\"\n    },\n    \"m_Name\": \"TranslucencyWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_6B2D00A4\",\n    \"m_OverrideReferenceName\": \"_TranslucencyWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"5df66cd3-399b-4010-8516-8bfc489fa5ed\"\n    },\n    \"m_Name\": \"TranslucencyWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_6B2D00A4\",\n    \"m_OverrideReferenceName\": \"_TranslucencyWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8ebd9456-1fa2-42d1-a40b-20d3ffdc801d\"\n    },\n    \"m_Name\": \"DualLobeSpecularWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_830213A8\",\n    \"m_OverrideReferenceName\": \"_DualLobeSpecularWeight\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8ebd9456-1fa2-42d1-a40b-20d3ffdc801d\"\n    },\n    \"m_Name\": \"DualLobeSpecularWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_830213A8\",\n    \"m_OverrideReferenceName\": \"_DualLobeSpecularWeight\",\n    \"m_GeneratePropertyBlock\": false,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
@@ -64,13 +64,13 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"de62a7a9-eef5-4699-9b5d-827f749bbcc5\"\n    },\n    \"m_Name\": \"SpecularLobe1Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_55EF8B06\",\n    \"m_OverrideReferenceName\": \"_SpecularLobe1Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"de62a7a9-eef5-4699-9b5d-827f749bbcc5\"\n    },\n    \"m_Name\": \"SpecularLobe1Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_55EF8B06\",\n    \"m_OverrideReferenceName\": \"_SpecularLobe1Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"e5aa7ee5-1950-464c-9a54-67bd44803763\"\n    },\n    \"m_Name\": \"SpecularLobe2Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_C0E1EA15\",\n    \"m_OverrideReferenceName\": \"_SpecularLobe2Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"e5aa7ee5-1950-464c-9a54-67bd44803763\"\n    },\n    \"m_Name\": \"SpecularLobe2Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_C0E1EA15\",\n    \"m_OverrideReferenceName\": \"_SpecularLobe2Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
@@ -88,7 +88,7 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"fa3b934c-062c-4228-85ee-d823163f8770\"\n    },\n    \"m_Name\": \"Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_5E94940C\",\n    \"m_OverrideReferenceName\": \"_Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.5,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"fa3b934c-062c-4228-85ee-d823163f8770\"\n    },\n    \"m_Name\": \"Roughness\",\n    \"m_DefaultReferenceName\": \"Vector1_5E94940C\",\n    \"m_OverrideReferenceName\": \"_Roughness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.5,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
@@ -106,7 +106,7 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8e409e6c-3a14-44fd-a017-80afe570cc6b\"\n    },\n    \"m_Name\": \"IndexOfRefractionWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_5E3CCC38\",\n    \"m_OverrideReferenceName\": \"_IndexOfRefractionWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8e409e6c-3a14-44fd-a017-80afe570cc6b\"\n    },\n    \"m_Name\": \"IndexOfRefractionWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_5E3CCC38\",\n    \"m_OverrideReferenceName\": \"_IndexOfRefractionWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
@@ -166,13 +166,13 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"e5dea557-4c6a-4313-8456-4dde2d7dbf65\"\n    },\n    \"m_Name\": \"EmissionExposureWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_4C93D534\",\n    \"m_OverrideReferenceName\": \"_EmissionExposureWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 1.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"e5dea557-4c6a-4313-8456-4dde2d7dbf65\"\n    },\n    \"m_Name\": \"EmissionExposureWeight\",\n    \"m_DefaultReferenceName\": \"Vector1_4C93D534\",\n    \"m_OverrideReferenceName\": \"_EmissionExposureWeight\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 1.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"c3580203-e9cf-4739-bb5b-c8b47c74e999\"\n    },\n    \"m_Name\": \"Alpha\",\n    \"m_DefaultReferenceName\": \"Vector1_836AC191\",\n    \"m_OverrideReferenceName\": \"_Alpha\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 1.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"c3580203-e9cf-4739-bb5b-c8b47c74e999\"\n    },\n    \"m_Name\": \"Alpha\",\n    \"m_DefaultReferenceName\": \"Vector1_836AC191\",\n    \"m_OverrideReferenceName\": \"_Alpha\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 1.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
@@ -214,7 +214,7 @@
             "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
             },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8ef4a378-3fc1-4783-a4b0-f7abc8a0a214\"\n    },\n    \"m_Name\": \"Glossiness\",\n    \"m_DefaultReferenceName\": \"Vector1_E4B2EB43\",\n    \"m_OverrideReferenceName\": \"_Glossiness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 0,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"8ef4a378-3fc1-4783-a4b0-f7abc8a0a214\"\n    },\n    \"m_Name\": \"Glossiness\",\n    \"m_DefaultReferenceName\": \"Vector1_E4B2EB43\",\n    \"m_OverrideReferenceName\": \"_Glossiness\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.0,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {

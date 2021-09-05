@@ -37,7 +37,7 @@ namespace Daz3D
 	}
 
 	/// <summary>
-	/// A temporary data structure that reads and interprest the .dtu file the Daz to Unity bridge produces
+	/// A temporary data structure that reads and interprets the .dtu file the DTU bridge produces
 	/// </summary>
 	public struct DTU
 	{
@@ -570,6 +570,42 @@ namespace Daz3D
 			var normalMap = dtuMaterial.Get("Normal Map");
 			var thinWalled = dtuMaterial.Get("Thin Walled");
 			var emissionColor = dtuMaterial.Get("Emission Color");
+			// DB 2021-09-02: Luminance / Units
+			var luminanceUnits = dtuMaterial.Get("Luminance Units");
+			// 0 = cd/m^2,
+			// 1 = kcd/m^2,
+			// 2 = cd/ft^2,
+			// 3 = cd/cm^2,
+			// 4 = lm,
+			// 5 = W
+			// CONVERT luminance into Nits (candela per meter squared)
+			double luminanceConversionFactor=1.0;
+			if (luminanceUnits.Exists)
+            {
+				switch (luminanceUnits.Float)
+				{
+					case 0:
+						luminanceConversionFactor = 1.0; // cd/m^2
+						break;
+					case 1:
+						luminanceConversionFactor = 1000.0; // kcd/m^2
+						break;
+					case 2:
+						luminanceConversionFactor = 10.7639; // cd/ft^2
+						break;
+					case 3:
+						luminanceConversionFactor = 10000; // cd/cm^2
+						break;
+					case 4:
+						luminanceConversionFactor = 0.2919; // lumens
+						break;
+					case 5:
+						luminanceConversionFactor = 6830000; // Watts
+						break;
+				}
+
+			}
+			var luminance = dtuMaterial.Get("Luminance");
 			// DB (2021-05-14): added functionallity to return default value if property does not exist
 			var cutoutOpacity = dtuMaterial.Get("Cutout Opacity", new DTUValue(1.0f));
 
@@ -990,6 +1026,14 @@ namespace Daz3D
 				mat.SetColor("_Emission",emissionColor.Color);
 				mat.SetTexture("_EmissionMap",ImportTextureFromPath(emissionColor.Texture,materialDir, record));
 
+				// DB 2021-09-02: EmissionStrength and Weight
+				if (emissionColor.Exists && emissionColor.Color != Color.black && luminance.Exists)
+                {
+					float emissionStrength = luminance.Float * (float)luminanceConversionFactor;
+					mat.SetFloat("_EmissionStrength", emissionStrength);
+					// set exposure weight to 1, aka full affect of camera exposure on emission strength
+					mat.SetFloat("_EmissionExposureWeight", 1.0f);
+                }
 
 				//TODO: support displacement maps and tessellation
 				//TODO: support alternate uv sets (this can be done easier in code then in the shader though)
@@ -2081,7 +2125,16 @@ namespace Daz3D
 			if (copyRemtoe)
 			{
 				UnityEngine.Debug.Log("Copying file: " + path);
-				System.IO.File.Copy(path,cleanPath);
+				// BUGFIX: copyRemote is set to false if file exists OR if MD5 is different, which means overwrite must be turned on
+				try 
+				{
+					System.IO.File.Copy(path, cleanPath, true);
+				}
+				catch (System.IO.IOException e)
+                {
+					// BUGFIX: fail gracefully, issue error and continue import...
+					UnityEngine.Debug.LogError("WARNING: Failed to copy texture file, DTU import will continue but there may be missing textures: " + path);
+				}
 				AssetDatabase.Refresh();
 			}
 

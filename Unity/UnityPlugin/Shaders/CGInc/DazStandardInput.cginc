@@ -62,7 +62,7 @@ sampler2D   _HeightMap;
 half        _Height;
 half        _UVSec;
 
-half4       _EmissionColor;
+half4       _Emission;
 sampler2D   _EmissionMap;
 
 float       _Alpha;
@@ -241,7 +241,7 @@ half3 Emission(float2 uv)
 #ifndef _EMISSION
     return 0;
 #else
-    return tex2D(_EmissionMap, uv).rgb * _EmissionColor.rgb;
+    return tex2D(_EmissionMap, uv).rgb * _Emission.rgb;
 #endif
 }
 

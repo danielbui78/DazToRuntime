@@ -44,7 +44,7 @@ Shader "Daz3D/Built-In Hair"
         _OcclusionMap("Occlusion Map", 2D) = "white" {}
 
 //        _EmissionColor("Color", Color) = (0,0,0)
-        _EmissionColor("Emission Color", Color) = (0,0,0)
+        _Emission("Emission Color", Color) = (0,0,0)
 //        _EmissionMap("Emission", 2D) = "white" {}
         _EmissionMap("Emission Map", 2D) = "white" {}
 
