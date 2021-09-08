@@ -150,6 +150,7 @@ namespace Daz3D
 				valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair")
 				|| valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache")
 				|| valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard")
+				|| valueLower.Contains("eyelash") || assetNameLower.EndsWith("eyelash") || matNameLower.Contains("eyelash")
 			)
 			{
 				return true;
@@ -169,7 +170,12 @@ namespace Daz3D
 			var assetNameLower = dtuMaterial.AssetName.ToLower();
 			var valueLower = dtuMaterial.Value.ToLower();
 
-			if(matNameLower.Contains("cornea") || matNameLower.Contains("eyemoisture") || matNameLower.Contains("eyereflection") || matNameLower.Contains("tear"))
+			if(
+				valueLower.Contains("cornea") || assetNameLower.EndsWith("cornea") || matNameLower.Contains("cornea") 
+				|| valueLower.Contains("eyemoisture") || assetNameLower.EndsWith("eyemoisture") || matNameLower.Contains("eyemoisture") 
+				|| valueLower.Contains("eyereflection") || assetNameLower.EndsWith("eyereflection") || matNameLower.Contains("eyereflection") 
+				|| valueLower.Contains("tear") || assetNameLower.EndsWith("tear") || matNameLower.Contains("tear")
+				)
 			{
 				return true;
 			}
@@ -186,7 +192,9 @@ namespace Daz3D
 			var valueLower = dtuMaterial.Value.ToLower();
 
 
-			if(matNameLower.Contains("sclera"))
+			if(
+				valueLower.Contains("sclera") || assetNameLower.EndsWith("sclera") || matNameLower.Contains("sclera")
+				)
 			{
 				return true;
 			}
