@@ -35,8 +35,8 @@
 		<file alias="IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSpec.shadergraph.meta</file>
 		<file alias="IrayUberSkin.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph</file>
 		<file alias="IrayUberSkin.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph.meta</file>
-    <file alias="IrayUberSkin.NewDualLobeSpec.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.NewDualLobeSpec.shadergraph</file>
-		<file alias="IrayUberSkin.NewDualLobeSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.NewDualLobeSpec.shadergraph.meta</file>
+    <file alias="IrayUberSkin.NewDualLobeSpec.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.2021Q4.shadergraph</file>
+		<file alias="IrayUberSkin.NewDualLobeSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.2021Q4.shadergraph.meta</file>
 		<file alias="Hair.shadergraph">../../UnityPlugin/Shaders/Hair.shadergraph</file>
 		<file alias="Hair.shadergraph.meta">../../UnityPlugin/Shaders/Hair.shadergraph.meta</file>
 		<file alias="Wet.shadergraph">../../UnityPlugin/Shaders/Wet.shadergraph</file>
