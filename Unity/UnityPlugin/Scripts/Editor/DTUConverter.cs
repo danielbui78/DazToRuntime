@@ -568,6 +568,7 @@ namespace Daz3D
 			var glossyRoughness = dtuMaterial.Get("Glossy Roughness");
 			var glossySpecular = dtuMaterial.Get("Glossy Specular");
 			var glossiness = dtuMaterial.Get("Glossiness");
+			var anisotropy = dtuMaterial.Get("Glossy Anisotropy");
 			var refractionIndex = dtuMaterial.Get("Refraction Index");
 			var refractionWeight = dtuMaterial.Get("Refraction Weight");
 			var refractionRoughness = dtuMaterial.Get("Refraction Roughness");
@@ -954,10 +955,19 @@ namespace Daz3D
 
 					if(baseMixing == DTUBaseMixing.Weighted)
 					{
-						glossyRoughnessValue *= glossyRoughness.Float;
+						// DB 2021-09-07: Bugfix?? I think the intentnion based on the two conditional expressions above is to multiply
+						//   glossyRoughness * glossyWeight, instead of multiplying it to itself.
+						//   Unfortunately, the code block below competely overrides this entire section, so I'm uncertain whether
+						//   the final intention was to remove this section or do something else entirely.
+
+						//glossyRoughnessValue *= glossyRoughness.Float;
+						glossyRoughnessValue *= glossyWeight.Float;
 					}
 				}
 
+				// DB 2021-09-07: The code block below overrides some or all of the code block above.
+				//   I don't know if the intention was to have the section below replace the one above
+				//   or to do something else entirely.
 				switch(baseMixing)
 				{
 					case DTUBaseMixing.PBRMetalRoughness:
