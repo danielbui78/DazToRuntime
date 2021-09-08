@@ -44,6 +44,12 @@
         },
         {
             "typeInfo": {
+                "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
+            },
+            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"12900b7e-40d5-4a87-b047-01fe75383272\"\n    },\n    \"m_Name\": \"AlphaClip\",\n    \"m_DefaultReferenceName\": \"Vector1_8CB2D44D\",\n    \"m_OverrideReferenceName\": \"_AlphaClip\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.5,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
+        },
+        {
+            "typeInfo": {
                 "fullName": "UnityEditor.ShaderGraph.Internal.ColorShaderProperty"
             },
             "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"b6a014a1-0bd5-47d4-abeb-e2cd2ff97cc3\"\n    },\n    \"m_Name\": \"SpecularColor\",\n    \"m_DefaultReferenceName\": \"Color_51358B7F\",\n    \"m_OverrideReferenceName\": \"_SpecularColor\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"r\": 0.0,\n        \"g\": 0.0,\n        \"b\": 0.0,\n        \"a\": 0.0\n    },\n    \"m_ColorMode\": 0\n}"
@@ -65,12 +71,6 @@
                 "fullName": "UnityEditor.ShaderGraph.Internal.Texture2DShaderProperty"
             },
             "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"08523d51-5cc9-48a8-a8f6-854159a6fb79\"\n    },\n    \"m_Name\": \"GlossyRoughnessTexture\",\n    \"m_DefaultReferenceName\": \"Texture2D_6A1FE0A9\",\n    \"m_OverrideReferenceName\": \"_GlossyRoughnessMap\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": {\n        \"m_SerializedTexture\": \"{\\\"texture\\\":{\\\"instanceID\\\":0}}\",\n        \"m_Guid\": \"\"\n    },\n    \"m_Modifiable\": true,\n    \"m_DefaultType\": 0\n}"
-        },
-        {
-            "typeInfo": {
-                "fullName": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty"
-            },
-            "JSONnodeData": "{\n    \"m_Guid\": {\n        \"m_GuidSerialized\": \"12900b7e-40d5-4a87-b047-01fe75383272\"\n    },\n    \"m_Name\": \"AlphaClip\",\n    \"m_DefaultReferenceName\": \"Vector1_8CB2D44D\",\n    \"m_OverrideReferenceName\": \"_AlphaClip\",\n    \"m_GeneratePropertyBlock\": true,\n    \"m_Precision\": 0,\n    \"m_GPUInstanced\": false,\n    \"m_Hidden\": false,\n    \"m_Value\": 0.5,\n    \"m_FloatType\": 1,\n    \"m_RangeValues\": {\n        \"x\": 0.0,\n        \"y\": 1.0\n    }\n}"
         },
         {
             "typeInfo": {
