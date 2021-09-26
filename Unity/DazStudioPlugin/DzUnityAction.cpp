@@ -68,12 +68,12 @@ void UnofficialDzUnityAction::executeAction()
 	 {
 		  //Create Daz3D folder if it doesn't exist
 		  QDir dir;
-		  ImportFolder = dlg->assetsFolderEdit->text() + "\\Daz3D";
+		  ImportFolder = dlg->assetsFolderEdit->text() + "/Daz3D";
 		  dir.mkpath(ImportFolder);
 
 		  // Collect the values from the dialog fields
 		  CharacterName = dlg->assetNameEdit->text();
-		  CharacterFolder = ImportFolder + "\\" + CharacterName + "\\";
+		  CharacterFolder = ImportFolder + "/" + CharacterName + "/";
 		  CharacterFBX = CharacterFolder + CharacterName + ".fbx";
 		  AssetType = dlg->assetTypeCombo->currentText().replace(" ", "");
 		  MorphString = dlg->GetMorphString();
@@ -97,8 +97,8 @@ void UnofficialDzUnityAction::executeAction()
 		  SubdivisionDialog->UnlockSubdivisionProperties(ExportSubdivisions);
 
 		  //Rename the textures folder
-		  QDir textureDir(CharacterFolder + "\\" + CharacterName + ".images");
-		  textureDir.rename(CharacterFolder + "\\" + CharacterName + ".images", CharacterFolder + "\\Textures");
+		  QDir textureDir(CharacterFolder + "/" + CharacterName + ".images");
+		  textureDir.rename(CharacterFolder + "/" + CharacterName + ".images", CharacterFolder + "/Textures");
 
 		  // DB 2021-09-02: messagebox "Export Complete"
 		  //QMessageBox msgBox;
@@ -186,104 +186,104 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 
 	 //Create shader folder if it doesn't exist
 	 QDir dir;
-	 QString scriptsFolder = ImportFolder + "\\Scripts";
+	 QString scriptsFolder = ImportFolder + "/Scripts";
 	 dir.mkpath(scriptsFolder);
 
 	 QStringList scripts = QDir(":/UnofficialDaz/Scripts/").entryList();
 	 for (int i = 0; i < scripts.size(); i++)
 	 {
-		  QString script = scriptsFolder + "\\" + scripts[i];
+		  QString script = scriptsFolder + "/" + scripts[i];
 		  QFile file(":/UnofficialDaz/Scripts/" + scripts[i]);
 		  CopyFile(&file, &script, replace);
 		  file.close();
 	 }
 
 	 //Create editor folder if it doesn't exist
-	 QString editorFolder = ImportFolder + "\\Scripts\\Editor";
+	 QString editorFolder = ImportFolder + "/Scripts/Editor";
 	 dir.mkpath(editorFolder);
 
 	 QStringList editorScripts = QDir(":/UnofficialDaz/Editor/").entryList();
 	 for (int i = 0; i < editorScripts.size(); i++)
 	 {
-		  QString script = editorFolder + "\\" + editorScripts[i];
+		  QString script = editorFolder + "/" + editorScripts[i];
 		  QFile file(":/UnofficialDaz/Editor/" + editorScripts[i]);
 		  CopyFile(&file, &script, replace);
 		  file.close();
 	 }
 
 	 //Create shader folder if it doesn't exist
-	 QString shaderFolder = ImportFolder + "\\Shaders";
+	 QString shaderFolder = ImportFolder + "/Shaders";
 	 dir.mkpath(shaderFolder);
 
 	 QStringList shaders = QDir(":/UnofficialDaz/Shaders/").entryList();
 	 for (int i = 0; i < shaders.size(); i++)
 	 {
-		  QString shader = shaderFolder + "\\" + shaders[i];
+		  QString shader = shaderFolder + "/" + shaders[i];
 		  QFile file(":/UnofficialDaz/Shaders/" + shaders[i]);
 		  CopyFile(&file, &shader, replace);
 		  file.close();
 	 }
 
 	 //Create shader CGInc folder if it doesn't exist
-	 QString shaderCGIncFolder = ImportFolder + "\\Shaders\\CGInc";
+	 QString shaderCGIncFolder = ImportFolder + "/Shaders/CGInc";
 	 dir.mkpath(shaderCGIncFolder);
 
 	 QStringList shaderCGIncStringList = QDir(":/UnofficialDaz/ShaderCGInc/").entryList();
 	 for (int i = 0; i < shaderCGIncStringList.size(); i++)
 	 {
-		 QString shaderCGIncFilename = shaderCGIncFolder + "\\" + shaderCGIncStringList[i];
+		 QString shaderCGIncFilename = shaderCGIncFolder + "/" + shaderCGIncStringList[i];
 		 QFile file(":/UnofficialDaz/ShaderCGInc/" + shaderCGIncStringList[i]);
 		 CopyFile(&file, &shaderCGIncFilename, replace);
 		 file.close();
 	 }
 
 	 //Create shader helpers folder if it doesn't exist
-	 QString shaderHelperFolder = ImportFolder + "\\Shaders\\Helpers";
+	 QString shaderHelperFolder = ImportFolder + "/Shaders/Helpers";
 	 dir.mkpath(shaderHelperFolder);
 
 	 QStringList shaderHelpers = QDir(":/UnofficialDaz/ShaderHelpers/").entryList();
 	 for (int i = 0; i < shaderHelpers.size(); i++)
 	 {
-		  QString shaderHelper = shaderHelperFolder + "\\" + shaderHelpers[i];
+		  QString shaderHelper = shaderHelperFolder + "/" + shaderHelpers[i];
 		  QFile file(":/UnofficialDaz/ShaderHelpers/" + shaderHelpers[i]);
 		  CopyFile(&file, &shaderHelper, replace);
 		  file.close();
 	 }
 
 	 //Create vendors folder if it doesn't exist
-	 QString vendorsFolder = ImportFolder + "\\Vendors";
+	 QString vendorsFolder = ImportFolder + "/Vendors";
 	 dir.mkpath(vendorsFolder);
 
 	 QStringList vendors = QDir(":/UnofficialDaz/Vendors/").entryList();
 	 for (int i = 0; i < vendors.size(); i++)
 	 {
-		  QString vendor = vendorsFolder + "\\" + vendors[i];
+		  QString vendor = vendorsFolder + "/" + vendors[i];
 		  QFile file(":/UnofficialDaz/Vendors/" + vendors[i]);
 		  CopyFile(&file, &vendor, replace);
 		  file.close();
 	 }
 
 	 //Create DiffusionProfiles folder if it doesn't exist
-	 QString profilesFolder = ImportFolder + "\\DiffusionProfiles";
+	 QString profilesFolder = ImportFolder + "/DiffusionProfiles";
 	 dir.mkpath(profilesFolder);
 
 	 QStringList profiles = QDir(":/UnofficialDaz/DiffusionProfiles/").entryList();
 	 for (int i = 0; i < profiles.size(); i++)
 	 {
-		  QString profile = profilesFolder + "\\" + profiles[i];
+		  QString profile = profilesFolder + "/" + profiles[i];
 		  QFile file(":/UnofficialDaz/DiffusionProfiles/" + profiles[i]);
 		  CopyFile(&file, &profile, replace);
 		  file.close();
 	 }
 
 	 //Create Resources folder if it doesn't exist
-	 QString resourcesFolder = ImportFolder + "\\Resources";
+	 QString resourcesFolder = ImportFolder + "/Resources";
 	 dir.mkpath(resourcesFolder);
 
 	 QStringList resources = QDir(":/UnofficialDaz/Resources/").entryList();
 	 for (int i = 0; i < resources.size(); i++)
 	 {
-		  QString resource = resourcesFolder + "\\" + resources[i];
+		  QString resource = resourcesFolder + "/" + resources[i];
 		  QFile file(":/UnofficialDaz/Resources/" + resources[i]);
 		  CopyFile(&file, &resource, replace);
 		  file.close();
