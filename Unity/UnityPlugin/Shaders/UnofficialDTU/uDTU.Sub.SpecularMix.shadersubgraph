@@ -217,7 +217,7 @@
     "m_Groups": [
         {
             "m_GuidSerialized": "4cf9d8cb-ad6d-48fe-a55e-8d3afe9bc0e1",
-            "m_Title": "Specular Mix",
+            "m_Title": "Specular",
             "m_Position": {
                 "x": -557.0,
                 "y": -389.9999694824219
@@ -431,7 +431,7 @@
             "m_Guid": ""
         }
     },
-    "m_Path": "Sub Graphs",
+    "m_Path": "Daz3D/Unofficial DTU",
     "m_ConcretePrecision": 0,
     "m_ActiveOutputNodeGuidSerialized": ""
 }

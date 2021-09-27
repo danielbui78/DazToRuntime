@@ -50,13 +50,13 @@ namespace Daz3D
         {  
             _instance = (Daz3DBridge)GetWindow(typeof(Daz3DBridge));
 #if USING_HDRP
-            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - HDRP");
+            _instance.titleContent = new GUIContent("uDTU: HDRP");
 #elif USING_URP
-            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - URP");
+            _instance.titleContent = new GUIContent("uDTU: URP");
 #elif USING_BUILTIN
-            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - Built-In Rendering");
+            _instance.titleContent = new GUIContent("uDTU: Built-In Rendering");
 #else
-            _instance.titleContent = new GUIContent("Unofficial DTU Bridge - RenderPipeline Not Detected");
+            _instance.titleContent = new GUIContent("uDTU: RenderPipeline Not Detected");
             CurrentToolbarMode = ToolbarMode.Options;            
 #endif
         }
@@ -246,13 +246,21 @@ namespace Daz3D
             Daz3DDTUImporter.ReplaceSceneInstances = GUILayout.Toggle(Daz3DDTUImporter.ReplaceSceneInstances, "Replace instances of Unity Prefab in active scene(s)", bigStyle);
             Daz3DDTUImporter.AutomateMecanimAvatarMappings = GUILayout.Toggle(Daz3DDTUImporter.AutomateMecanimAvatarMappings, "Automatically setup the Mecanim Avatar", bigStyle);
             Daz3DDTUImporter.ReplaceMaterials = GUILayout.Toggle(Daz3DDTUImporter.ReplaceMaterials, "Replace FBX materials with high quality Daz-shader materials", bigStyle);
+
+            GUILayout.Space(12);
             Daz3DDTUImporter.EnableDForceSupport = GUILayout.Toggle(Daz3DDTUImporter.EnableDForceSupport, "Enable dForce support (experimental)", bigStyle);
+#if USING_HDRP || USING_URP
+            Daz3DDTUImporter.UseNewShaders = GUILayout.Toggle(Daz3DDTUImporter.UseNewShaders, "Use New Shaders (experimental)", bigStyle);
+#else
+            GUILayout.Label("New Shaders only available for HDRP and URP", bigStyle);
+            Daz3DDTUImporter.UseNewShaders = false;            
+#endif
 
             GUILayout.Space(12);
             if (GUILayout.Button("Reset All", GUILayout.Width(100)))
                 Daz3DDTUImporter.ResetOptions();
 
-            GUILayout.Space(12);
+            GUILayout.Space(24);
 #if USING_HDRP
             GUILayout.TextArea("Unofficial DTU Configured for HDRP");
 #elif USING_URP

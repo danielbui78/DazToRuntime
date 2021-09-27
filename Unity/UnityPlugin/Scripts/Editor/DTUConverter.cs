@@ -13,12 +13,14 @@ namespace Daz3D
 		public const string shaderNameIraySkin = "Daz3D/IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Hair";
 		public const string shaderNameWet = "Daz3D/Wet";
+		public const string newShaderNameBase = "Daz3D/Unofficial DTU/uDTU HDRP.";
 #elif USING_URP
 		public const string shaderNameMetal = "Daz3D/URP IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/URP IrayUberSpec";
 		public const string shaderNameIraySkin = "Daz3D/URP IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/URP Hair";
 		public const string shaderNameWet = "Daz3D/URP Wet";
+		public const string newShaderNameBase = "Daz3D/Unofficial DTU/uDTU URP.";
 #elif USING_BUILTIN
 		public const string shaderNameMetal = "Daz3D/Built-In IrayUberMetal";
 		public const string shaderNameSpecular = "Daz3D/Built-In IrayUberSpec";
@@ -565,7 +567,7 @@ namespace Daz3D
 			var glossyLayeredWeight = dtuMaterial.Get("Glossy Layered Weight");
 			var glossyWeight = dtuMaterial.Get("Glossy Weight");
 			var glossyColor = dtuMaterial.Get("Glossy Color");
-			var glossyRoughness = dtuMaterial.Get("Glossy Roughness");
+			var glossyRoughness = dtuMaterial.Get("Glossy Roughness", new DTUValue(1.0f));
 			var glossySpecular = dtuMaterial.Get("Glossy Specular");
 			var glossiness = dtuMaterial.Get("Glossiness");
 			var anisotropy = dtuMaterial.Get("Glossy Anisotropy");
@@ -626,12 +628,17 @@ namespace Daz3D
 			//we only support uv0 atm, but we should support alternates, requires us keywording/updating the shaders or procedurally updating the meshes to copy this value to uv0
 			var uvSet = dtuMaterial.Get("UV Set");
 
+			// DB (2021-09-22): Top Coat implementation
+			var topCoatWeight = dtuMaterial.Get("Top Coat Weight");
+			var topCoatRoughness = dtuMaterial.Get("Top Coat Roughness");
+            var topCoatIOR = dtuMaterial.Get("Top Coat IOR", new DTUValue(1.4f));
+			var topCoatColor = dtuMaterial.Get("Top Coat Color");
 
 
 			//let's figure out what type of shader we're going to pick
 
 			//Do we have any path specific config options to set before we create our material?
-			switch(baseMixing)
+			switch (baseMixing)
 			{
 				case DTUBaseMixing.PBRMetalRoughness:
 					isMetal = true;
@@ -646,10 +653,13 @@ namespace Daz3D
 
 			//This will be set for things like corenas, eye moisture, glass, etc
 			//isTransparent = translucencyWeight.Value.AsDouble > 0 || refractionWeight.Value.AsDouble > 0 || cutoutOpacity.TextureExists();
+			////for now we're only assuming transparent if a cutout texture is present
+			//// DB (2021-05-13): ...or if cutoutopacity.float < 1.0f
+			//isTransparent = cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
+			//isTranslucent = translucencyWeight.Float > 0f;
 
-			//for now we're only assuming transparent if a cutout texture is present
-			// DB (2021-05-13): ...or if cutoutopacity.float < 1.0f
-			isTransparent = cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
+			// DB 2021-09-25: Transparency is now set for refraction or cutout opacity
+			isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
 			isTranslucent = translucencyWeight.Float > 0f;
 
 			isHair = IsDTUMaterialHair(dtuMaterial);
@@ -667,7 +677,11 @@ namespace Daz3D
 			{
 				//if we're skin, force a specular workflow as well
 				isSpecular = true;
-				shaderName = DTU_Constants.shaderNameIraySkin;
+				// DB 2021-09-22
+				if (Daz3DDTUImporter.UseNewShaders)
+					shaderName = DTU_Constants.newShaderNameBase + "SSS";
+				else
+					shaderName = DTU_Constants.shaderNameIraySkin;
 				isDoubleSided = false;
 				isTransparent = false;
 				isTranslucent = true;
@@ -679,24 +693,43 @@ namespace Daz3D
 			else
 			{
 				//If we're not hair or skin, let's see which other shader we should fall into
-
+				// DB 2021-09-25: 
 				if(isTranslucent)
 				{
-					if(isMetal)
-					{
-						UnityEngine.Debug.LogWarning("Using translucency with metal is not supported, swapping to specular instead for mat: " + dtuMaterial.MaterialName);
-					}
+                    // DB 2021-09-25: following message doesn't make sense because there is no support in specular shader either.
+                    //if(isMetal)
+                    //{
+                    //	UnityEngine.Debug.LogWarning("Using translucency with metal is not supported, swapping to specular instead for mat: " + dtuMaterial.MaterialName);
+                    //}
+                    ////if we're translucent, force into a specular workflow
+                    isSpecular = true;
 
-					//if we're translucent, force into a specular workflow
-					isSpecular = true;
-					shaderName = DTU_Constants.shaderNameSpecular;
-				} else if(isSpecular)
+                    // DB 2021-09-22: If Translucent, then use the SSS shader
+                    if (Daz3DDTUImporter.UseNewShaders)
+                    {
+						if (!isTransparent)
+							shaderName = DTU_Constants.newShaderNameBase + "SSS";
+						else
+							shaderName = DTU_Constants.newShaderNameBase + "Specular";
+					}
+					else
+                        shaderName = DTU_Constants.shaderNameSpecular;
+				}
+				else if(isSpecular)
 				{
-					shaderName = DTU_Constants.shaderNameSpecular;
+					// DB 2021-09-22
+					if (Daz3DDTUImporter.UseNewShaders)
+						shaderName = DTU_Constants.newShaderNameBase + "Specular";
+					else
+						shaderName = DTU_Constants.shaderNameSpecular;
 				}
 				else if(isMetal)
 				{
-					shaderName = DTU_Constants.shaderNameMetal;
+					// DB 2021-09-22
+					if (Daz3DDTUImporter.UseNewShaders)
+						shaderName = DTU_Constants.newShaderNameBase + "Metallic";
+					else
+						shaderName = DTU_Constants.shaderNameMetal;
 				}
 				else {
 					UnityEngine.Debug.LogError("Invalid material, we don't know what shader to pick");
@@ -794,9 +827,10 @@ namespace Daz3D
 			}
 			else
 			{
-				//this means we're either skin, metal, spec, etc...
-				// DB (2021-05-13): add cutoutopacity.float < 1.0
-				isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
+				////this means we're either skin, metal, spec, etc...
+
+				// Following line is redundant, isTransparent already set above. WARNING: Setting it here will wipe-out special override conditions above.
+				//isTransparent = refractionWeight.Float > 0f || refractionWeight.TextureExists() || cutoutOpacity.TextureExists() || (cutoutOpacity.Float < 1.0f);
 
 				//These properties are going to be parsed/interpretted in roughly the order that they appear in the table of iray props in the large comment block
 
@@ -808,31 +842,40 @@ namespace Daz3D
 					mat.SetTexture("_DiffuseMap",tex);
 				}
 
-				//Metallic Weight affects the metalness and is only used with PBR Metal
-				if(isMetal)
+				// DB 2021-09-25: Metallic properties set for all shading modes, this let's the shadergraph variant
+				//    decide how to handle the metallic property -- either passing it directly to hardware or pre-process / emulate as needed.
+				mat.SetFloat("_Metallic", metallicWeight.Float);
+				if (metallicWeight.TextureExists())
 				{
-					//If we're usign a metal workflow...
-					mat.SetFloat("_Metallic", metallicWeight.Float);
-					if(metallicWeight.TextureExists())
-					{
-						var tex = ImportTextureFromPath(metallicWeight.Texture,materialDir, record, false,true);
-						mat.SetTexture("_MetallicMap",tex);
-					}
+					var tex = ImportTextureFromPath(metallicWeight.Texture, materialDir, record, false, true);
+					mat.SetTexture("_MetallicMap", tex);
 				}
-				else
-				{
-					//Spec/Gloss and Weighted don't use metalness in their shader, so we will clear them out if they do exist, though it doesn't matter
-					if(mat.HasProperty("_Metallic"))
-					{
-						mat.SetFloat("_Metallic",0.0f);
-					}
-					if(mat.HasProperty("_MetallicaMap"))
-					{
-						mat.SetTexture("_MetallicaMap",null);
-					}
-				}
+				////Metallic Weight affects the metalness and is only used with PBR Metal
+				////If we're usign a metal workflow...
+				//if (isMetal)
+				//{
+				//	//If we're usign a metal workflow...
+				//	mat.SetFloat("_Metallic", metallicWeight.Float);
+				//	if(metallicWeight.TextureExists())
+				//	{
+				//		var tex = ImportTextureFromPath(metallicWeight.Texture,materialDir, record, false,true);
+				//		mat.SetTexture("_MetallicMap",tex);
+				//	}
+				//}
+				//else
+				//{
+				//	//Spec/Gloss and Weighted don't use metalness in their shader, so we will clear them out if they do exist, though it doesn't matter
+				//	if(mat.HasProperty("_Metallic"))
+				//	{
+				//		mat.SetFloat("_Metallic",0.0f);
+				//	}
+				//	if(mat.HasProperty("_MetallicaMap"))
+				//	{
+				//		mat.SetTexture("_MetallicaMap",null);
+				//	}
+				//}
 
-				if(baseMixing == DTUBaseMixing.Weighted)
+				if (baseMixing == DTUBaseMixing.Weighted)
 				{
 					if(diffuseOverlayWeight.Float > 0)
 					{
@@ -937,61 +980,84 @@ namespace Daz3D
 				float glossyRoughnessValue = 0.0f;
 				Texture glossyRoughessMap = null;
 
-				float glossinessValue = 0.0f;
-				Texture glossinessMap = null;
+				// DB 2021-09-23: Removed glossiness, since mutally exclusive with roughness, just use roughness is smoothness value in shader
+				//float glossinessValue = 0.0f;
+				//Texture glossinessMap = null;
 
-				if(
-					(baseMixing == DTUBaseMixing.PBRMetalRoughness || baseMixing == DTUBaseMixing.PBRSpecularGlossiness)
-					|| (baseMixing == DTUBaseMixing.Weighted &&  glossyWeight.Float > 0.0f)
-				)
-				{
-					//if we have a glossy weight set, use values from these fields
-					glossyRoughnessValue = glossyRoughness.Float;
-					if(glossyRoughness.TextureExists())
-					{
-						glossyRoughessMap = ImportTextureFromPath(glossyRoughness.Texture,materialDir,record,false,true);
-					}
-
-
-					if(baseMixing == DTUBaseMixing.Weighted)
-					{
-						// DB 2021-09-07: Bugfix?? I think the intentnion based on the two conditional expressions above is to multiply
-						//   glossyRoughness * glossyWeight, instead of multiplying it to itself.
-						//   Unfortunately, the code block below competely overrides this entire section, so I'm uncertain whether
-						//   the final intention was to remove this section or do something else entirely.
-
-						//glossyRoughnessValue *= glossyRoughness.Float;
-						glossyRoughnessValue *= glossyWeight.Float;
-					}
-				}
+				// DB 2021-09-23: Removed to use code block below
+				//if (
+				//	(baseMixing == DTUBaseMixing.PBRMetalRoughness || baseMixing == DTUBaseMixing.PBRSpecularGlossiness)
+				//	|| (baseMixing == DTUBaseMixing.Weighted &&  glossyWeight.Float > 0.0f)
+				//)
+				//{
+				//	//if we have a glossy weight set, use values from these fields
+				//	glossyRoughnessValue = glossyRoughness.Float;
+				//	if(glossyRoughness.TextureExists())
+				//	{
+				//		glossyRoughessMap = ImportTextureFromPath(glossyRoughness.Texture,materialDir,record,false,true);
+				//	}
+				//                if (baseMixing == DTUBaseMixing.Weighted)
+				//                {
+				//                    // DB 2021-09-07: Bugfix?? I think the intentnion based on the two conditional expressions above is to multiply
+				//                    //   glossyRoughness * glossyWeight, instead of multiplying it to itself.
+				//                    //   Unfortunately, the code block below competely overrides this entire section, so I'm uncertain whether
+				//                    //   the final intention was to remove this section or do something else entirely.
+				//                    //glossyRoughnessValue *= glossyRoughness.Float;
+				//                    glossyRoughnessValue *= glossyWeight.Float;
+				//                }
+				//            }
 
 				// DB 2021-09-07: The code block below overrides some or all of the code block above.
 				//   I don't know if the intention was to have the section below replace the one above
 				//   or to do something else entirely.
-				switch(baseMixing)
+				glossyRoughnessValue = glossyRoughness.Float;
+				if (glossyRoughness.TextureExists())
+				{
+					glossyRoughessMap = ImportTextureFromPath(glossyRoughness.Texture, materialDir, record, false, true);
+				}
+				mat.SetFloat("_GlossyLayeredWeight", glossyLayeredWeight.Float);
+
+				switch (baseMixing)
 				{
 					case DTUBaseMixing.PBRMetalRoughness:
-						//no gloss maps on metal...
-
-						glossyRoughnessValue = Mathf.Lerp(1.0f,glossyRoughnessValue,glossyLayeredWeight.Float);
+						mat.DisableKeyword("ROUGHNESS_IS_SMOOTHNESS_ON");
+						// DB 2021-09-23: disabled Lerp and LayerWeight, now done in shader
+						//glossyRoughnessValue = Mathf.Lerp(1.0f,glossyRoughnessValue,glossyLayeredWeight.Float);
 						break;
 					case DTUBaseMixing.PBRSpecularGlossiness:
-						glossyRoughnessValue = 1f - (glossiness.Float * glossyLayeredWeight.Float);
+						mat.EnableKeyword("ROUGHNESS_IS_SMOOTHNESS_ON");
+						glossyRoughnessValue = glossiness.Float;
+						if (glossyRoughness.TextureExists())
+                        {
+							glossyRoughessMap = ImportTextureFromPath(glossiness.Texture, materialDir, record, false, true);
+						}
+						// DB 2021-09-23: disabled Lerp and LayerWeight, now done in shader
+						//glossyRoughnessValue = 1f - (glossiness.Float * glossyLayeredWeight.Float);
 						//this is an inverted map where 1 is smooth and 0 is rough
-						glossinessMap = ImportTextureFromPath(glossiness.Texture,materialDir,record,false,true);
-						glossinessValue = glossiness.Float * glossyLayeredWeight.Float;
+						//glossinessMap = ImportTextureFromPath(glossiness.Texture,materialDir,record,false,true);
+						//glossinessValue = glossiness.Float * glossyLayeredWeight.Float;
 						break;
 					case DTUBaseMixing.Weighted:
-						//if glossy weight > 0 in iray it applies a glossy layer on top, you now need to pay attention to the glossyColor
-						// we're not going to render the same way
+						// Daz Reference Information:
+						// "The Weighted Base Mixing option takes the values of both the Diffuse and Glossy weights and normalizes them, giving the percentages weight as to how much each layer gets. "
+						//
+						// Based on the reference information, this sounds similar to a conservation of light energy equation.
+						// For HDRP shaders: if "conserve specular energy" is turned on in the shader, then diffuse is already weighted down based on specular color.
+						// Pass the GlossyWeight into the HDRP Shader's specular port and it will automatically perform the "Weighted" BaseMixing operation for us.
 
-						glossyRoughnessValue = 1f - glossyWeight.Float;
-						if(glossyWeight.TextureExists())
-						{
-							//this is an inverted map where 1 is smooth and 0 is rough
-							glossinessMap = ImportTextureFromPath(glossyWeight.Texture,materialDir,record,false,true);
-							glossinessValue = glossyWeight.Float;
-						}
+						// TODO: for HDRP shaders with "conserve specular energy" enabled, pass the Daz "Glossy Weight" as an intensity value into the SpecularColor port.
+						// TODO: for other shaders without "conserve specular energy" enabled, subtract Glossy Weight from Diffuse intensity, and weight down Specular Lighting as appropriate.
+
+						// ??? Comments and code block below don't make sense to me, based on the above reference information from Daz.
+						//??//if glossy weight > 0 in iray it applies a glossy layer on top, you now need to pay attention to the glossyColor
+						//??// we're not going to render the same way
+						//glossyRoughnessValue = 1f - glossyWeight.Float;
+						//if(glossyWeight.TextureExists())
+						//{
+						//	//this is an inverted map where 1 is smooth and 0 is rough
+						//	glossinessMap = ImportTextureFromPath(glossyWeight.Texture,materialDir,record,false,true);
+						//	glossinessValue = glossyWeight.Float;
+						//}
 						break;
 				}
 
@@ -1020,8 +1086,8 @@ namespace Daz3D
 				{
 					mat.SetColor("_SpecularColor",glossySpecular.Color);
 					mat.SetTexture("_SpecularColorMap",ImportTextureFromPath(glossySpecular.Texture,materialDir, record));
-					mat.SetFloat("_Glossiness",glossinessValue);
-					mat.SetTexture("_GlossinessMap",glossinessMap);
+					//mat.SetFloat("_Glossiness",glossinessValue);
+					//mat.SetTexture("_GlossinessMap",glossinessMap);
 				}
 
 				//this only applies for some material types such as see thru mats
@@ -1039,7 +1105,12 @@ namespace Daz3D
 				mat.SetFloat("_Normal",normalMap.Float);
 				mat.SetTexture("_NormalMap",ImportTextureFromPath(normalMap.Texture,materialDir,record,true));
 
-				//right now we're ignoring top coats
+				// ---//right now we're ignoring top coats
+				// DB 2021-09-22: TopCoat implementation
+				mat.SetFloat("_TopCoatWeight", topCoatWeight.Float * 0.5f);
+				mat.SetFloat("_TopCoatRoughness", topCoatRoughness.Float);
+				mat.SetFloat("_TopCoatIOR", topCoatIOR.Float);
+				mat.SetColor("_TopCoatColor", topCoatColor.Color);
 
 				mat.SetColor("_Emission",emissionColor.Color);
 				mat.SetTexture("_EmissionMap",ImportTextureFromPath(emissionColor.Texture,materialDir, record));
@@ -1047,8 +1118,10 @@ namespace Daz3D
 				// DB 2021-09-02: EmissionStrength and Weight
 				if (emissionColor.Exists && emissionColor.Color != Color.black && luminance.Exists)
                 {
-					float emissionStrength = luminance.Float * (float)luminanceConversionFactor;
-					mat.SetFloat("_EmissionStrength", emissionStrength);
+					float rawEmissionStrength = luminance.Float * (float)luminanceConversionFactor;
+					//float emissionStrength = Mathf.Log(rawEmissionStrength, 2);
+					mat.SetFloat("_EmissionStrength", rawEmissionStrength);
+
 					// set exposure weight to 1, aka full affect of camera exposure on emission strength
 					mat.SetFloat("_EmissionExposureWeight", 1.0f);
                 }
