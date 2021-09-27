@@ -35,8 +35,6 @@
 		<file alias="IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSpec.shadergraph.meta</file>
 		<file alias="IrayUberSkin.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph</file>
 		<file alias="IrayUberSkin.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.shadergraph.meta</file>
-    <file alias="IrayUberSkin.NewDualLobeSpec.shadergraph">../../UnityPlugin/Shaders/IrayUberSkin.2021Q4.shadergraph</file>
-		<file alias="IrayUberSkin.NewDualLobeSpec.shadergraph.meta">../../UnityPlugin/Shaders/IrayUberSkin.2021Q4.shadergraph.meta</file>
 		<file alias="Hair.shadergraph">../../UnityPlugin/Shaders/Hair.shadergraph</file>
 		<file alias="Hair.shadergraph.meta">../../UnityPlugin/Shaders/Hair.shadergraph.meta</file>
 		<file alias="Wet.shadergraph">../../UnityPlugin/Shaders/Wet.shadergraph</file>
@@ -63,6 +61,36 @@
     <file alias="URP IrayUberSpec.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberSpec.shadergraph.meta</file>
     <file alias="URP IrayUberMetal.shadergraph">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph</file>
     <file alias="URP IrayUberMetal.shadergraph.meta">../../UnityPlugin/Shaders/URP IrayUberMetal.shadergraph.meta</file>
+  </qresource>
+  <qresource prefix="/UnofficialDaz/ShaderCGInc">
+    <file alias="uDTU HDRP.Metallic.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.Metallic.shadergraph</file>
+    <file alias="uDTU HDRP.Metallic.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.Metallic.shadergraph.meta</file>
+    <file alias="uDTU HDRP.Specular.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.Specular.shadergraph</file>
+    <file alias="uDTU HDRP.Specular.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.Specular.shadergraph.meta</file>
+    <file alias="uDTU HDRP.SSS.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.SSS.shadergraph</file>
+    <file alias="uDTU HDRP.SSS.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU HDRP.SSS.shadergraph.meta</file>
+    <file alias="uDTU URP.Metallic.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.Metallic.shadergraph</file>
+    <file alias="uDTU URP.Metallic.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.Metallic.shadergraph.meta</file>
+    <file alias="uDTU URP.Specular.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.Specular.shadergraph</file>
+    <file alias="uDTU URP.Specular.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.Specular.shadergraph.meta</file>
+    <file alias="uDTU URP.SSS.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.SSS.shadergraph</file>
+    <file alias="uDTU URP.SSS.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU URP.SSS.shadergraph.meta</file>
+    <file alias="uDTU.Sub.Base.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.Base.shadergraph</file>
+    <file alias="uDTU.Sub.Base.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.Base.shadergraph.meta</file>
+    <file alias="uDTU.Sub.DualLobeSpecular.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.DualLobeSpecular.shadergraph</file>
+    <file alias="uDTU.Sub.DualLobeSpecular.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.DualLobeSpecular.shadergraph.meta</file>
+    <file alias="uDTU.Sub.GlossyLayeredEffect.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.GlossyLayeredEffect.shadergraph</file>
+    <file alias="uDTU.Sub.GlossyLayeredEffect.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.GlossyLayeredEffect.shadergraph.meta</file>
+    <file alias="uDTU.Sub.MetallicMix.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.MetallicMix.shadergraph</file>
+    <file alias="uDTU.Sub.MetallicMix.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.MetallicMix.shadergraph.meta</file>
+    <file alias="uDTU.Sub.SpecularMix.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.SpecularMix.shadergraph</file>
+    <file alias="uDTU.Sub.SpecularMix.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.SpecularMix.shadergraph.meta</file>
+    <file alias="uDTU.Sub.SubSurfaceScatter.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.SubSurfaceScatter.shadergraph</file>
+    <file alias="uDTU.Sub.SubSurfaceScatter.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.SubSurfaceScatter.shadergraph.meta</file>
+    <file alias="uDTU.Sub.TopCoat.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.TopCoat.shadergraph</file>
+    <file alias="uDTU.Sub.TopCoat.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.TopCoat.shadergraph.meta</file>
+    <file alias="uDTU.Sub.TranslucencyMask.shadergraph">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.TranslucencyMask.shadergraph</file>
+    <file alias="uDTU.Sub.TranslucencyMask.shadergraph.meta">../../UnityPlugin/Shaders/UnofficialDTU/uDTU.Sub.TranslucencyMask.shadergraph.meta</file>
   </qresource>
   <qresource prefix="/UnofficialDaz/ShaderCGInc">
     <file alias="DazStandardCore.cginc">../../UnityPlugin/Shaders/CGInc/DazStandardCore.cginc</file>
