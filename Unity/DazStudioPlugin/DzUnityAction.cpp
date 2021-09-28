@@ -237,6 +237,19 @@ void UnofficialDzUnityAction::CreateUnityFiles(bool replace)
 		 file.close();
 	 }
 
+	 //Create shader UnofficialDTU folder if it doesn't exist
+	 QString shaderUDTUFolder = ImportFolder + "/Shaders/UnofficialDTU";
+	 dir.mkpath(shaderUDTUFolder);
+
+	 QStringList shaderUDTUStringList = QDir(":/UnofficialDaz/UnofficialDTU/").entryList();
+	 for (int i = 0; i < shaderUDTUStringList.size(); i++)
+	 {
+		 QString shaderUDTUFilename = shaderUDTUFolder + "/" + shaderUDTUStringList[i];
+		 QFile file(":/UnofficialDaz/UnofficialDTU/" + shaderUDTUStringList[i]);
+		 CopyFile(&file, &shaderUDTUFilename, replace);
+		 file.close();
+	 }
+
 	 //Create shader helpers folder if it doesn't exist
 	 QString shaderHelperFolder = ImportFolder + "/Shaders/Helpers";
 	 dir.mkpath(shaderHelperFolder);
