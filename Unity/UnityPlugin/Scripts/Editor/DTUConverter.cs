@@ -27,12 +27,14 @@ namespace Daz3D
 		public const string shaderNameIraySkin = "Daz3D/Built-In IrayUberSkin";
 		public const string shaderNameHair = "Daz3D/Built-In Hair";
 		public const string shaderNameWet = "Daz3D/Built-In Wet";
+		public const string newShaderNameBase = "";
 #else
 		public const string shaderNameMetal = "Standard";
 		public const string shaderNameSpecular = "Standard";
 		public const string shaderNameIraySkin = "Standard";
 		public const string shaderNameHair = "Standard";
 		public const string shaderNameWet = "Standard";
+		public const string newShaderNameBase = "";
 #endif
 		public const string shaderNameInvisible = "Daz3D/Invisible";        //special shader that doesn't render anything
 
@@ -735,6 +737,13 @@ namespace Daz3D
 					UnityEngine.Debug.LogError("Invalid material, we don't know what shader to pick");
 					return null;
 				}
+#if USING_URP
+				// DB 2021-09-28: URP needs hardcoded transparency shader mode, so this block is needed to override everything above
+				if(isTransparent && Daz3DDTUImporter.UseNewShaders)
+                {
+					shaderName = DTU_Constants.newShaderNameBase + "Transparent";
+				}
+#endif
 			}
 
 			//Now that we know which shader to use, go ahead and make the mat
@@ -802,10 +811,12 @@ namespace Daz3D
 				//A few magic values that work for most hairs
 				mat.SetFloat("_AlphaStrength",1.5f);
 				mat.SetFloat("_AlphaOffset",0.35f);
-#if USING_HDRP || USING_URP
+#if USING_HDRP
 				mat.SetFloat("_AlphaClip",0.75f);
+#elif USING_URP
+				mat.SetFloat("_AlphaClipThreshold", 0.75f);
 #elif USING_BUILTIN
-				mat.SetFloat("_AlphaClip", 0.025f);
+				mat.SetFloat("_AlphaClipThreshold", 0.025f);
 #endif
 				mat.SetFloat("_AlphaPower",0.4f);
 			}
@@ -1687,7 +1698,11 @@ namespace Daz3D
 				//A few magic values that work for most hairs
 				mat.SetFloat("_AlphaStrength",1.5f);
 				mat.SetFloat("_AlphaOffset",0.35f);
+#if USING_HDRP
 				mat.SetFloat("_AlphaClip",0.75f);
+#else
+				mat.SetFloat("_AlphaClipThreshold", 0.75f);
+#endif
 				mat.SetFloat("_AlphaPower",0.4f);
 			}
 			else if(isWet)
@@ -1863,7 +1878,11 @@ namespace Daz3D
 			//A few magic values that work for most hairs
 			mat.SetFloat("_AlphaStrength",1.5f);
 			mat.SetFloat("_AlphaOffset",0.35f);
+#if USING_HDRP
 			mat.SetFloat("_AlphaClip",0.75f);
+#else
+			mat.SetFloat("_AlphaClipThreshold", 0.75f);
+#endif
 			mat.SetFloat("_AlphaPower",0.4f);
 
 
@@ -1988,7 +2007,11 @@ namespace Daz3D
 			//A few magic values that work for most hairs
 			mat.SetFloat("_AlphaStrength",1.5f);
 			mat.SetFloat("_AlphaOffset",0.35f);
+#if USING_HDRP
 			mat.SetFloat("_AlphaClip",0.75f);
+#else
+			mat.SetFloat("_AlphaClipThreshold", 0.75f);
+#endif
 			mat.SetFloat("_AlphaPower",0.4f);
 
 
