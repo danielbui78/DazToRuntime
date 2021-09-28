@@ -403,10 +403,10 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 	 bool bDForceSettingsAvailable = false;
 	 if (Shape)
 	 {
-		 DzModifierIterator* modIter = &Object->modifierIterator();
-		 while (modIter->hasNext())
+		 DzModifierIterator modIter = Object->modifierIterator();
+		 while (modIter.hasNext())
 		 {
-			 DzModifier* modifier = modIter->next();
+			 DzModifier* modifier = modIter.next();
 			 QString mod_Class = modifier->className();
 			 if (mod_Class.toLower().contains("dforce"))
 			 {
@@ -536,12 +536,12 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							 if (elSimulationSettingsProvider)
 							 {
 								int numProperties = elSimulationSettingsProvider->getNumProperties();
-								DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+								DzPropertyListIterator propIter = elSimulationSettingsProvider->propertyListIterator();
 								QString propString = "";
 								int propIndex = 0;
-								while (propIter->hasNext())
+								while (propIter.hasNext())
 								{
-									DzProperty* Property = propIter->next();
+									DzProperty* Property = propIter.next();
 									DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
 									if (NumericProperty)
 									{
@@ -659,10 +659,10 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 	if ( Shape && Shape->inherits("DzFacetShape") )
 	{
 		DzModifier *dforceModifier;
-		DzModifierIterator* modIter = &Object->modifierIterator();
-		while (modIter->hasNext())
+		DzModifierIterator modIter = Object->modifierIterator();
+		while (modIter.hasNext())
 		{
-			DzModifier* modifier = modIter->next();
+			DzModifier* modifier = modIter.next();
 			QString mod_Class = modifier->className();
 			if (mod_Class.toLower().contains("dforce"))
 			{
