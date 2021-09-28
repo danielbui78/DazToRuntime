@@ -1,17 +1,21 @@
-Unofficial DTU Bridge version 1.0
+Unofficial DTU Bridge version 1.1
 
 This is an unofficial update project for the opensource Daz To Unity Bridge released by Daz3D.  It contains a number of bugfixes and feature additions not yet incorporated in the official Daz To Unity project.
 
 New in this version:
 ====================
-- Bugfix: Imported asset files with different hash values are appropriately overwritten.
-- Bugfix: Emission strength values are properly set for IrayUber materials.
-- Bugfix: Emission Color now working for URP and Built-in RenderPipeline.
-- "Enable dForce" checkbox added to Options tab of DTU Bridge window.
-- RenderPipeline Detection procedure will ask to confirm Symbol Definition updates before proceeding.
-- Notification windows will popup when Daz Export and Unity Import steps are complete.
-- Daz Studio Subdivision settings are restored after Send To operation.
-- Changed plugin name and window titles to "Unofficial DTU Bridge".
+- MacOS filesystem support.
+- Experimental uDTU shaders added for HDRP and URP, made from refactored and unified shadersubgraph codebase.
+   - "Use New Shaders" option added to DTU Bridge Options panel (disabled by default).
+   - Translucency Map, SSS, Dual Lobe Specular, Glossy Specular, Specular Strength, Top Coat implemented.
+   - URP Transparency support via URP-Transparent shading mode.
+   - Dual Lobe Specular and Glossy Specular simultaneously supported in all shading modes (SSS, Metallic, Specular, URP-Transparent).
+   - Metallic emulation implemented in Specular and URP-Transparent shading modes.
+   - SSS supported for all non-transparent materials (previously only Skin).
+- Fixed Alpha Clip Threshold bug in URP: affected depth-testing, especially hair.
+- Glossy Anisotropy, Roughness and Weight fixes.
+- "eyelash" material assigned to Hair shader.
+- Changed window titles to "uDTU".
 
 Known Issues:
 =============
@@ -62,6 +66,16 @@ Tips: if clothing falls off or explodes, try decreasing the Dynamics Strength in
 
 Change Log:
 ===========
+Version 1.0:
+- Bugfix: Imported asset files with different hash values are appropriately overwritten.
+- Bugfix: Emission strength values are properly set for IrayUber materials.
+- Bugfix: Emission Color now working for URP and Built-in RenderPipeline.
+- "Enable dForce" checkbox added to Options tab of DTU Bridge window.
+- RenderPipeline Detection procedure will ask to confirm Symbol Definition updates before proceeding.
+- Notification windows will popup when Daz Export and Unity Import steps are complete.
+- Daz Studio Subdivision settings are restored after Send To operation.
+- Changed plugin name and window titles to "Unofficial DTU Bridge".
+
 Version 0.5-alpha:
 - Smoother Unity Files installation with automatic dialog popup, RP detection and proper importing of first asset.
 - UI tweaks such as Daz3D menu command order, Install/Overwrite Unity Files checkbox.
