@@ -1,18 +1,22 @@
-Unofficial DTU Bridge version 1.0
+Unofficial DTU Bridge version 1.1
 =================================
 
 This is an unofficial update project for the opensource Daz To Unity Bridge released by Daz3D.  It contains a number of bugfixes and feature additions not yet incorporated in the official Daz To Unity project.
 
 New in this version:
 ====================
-- Bugfix: Imported asset files with different hash values are appropriately overwritten.
-- Bugfix: Emission strength values are properly set for IrayUber materials.
-- Bugfix: Emission Color now working for URP and Built-in RenderPipeline.
-- "Enable dForce" checkbox added to Options tab of DTU Bridge window.
-- RenderPipeline Detection procedure will ask to confirm Symbol Definition updates before proceeding.
-- Notification windows will popup when Daz Export and Unity Import steps are complete.
-- Daz Studio Subdivision settings are restored after Send To operation.
-- Changed plugin name and window titles to "Unofficial DTU Bridge".
+- Experimental MacOS support.
+- Experimental uDTU shaders added for HDRP and URP, made from refactored and unified shadersubgraph codebase.
+   - "Use New Shaders" option added to DTU Bridge Options panel (disabled by default).
+   - Translucency Map, SSS, Dual Lobe Specular, Glossy Specular, Specular Strength, Top Coat implemented.
+   - URP Transparency support via URP-Transparent shading mode.
+   - Dual Lobe Specular and Glossy Specular simultaneously supported in all shading modes (SSS, Metallic, Specular, URP-Transparent).
+   - Metallic emulation implemented in Specular and URP-Transparent shading modes.
+   - SSS supported for all non-transparent materials (previously only Skin).
+- Fixed Alpha Clip Threshold bug in URP: affected depth-testing, especially hair.
+- Glossy Anisotropy, Roughness and Weight fixes.
+- "eyelash" material assigned to Hair shader.
+- Changed window titles to "uDTU".
 
 Known Issues:
 =============
@@ -24,14 +28,20 @@ Known Issues:
 - Identical / duplicate materials are not yet detected for merger in Unity.
 - Cloth physics colliders are not yet resized to Daz figures.
 - Daz dForce weight maps are not yet converted properly to Unity Cloth physics weight maps.
+- Mac OS support is still experimental and requires manual installation of Unity plugin (see instructions below).  Only tested with Big Sur.
 
-Installation Instructions:
+macOS Installation Instructions:
 ==========================
-The "unofficialdzunitybridge_v1_0.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial Daz To Unity. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.
+Unity Plugin must be installed using the "Unofficial_Daz3D_Bridge_v1_1.unitypackage".  You can drag this into the Unity Editor Window, or double-click while Unity Editor window is open.
 
-Alternatively, you can install the "Unofficial_Daz3D_Bridge_v1_0.unitypackage" by drag-and-dropping it into the Project pane of the Unity Editor window, if you want to install it without using the DazStudio plugin.
+Daz Studio Mac Plugin: Unzip the "libunofficialdzunitybridge.dylib.v1_1.zip" file and move the "libunofficialdzunitybridge.dylib" file into the plugins folder of Daz Studio.  The plugin folder is found in the same folder containing the main Daz Studio application icon.  The bridge can then be accessed from the main menu: File->Send To->Unofficial Daz To Unity.
 
-You do Not need to do both.
+
+Windows Installation Instructions:
+==========================
+The "unofficialdzunitybridge_v1_1.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial Daz To Unity. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.
+
+Alternatively, you can install the "Unofficial_Daz3D_Bridge_v1_1.unitypackage" by drag-and-dropping it into the Project pane of the Unity Editor window, if you want to install it without using the DazStudio plugin.
 
 To Test dForce Clothing to Unity Cloth Physics support:
 =======================================================
@@ -70,6 +80,16 @@ Tips: if clothing falls off or explodes, try decreasing the Dynamics Strength in
 
 Change Log:
 ===========
+Version 1.0:
+- Bugfix: Imported asset files with different hash values are appropriately overwritten.
+- Bugfix: Emission strength values are properly set for IrayUber materials.
+- Bugfix: Emission Color now working for URP and Built-in RenderPipeline.
+- "Enable dForce" checkbox added to Options tab of DTU Bridge window.
+- RenderPipeline Detection procedure will ask to confirm Symbol Definition updates before proceeding.
+- Notification windows will popup when Daz Export and Unity Import steps are complete.
+- Daz Studio Subdivision settings are restored after Send To operation.
+- Changed plugin name and window titles to "Unofficial DTU Bridge".
+
 Version 0.5-alpha:
 - Smoother Unity Files installation with automatic dialog popup, RP detection and proper importing of first asset.
 - UI tweaks such as Daz3D menu command order, Install/Overwrite Unity Files checkbox.
