@@ -108,7 +108,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 connect(subdivisionEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleSubdivisionCheckBoxChange(int)));
 
 	 // Show FBX Dialog option
-	 installUnityFilesCheckBox = new QCheckBox("", this);
+     installUnityFilesCheckBox = new QCheckBox("", this);
 
 	 // Add the widget to the basic dialog
 	 mainLayout->addRow("Asset Name", assetNameEdit);
@@ -116,9 +116,16 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 mainLayout->addRow("Enable Morphs", morphsLayout);
 	 mainLayout->addRow("Enable Subdivision", subdivisionLayout);
 	 mainLayout->addRow("Unity Assets Folder", assetsFolderLayout);
-	 installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+     installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+
+#ifdef __APPLE__
+     installUnityFilesCheckBox->setEnabled(false);
+     installUnityFilesCheckBox->setText(tr("CURRENTLY UNSUPPORTED. PLEASE INSTALL WITH .UNITYPACKAGE"));
+     mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
+#else
 	 mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
 	 connect(installUnityFilesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleInstallUnityFilesCheckBoxChange(int)));
+#endif
 	 addLayout(mainLayout);
 #ifdef FBXOPTIONS
 	 showFbxDialogCheckBox = new QCheckBox("", this);
@@ -205,6 +212,11 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 {
 		  assetTypeCombo->setCurrentIndex(1);
 	 }
+
+#ifdef __APPLE__
+    settings->setValue("InstallUnityFiles", false);
+    installUnityFilesCheckBox->setChecked(false);
+#endif
 }
 
 void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
@@ -269,6 +281,11 @@ void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 				settings->setValue("AssetsPath", directoryName);
 		  }
 	 }
+    
+#ifdef __APPLE__
+    settings->setValue("InstallUnityFiles", false);
+    installUnityFilesCheckBox->setChecked(false);
+#endif
 }
 
 void UnofficialDzUnityDialog::HandleChooseMorphsButton()
