@@ -154,7 +154,7 @@ namespace Daz3D
 				valueLower.Contains("hair") || assetNameLower.EndsWith("hair") || matNameLower.Contains("hair")
 				|| valueLower.Contains("moustache") || assetNameLower.EndsWith("moustache") || matNameLower.Contains("moustache")
 				|| valueLower.Contains("beard") || assetNameLower.EndsWith("beard") || matNameLower.Contains("beard")
-				|| valueLower.Contains("eyelash") || assetNameLower.EndsWith("eyelash") || matNameLower.Contains("eyelash")
+				|| matNameLower.Contains("eyelash")
 			)
 			{
 				return true;
