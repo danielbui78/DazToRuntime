@@ -251,7 +251,7 @@ inline FragmentCommonData FragmentSetup (inout float4 i_tex, float3 i_eyeVec, ha
     half alpha = Alpha(i_tex.xy);
     #if defined(_ALPHATEST_ON)
 //        clip (alpha - _Cutoff);
-        clip(alpha - _AlphaClip);
+        clip(alpha - _AlphaClipThreshold);
 #endif
 
     FragmentCommonData o = UNITY_SETUP_BRDF_INPUT (i_tex);

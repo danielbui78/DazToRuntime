@@ -22,7 +22,7 @@
 //half4       _Color;
 //half        _Cutoff;
 half4       _Diffuse;
-half        _AlphaClip;
+half        _AlphaClipThreshold;
 
 //sampler2D   _MainTex;
 //float4      _MainTex_ST;

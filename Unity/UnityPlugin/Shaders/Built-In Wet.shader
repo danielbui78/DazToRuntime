@@ -10,7 +10,7 @@ Shader "Daz3D/Built-In Wet"
         _DiffuseMap("Diffuse Map", 2D) = "white" {}
 
 //        _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
-        _AlphaClip("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
+        _AlphaClipThreshold("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
 
 //        _Glossiness("Smoothness", Range(0.0, 1.0)) = 0.5
 //        _GlossMapScale("Smoothness Scale", Range(0.0, 1.0)) = 1.0
@@ -71,7 +71,7 @@ Shader "Daz3D/Built-In Wet"
 //            [Enum(Zero, (int)UnityEngine.Rendering.BlendMode.Zero, OneMinusSrcAlpha, (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha)]
             _DstBlend("DstBlend", Float) = 0.0
             [ToggleOff]
-            _ZWrite("Zwrite", Float) = 1.0    
+            _ZWrite("Zwrite", Float) = 1.0
     }
 
         CGINCLUDE
