@@ -32,7 +32,7 @@
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial DTU (Daz To Unity)"), tr("Send the selected node to Unity."))
 {
-	 SubdivisionDialog = nullptr;
+	 SubdivisionDialog = NULL;
 	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
 }
 
@@ -430,7 +430,7 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 					 Writer.addMember("Material Type", Material->getMaterialName());
 
 					 DzPresentation* presentation = Node->getPresentation();
-					 if (presentation != nullptr)
+					 if (presentation != NULL)
 					 {
 						  const QString presentationType = presentation->getType();
 						  Writer.addMember("Value", presentationType);
