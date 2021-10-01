@@ -118,14 +118,8 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 mainLayout->addRow("Unity Assets Folder", assetsFolderLayout);
      installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
 
-#ifdef __APPLE__DISABLED
-     installUnityFilesCheckBox->setEnabled(false);
-     installUnityFilesCheckBox->setText(tr("CURRENTLY UNSUPPORTED. PLEASE INSTALL WITH .UNITYPACKAGE"));
-     mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
-#else
 	 mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
 	 connect(installUnityFilesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleInstallUnityFilesCheckBoxChange(int)));
-#endif
 	 addLayout(mainLayout);
 #ifdef FBXOPTIONS
 	 showFbxDialogCheckBox = new QCheckBox("", this);
@@ -213,10 +207,6 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 		  assetTypeCombo->setCurrentIndex(1);
 	 }
 
-#ifdef __APPLE__DISABLED
-    settings->setValue("InstallUnityFiles", false);
-    installUnityFilesCheckBox->setChecked(false);
-#endif
 }
 
 void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
@@ -282,10 +272,6 @@ void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 		  }
 	 }
     
-#ifdef __APPLE__DISABLED
-    settings->setValue("InstallUnityFiles", false);
-    installUnityFilesCheckBox->setChecked(false);
-#endif
 }
 
 void UnofficialDzUnityDialog::HandleChooseMorphsButton()
