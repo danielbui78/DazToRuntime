@@ -108,7 +108,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 connect(subdivisionEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleSubdivisionCheckBoxChange(int)));
 
 	 // Show FBX Dialog option
-	 installUnityFilesCheckBox = new QCheckBox("", this);
+     installUnityFilesCheckBox = new QCheckBox("", this);
 
 	 // Add the widget to the basic dialog
 	 mainLayout->addRow("Asset Name", assetNameEdit);
@@ -116,7 +116,8 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 mainLayout->addRow("Enable Morphs", morphsLayout);
 	 mainLayout->addRow("Enable Subdivision", subdivisionLayout);
 	 mainLayout->addRow("Unity Assets Folder", assetsFolderLayout);
-	 installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+     installOrOverwriteUnityFilesLabel = new QLabel(tr("Install Unity Files"));
+
 	 mainLayout->addRow(installOrOverwriteUnityFilesLabel, installUnityFilesCheckBox);
 	 connect(installUnityFilesCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleInstallUnityFilesCheckBoxChange(int)));
 	 addLayout(mainLayout);
@@ -205,6 +206,7 @@ UnofficialDzUnityDialog::UnofficialDzUnityDialog(QWidget* parent) :
 	 {
 		  assetTypeCombo->setCurrentIndex(1);
 	 }
+
 }
 
 void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
@@ -269,6 +271,7 @@ void UnofficialDzUnityDialog::HandleSelectAssetsFolderButton()
 				settings->setValue("AssetsPath", directoryName);
 		  }
 	 }
+    
 }
 
 void UnofficialDzUnityDialog::HandleChooseMorphsButton()

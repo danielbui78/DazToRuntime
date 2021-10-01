@@ -159,11 +159,11 @@ void UnofficialDzRuntimePluginAction::Export()
 			  ExportOptions.setBoolValue("doLimits", false);
 
 			  // Loop through and Hide all visible geometry, putting it into list to unhide
-			  DzNodeListIterator *nodeIterator = &dzScene->nodeListIterator();
-			  nodeIterator->toFront();
-			  while (nodeIterator->hasNext())
+			  DzNodeListIterator nodeIterator = dzScene->nodeListIterator();
+			  nodeIterator.toFront();
+			  while (nodeIterator.hasNext())
 			  {
-				  DzNode *node = nodeIterator->next();
+				  DzNode *node = nodeIterator.next();
 				  if (node == Selection)
 					  continue;
 				  if (node->isVisible())

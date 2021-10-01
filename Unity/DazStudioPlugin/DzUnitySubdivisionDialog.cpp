@@ -50,7 +50,7 @@ Local definitions
 #define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDTU"
 
 
-DzUnitySubdivisionDialog* DzUnitySubdivisionDialog::singleton = nullptr;
+DzUnitySubdivisionDialog* DzUnitySubdivisionDialog::singleton = NULL;
 
 
 DzUnitySubdivisionDialog::DzUnitySubdivisionDialog(QWidget *parent) :

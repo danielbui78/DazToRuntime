@@ -29,7 +29,7 @@ public:
 
 	static DzUnitySubdivisionDialog* Get(QWidget* Parent)
 	{
-		if (singleton == nullptr)
+		if (singleton == NULL)
 		{
 			singleton = new DzUnitySubdivisionDialog(Parent);
 		}

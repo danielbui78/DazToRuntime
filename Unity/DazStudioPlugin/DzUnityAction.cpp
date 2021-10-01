@@ -32,7 +32,7 @@
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial DTU (Daz To Unity)"), tr("Send the selected node to Unity."))
 {
-	 SubdivisionDialog = nullptr;
+	 SubdivisionDialog = NULL;
 	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
 }
 
@@ -173,8 +173,12 @@ bool UnofficialDzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, 
 
 	if(QFile::exists(*dst))
 	{
-		QFile::setPermissions(*dst, QFile::ReadOther | QFile::WriteOther);
-	}
+#if __APPLE__
+        QFile::setPermissions(*dst, QFile::ReadOwner | QFile::WriteOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther);
+#else
+        QFile::setPermissions(*dst, QFile::ReadOther | QFile::WriteOther);
+#endif
+    }
 
 	return result;
 }
@@ -403,10 +407,10 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 	 bool bDForceSettingsAvailable = false;
 	 if (Shape)
 	 {
-		 DzModifierIterator* modIter = &Object->modifierIterator();
-		 while (modIter->hasNext())
+		 DzModifierIterator modIter = Object->modifierIterator();
+		 while (modIter.hasNext())
 		 {
-			 DzModifier* modifier = modIter->next();
+			 DzModifier* modifier = modIter.next();
 			 QString mod_Class = modifier->className();
 			 if (mod_Class.toLower().contains("dforce"))
 			 {
@@ -430,7 +434,7 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 					 Writer.addMember("Material Type", Material->getMaterialName());
 
 					 DzPresentation* presentation = Node->getPresentation();
-					 if (presentation != nullptr)
+					 if (presentation != NULL)
 					 {
 						  const QString presentationType = presentation->getType();
 						  Writer.addMember("Value", presentationType);
@@ -536,12 +540,12 @@ void UnofficialDzUnityAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer)
 							 if (elSimulationSettingsProvider)
 							 {
 								int numProperties = elSimulationSettingsProvider->getNumProperties();
-								DzPropertyListIterator* propIter = &elSimulationSettingsProvider->propertyListIterator();
+								DzPropertyListIterator propIter = elSimulationSettingsProvider->propertyListIterator();
 								QString propString = "";
 								int propIndex = 0;
-								while (propIter->hasNext())
+								while (propIter.hasNext())
 								{
-									DzProperty* Property = propIter->next();
+									DzProperty* Property = propIter.next();
 									DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
 									if (NumericProperty)
 									{
@@ -659,10 +663,10 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 	if ( Shape && Shape->inherits("DzFacetShape") )
 	{
 		DzModifier *dforceModifier;
-		DzModifierIterator* modIter = &Object->modifierIterator();
-		while (modIter->hasNext())
+		DzModifierIterator modIter = Object->modifierIterator();
+		while (modIter.hasNext())
 		{
-			DzModifier* modifier = modIter->next();
+			DzModifier* modifier = modIter.next();
 			QString mod_Class = modifier->className();
 			if (mod_Class.toLower().contains("dforce"))
 			{
