@@ -173,8 +173,12 @@ bool UnofficialDzUnityAction::CopyFile(QFile *file, QString *dst, bool replace, 
 
 	if(QFile::exists(*dst))
 	{
-		QFile::setPermissions(*dst, QFile::ReadOther | QFile::WriteOther);
-	}
+#if __APPLE__
+        QFile::setPermissions(*dst, QFile::ReadOwner | QFile::WriteOwner | QFile::ReadUser | QFile::ReadGroup | QFile::ReadOther);
+#else
+        QFile::setPermissions(*dst, QFile::ReadOther | QFile::WriteOther);
+#endif
+    }
 
 	return result;
 }
