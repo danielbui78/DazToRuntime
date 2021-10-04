@@ -147,6 +147,8 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 		subdivisionLevelCombo->addItem("0");
 		subdivisionLevelCombo->addItem("1");
 		subdivisionLevelCombo->addItem("2");
+		subdivisionLevelCombo->addItem("3");
+		subdivisionLevelCombo->addItem("4");
 		SubdivisionCombos.append(subdivisionLevelCombo);
 		subdivisionItemsGrid->addWidget(subdivisionLevelCombo, row, 1);
 		if (SubdivisionLevels.contains(Node->getName()))
@@ -156,7 +158,7 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 		connect(subdivisionLevelCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(HandleSubdivisionLevelChanged(const QString &)));
 
 		// DB 2021-10-03: DEBUG Testing: Hardcode to SubD 2 by default
-		subdivisionLevelCombo->setCurrentIndex(2);
+		subdivisionLevelCombo->setCurrentIndex(4);
 
 		if (Geo)
 		{

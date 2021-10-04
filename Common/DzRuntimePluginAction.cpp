@@ -184,23 +184,23 @@ void UnofficialDzRuntimePluginAction::Export()
 		  // Unnecessary, all code is already done above
 //		  SetExportOptions(ExportOptions);
 
-		  if (ExportSubdivisions)
+		  if (ExportSubdivisions && ExportBaseMesh)
 		  {
-			  if (ExportBaseMesh)
-			  {
+			  //if (ExportBaseMesh)
+			  //{
 				  // Create Base FBX in addition to main subdivided FBX
 				  QString CharacterBaseFBX = CharacterFBX;
 				  CharacterBaseFBX.replace(".fbx", "_base.fbx");
 				  Exporter->writeFile(CharacterBaseFBX, &ExportOptions);
-			  }
-			  else
-			  {
-				  QString CharacterHDFBX = CharacterFBX;
-				  CharacterHDFBX.replace(".fbx", "_HD.fbx");
-				  Exporter->writeFile(CharacterHDFBX, &ExportOptions);
+			  //}
+			  //else
+			  //{
+				 // QString CharacterHDFBX = CharacterFBX;
+				 // CharacterHDFBX.replace(".fbx", "_HD.fbx");
+				 // Exporter->writeFile(CharacterHDFBX, &ExportOptions);
 
-				  WriteConfiguration();
-			  }
+				 // WriteConfiguration();
+			  //}
 		  }
 		  else
 		  {

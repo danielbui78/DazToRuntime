@@ -91,28 +91,28 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 	return false;
 }
 
-bool UpgradeToHD(std::string fbxFilePath)
-{
-	std::string baseFilePath(fbxFilePath);
-	int pos = baseFilePath.find(".fbx");
-	if (pos <= 0)
-	{
-		printf("FBX filepath is invalid (extension must be .fbx)");
-		return false;
-	}
-
-	int len = strlen("_base.fbx");
-	baseFilePath.replace(pos, len, "_base.fbx");
-
-	std::string  hdFilePath(fbxFilePath);
-	len = strlen("_HD.fbx");
-	hdFilePath.replace(pos, len, "_HD.fbx");
-
-	if (UpgradeToHD(baseFilePath.c_str(), hdFilePath.c_str(), fbxFilePath.c_str(), 0) == false)
-		return false;
-
-	return true;
-}
+//bool UpgradeToHD(std::string fbxFilePath)
+//{
+//	std::string baseFilePath(fbxFilePath);
+//	int pos = baseFilePath.find(".fbx");
+//	if (pos <= 0)
+//	{
+//		printf("FBX filepath is invalid (extension must be .fbx)");
+//		return false;
+//	}
+//
+//	int len = strlen("_base.fbx");
+//	baseFilePath.replace(pos, len, "_base.fbx");
+//
+//	std::string  hdFilePath(fbxFilePath);
+//	len = strlen("_HD.fbx");
+//	hdFilePath.replace(pos, len, "_HD.fbx");
+//
+//	if (UpgradeToHD(baseFilePath.c_str(), hdFilePath.c_str(), fbxFilePath.c_str(), 0) == false)
+//		return false;
+//
+//	return true;
+//}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,10 +195,11 @@ void UnofficialDzUnityAction::executeAction()
 		  if (ExportSubdivisions)
 		  {
 			  QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
-			  QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
+			  //QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
 			  // DB 2021-10-02: Upgrade HD
-			  int SubDLevel = 2;
-			  UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
+			  int SubDLevel = 4;
+			  //UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
+			  UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, SubDLevel);
 		  }
 
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
