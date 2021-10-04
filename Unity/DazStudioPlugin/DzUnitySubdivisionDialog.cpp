@@ -146,6 +146,7 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 		subdivisionLevelCombo->setProperty("Object", QVariant(Node->getName()));
 		subdivisionLevelCombo->addItem("0");
 		subdivisionLevelCombo->addItem("1");
+		subdivisionLevelCombo->addItem("2");
 		SubdivisionCombos.append(subdivisionLevelCombo);
 		subdivisionItemsGrid->addWidget(subdivisionLevelCombo, row, 1);
 		if (SubdivisionLevels.contains(Node->getName()))
@@ -153,6 +154,9 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 			subdivisionLevelCombo->setCurrentIndex(SubdivisionLevels[Node->getName()]);
 		}
 		connect(subdivisionLevelCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(HandleSubdivisionLevelChanged(const QString &)));
+
+		// DB 2021-10-03: DEBUG Testing: Hardcode to SubD 2 by default
+		subdivisionLevelCombo->setCurrentIndex(2);
 
 		if (Geo)
 		{
@@ -253,7 +257,7 @@ void DzUnitySubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled
 }
 
 // DB 2021-09-02: Unlock/Undo Subdivision Property Changes
-void DzUnitySubdivisionDialog::UnlockSubdivisionProperties(bool subdivisionEnabled)
+void DzUnitySubdivisionDialog::UnlockSubdivisionProperties()
 {
 	QMap<DzProperty*, UndoData>::iterator undoIterator = UndoSubdivisionOverrides.begin();
 	while (undoIterator != UndoSubdivisionOverrides.end())

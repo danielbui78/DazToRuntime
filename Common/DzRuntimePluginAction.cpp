@@ -106,17 +106,17 @@ void UnofficialDzRuntimePluginAction::Export()
 		  ExportOptions.setStringValue("format", FBXVersion);
 		  ExportOptions.setIntValue("RunSilent", !ShowFbxDialog);
 
-		  ExportOptions.setBoolValue("doEmbed", true);
-		  ExportOptions.setBoolValue("doCopyTextures", true);
-		  ExportOptions.setBoolValue("doDiffuseOpacity", true);
+		  ExportOptions.setBoolValue("doEmbed", false);
+		  ExportOptions.setBoolValue("doCopyTextures", false);
+		  ExportOptions.setBoolValue("doDiffuseOpacity", false);
 		  ExportOptions.setBoolValue("doMergeClothing", true);
 		  ExportOptions.setBoolValue("doStaticClothing", false);
 		  ExportOptions.setBoolValue("degradedSkinning", true);
 		  ExportOptions.setBoolValue("degradedScaling", true);
 		  ExportOptions.setBoolValue("doSubD", false);
 		  ExportOptions.setBoolValue("doCollapseUVTiles", false);
-		  ExportOptions.setBoolValue("doLocks", true);
-		  ExportOptions.setBoolValue("doLimits", true);
+		  //ExportOptions.setBoolValue("doLocks", true);
+		  //ExportOptions.setBoolValue("doLimits", true);
 
 		  ////////////
 		  // Prepare for Material exports (Skeleton and Static Mesh)
@@ -184,9 +184,30 @@ void UnofficialDzRuntimePluginAction::Export()
 		  // Unnecessary, all code is already done above
 //		  SetExportOptions(ExportOptions);
 
-		  Exporter->writeFile(CharacterFBX, &ExportOptions);
+		  if (ExportSubdivisions)
+		  {
+			  if (ExportBaseMesh)
+			  {
+				  // Create Base FBX in addition to main subdivided FBX
+				  QString CharacterBaseFBX = CharacterFBX;
+				  CharacterBaseFBX.replace(".fbx", "_base.fbx");
+				  Exporter->writeFile(CharacterBaseFBX, &ExportOptions);
+			  }
+			  else
+			  {
+				  QString CharacterHDFBX = CharacterFBX;
+				  CharacterHDFBX.replace(".fbx", "_HD.fbx");
+				  Exporter->writeFile(CharacterHDFBX, &ExportOptions);
 
-		  WriteConfiguration();
+				  WriteConfiguration();
+			  }
+		  }
+		  else
+		  {
+			  Exporter->writeFile(CharacterFBX, &ExportOptions);
+			  WriteConfiguration();
+		  }
+
 		  ////////////////////////
 		  // DONE: Export FBX
 		  ////////////////////////

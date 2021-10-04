@@ -30,6 +30,7 @@ protected:
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
+	 bool ExportBaseMesh;
 	 bool ShowFbxDialog;
 	 DzNode* Selection;
 

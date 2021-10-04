@@ -29,6 +29,96 @@
 #include "DzUnityAction.h"
 
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SUBDIVISION
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "FbxSdkManager.h"
+#include "SubdivideMesh.h"
+
+bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, int SubDLevel)
+{
+	FbxManager* lSdkManager = NULL;
+	FbxScene* baseMeshScene = NULL;
+	bool lResult;
+
+	// Prepare the FBX SDK and load base mesh scene
+	InitializeSdkObjects(lSdkManager, baseMeshScene);
+	QByteArray base_ba = baseFilePath.toLocal8Bit();
+	lResult = LoadScene(lSdkManager, baseMeshScene, base_ba.data(), false);
+	if (lResult == false)
+	{
+		QMessageBox::warning(0, "Error",
+			"An error occurred while loading the base scene...", QMessageBox::Ok);
+		printf("\n\nAn error occurred while loading the base scene...");
+		return false;
+	}
+
+	// subdivide
+	lResult = ProcessScene(baseMeshScene, SubDLevel);
+
+	// load HD mesh scene
+	FbxScene* hdMeshScene = FbxScene::Create(lSdkManager, "HD Mesh Scene");
+	QByteArray HD_ba = hdFilePath.toLocal8Bit();
+	lResult = LoadScene(lSdkManager, hdMeshScene, HD_ba.data(), false);
+	if (lResult == false)
+	{
+		QMessageBox::warning(0, "Error",
+			"An error occurred while loading the HD scene...", QMessageBox::Ok);
+
+		printf("\n\nAn error occurred while loading the HD scene...");
+		return false;
+	}
+
+	// save clusters to the scene object
+	lResult = SaveClustersToScene(hdMeshScene);
+
+	//DisplayString("Saving the output mesh FBX file:  ", outFilePath);
+	int fileFormat = lSdkManager->GetIOPluginRegistry()->GetNativeWriterFormat(); // binary file format
+	QByteArray final_ba = outFilePath.toLocal8Bit();
+	lResult = SaveScene(lSdkManager, hdMeshScene, final_ba.data(), fileFormat);
+	if (lResult == false)
+	{
+		QMessageBox::warning(0, "Error",
+			"An error occurred while saving the scene...", QMessageBox::Ok);
+
+		printf("\n\nAn error occurred while saving the scene...");
+		return false;
+	}
+
+	// Destroy all objects created by the FBX SDK.
+	DestroySdkObjects(lSdkManager, lResult);
+
+	return false;
+}
+
+bool UpgradeToHD(std::string fbxFilePath)
+{
+	std::string baseFilePath(fbxFilePath);
+	int pos = baseFilePath.find(".fbx");
+	if (pos <= 0)
+	{
+		printf("FBX filepath is invalid (extension must be .fbx)");
+		return false;
+	}
+
+	int len = strlen("_base.fbx");
+	baseFilePath.replace(pos, len, "_base.fbx");
+
+	std::string  hdFilePath(fbxFilePath);
+	len = strlen("_HD.fbx");
+	hdFilePath.replace(pos, len, "_HD.fbx");
+
+	if (UpgradeToHD(baseFilePath.c_str(), hdFilePath.c_str(), fbxFilePath.c_str(), 0) == false)
+		return false;
+
+	return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SUBDIVISION
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial DTU (Daz To Unity)"), tr("Send the selected node to Unity."))
 {
@@ -88,13 +178,31 @@ void UnofficialDzUnityAction::executeAction()
 		  CreateUnityFiles(true);
 
 		  SubdivisionDialog = DzUnitySubdivisionDialog::Get(dlg);
-		  SubdivisionDialog->LockSubdivisionProperties(ExportSubdivisions);
 		  FBXVersion = QString("FBX 2014 -- Binary");
 
+		  if (ExportSubdivisions)
+		  {
+			  SubdivisionDialog->LockSubdivisionProperties(false);
+			  ExportBaseMesh = true;
+			  Export();
+			  SubdivisionDialog->UnlockSubdivisionProperties();
+		  }
+	  
+		  SubdivisionDialog->LockSubdivisionProperties(ExportSubdivisions);
+		  ExportBaseMesh = false;
 		  Export();
 
+		  if (ExportSubdivisions)
+		  {
+			  QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
+			  QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
+			  // DB 2021-10-02: Upgrade HD
+			  int SubDLevel = 2;
+			  UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
+		  }
+
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
-		  SubdivisionDialog->UnlockSubdivisionProperties(ExportSubdivisions);
+		  SubdivisionDialog->UnlockSubdivisionProperties();
 
 		  //Rename the textures folder
 		  QDir textureDir(CharacterFolder + "/" + CharacterName + ".images");

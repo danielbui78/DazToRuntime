@@ -40,7 +40,7 @@ public:
 	QGridLayout* subdivisionItemsGrid;
 
 	void LockSubdivisionProperties(bool subdivisionEnabled);
-	void UnlockSubdivisionProperties(bool subdivisionEnabled);
+	void UnlockSubdivisionProperties();
 
 	void WriteSubdivisions(DzJsonWriter& Writer);
 	DzNode* FindObject(DzNode* Node, QString Name);
