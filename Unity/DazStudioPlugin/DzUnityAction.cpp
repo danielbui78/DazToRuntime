@@ -88,7 +88,7 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 	// Destroy all objects created by the FBX SDK.
 	DestroySdkObjects(lSdkManager, lResult);
 
-	return false;
+	return true;
 }
 
 //bool UpgradeToHD(std::string fbxFilePath)
