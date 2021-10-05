@@ -199,7 +199,20 @@ void UnofficialDzUnityAction::executeAction()
 			  // DB 2021-10-02: Upgrade HD
 			  int SubDLevel = 4;
 			  //UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
-			  UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, SubDLevel);
+			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, SubDLevel) == false)
+			  {
+				  QMessageBox::warning(0, tr("Error"),
+					  tr("There was an error during the Subdivision Surface refinement operation, the exported Daz model may not work correctly."), QMessageBox::Ok);
+			  }
+			  else
+			  {
+				  // remove intermediate base character fbx
+				  // Sanity Check
+				  if (QFile::exists(BaseCharacterFBX))
+				  {
+					  QFile::remove(BaseCharacterFBX);
+				  }
+			  }
 		  }
 
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
