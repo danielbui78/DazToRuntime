@@ -158,7 +158,7 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 		connect(subdivisionLevelCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(HandleSubdivisionLevelChanged(const QString &)));
 
 		// DB 2021-10-03: DEBUG Testing: Hardcode to SubD 2 by default
-		subdivisionLevelCombo->setCurrentIndex(4);
+		subdivisionLevelCombo->setCurrentIndex(2);
 
 		if (Geo)
 		{

@@ -197,7 +197,7 @@ void UnofficialDzUnityAction::executeAction()
 			  QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
 			  //QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
 			  // DB 2021-10-02: Upgrade HD
-			  int SubDLevel = 4;
+			  int SubDLevel = 2;
 			  //UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
 			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, SubDLevel) == false)
 			  {
