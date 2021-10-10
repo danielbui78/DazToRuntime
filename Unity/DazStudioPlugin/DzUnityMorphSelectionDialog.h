@@ -49,7 +49,7 @@ public:
 	 // Singleton access
 	 static DzUnityMorphSelectionDialog* Get(QWidget* Parent)
 	 {
-		  if (singleton == NULL)
+		  if (singleton == nullptr)
 		  {
 				singleton = new DzUnityMorphSelectionDialog(Parent);
 		  }
@@ -125,7 +125,7 @@ private:
 
 	 // List of morphs (recursive) under each tree node
 	 // For convenience populating the middle box.
-	 QMap<QTreeWidgetItem*, QList<MorphInfo> > morphsForNode;
+	 QMap<QTreeWidgetItem*, QList<MorphInfo>> morphsForNode;
 
 	 // Force the size of the dialog
 	 QSize minimumSizeHint() const override;
