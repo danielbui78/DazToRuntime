@@ -9,7 +9,9 @@
 
 ****************************************************************************************/
 
-#define USING_LIBSTDCPP 1
+#ifdef __APPLE__
+    #define USING_LIBSTDCPP     1
+#endif
 #include "FbxSdkManager.h"
 #include <fbxsdk/core/fbxclassid.h>
 
