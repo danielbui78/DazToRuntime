@@ -45,7 +45,7 @@ Local definitions
 #define DAZ_TO_UNITY_PLUGIN_NAME		"UnofficialDTU"
 
 
-DzUnityMorphSelectionDialog* DzUnityMorphSelectionDialog::singleton = NULL;
+DzUnityMorphSelectionDialog* DzUnityMorphSelectionDialog::singleton = nullptr;
 
 // For sorting the lists
 class SortingListItem : public QListWidgetItem {
@@ -316,7 +316,7 @@ void DzUnityMorphSelectionDialog::UpdateMorphsTree()
 	foreach(QString morph, morphs.keys())
 	{
 		QString path = morphs[morph].Path;
-		QTreeWidgetItem* parentItem = NULL;
+		QTreeWidgetItem* parentItem = nullptr;
 		foreach(QString pathPart, path.split("/"))
 		{
 			if (pathPart == "") continue;
@@ -335,7 +335,7 @@ void DzUnityMorphSelectionDialog::UpdateMorphsTree()
 // but it will also create the structure of that path in the tree as needed as it searches
 QTreeWidgetItem* DzUnityMorphSelectionDialog::FindTreeItem(QTreeWidgetItem* parent, QString name)
 {
-	if (parent == NULL)
+	if (parent == nullptr)
 	{
 		for(int i = 0; i < morphTreeWidget->topLevelItemCount(); i++)
 		{
