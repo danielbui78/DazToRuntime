@@ -32,9 +32,10 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // SUBDIVISION
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "FbxSdkManager.h"
-#include "SubdivideMesh.h"
-
+//#define USING_LIBSTDCPP 1
+//#include "FbxSdkManager.h"
+//#include "SubdivideMesh.h"
+/*
 bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, int SubDLevel)
 {
 	FbxManager* lSdkManager = NULL;
@@ -90,6 +91,7 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 
 	return true;
 }
+*/
 
 //bool UpgradeToHD(std::string fbxFilePath)
 //{
@@ -192,6 +194,7 @@ void UnofficialDzUnityAction::executeAction()
 		  ExportBaseMesh = false;
 		  Export();
 
+/*
 		  if (ExportSubdivisions)
 		  {
 			  QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
@@ -214,7 +217,8 @@ void UnofficialDzUnityAction::executeAction()
 				  }
 			  }
 		  }
-
+*/
+ 
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
 		  SubdivisionDialog->UnlockSubdivisionProperties();
 

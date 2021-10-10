@@ -9,6 +9,7 @@
 
 ****************************************************************************************/
 
+#define USING_LIBSTDCPP 1
 #include "FbxSdkManager.h"
 #include <fbxsdk/core/fbxclassid.h>
 

@@ -1,6 +1,7 @@
 #ifndef _SUBDIVIDE_MESH_H
 #define _SUBDIVIDE_MESH_H
 
+#define USING_LIBSTDCPP 1
 #include <fbxsdk.h>
 
 //------------------------------------------------------------------------------
