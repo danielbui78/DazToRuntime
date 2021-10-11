@@ -170,13 +170,13 @@ void UnofficialDzUnityAction::executeAction()
 		  }
 	  
 		  SubdivisionDialog->LockSubdivisionProperties(ExportSubdivisions);
-		  std::map<std::string, int>* pLookupTable = SubdivisionDialog->GetLookupTable();
 		  ExportBaseMesh = false;
 		  Export();
 
 		  if (ExportSubdivisions)
 		  {
-			  QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
+              std::map<std::string, int>* pLookupTable = SubdivisionDialog->GetLookupTable();
+              QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
 			  //QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
 			  // DB 2021-10-02: Upgrade HD
 			  int SubDLevel = 2;
@@ -195,8 +195,8 @@ void UnofficialDzUnityAction::executeAction()
 					  QFile::remove(BaseCharacterFBX);
 				  }
 			  }
+              delete(pLookupTable);
 		  }
-		  delete(pLookupTable);
 
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
 		  SubdivisionDialog->UnlockSubdivisionProperties();
