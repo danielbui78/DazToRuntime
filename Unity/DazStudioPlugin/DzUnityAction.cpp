@@ -24,6 +24,7 @@
 #include "dzfacetshape.h"
 #include "dzfacetmesh.h"
 #include "dzfacegroup.h"
+#include "dzprogress.h"
 
 #include "DzUnityDialog.h"
 #include "DzUnityAction.h"
@@ -137,6 +138,9 @@ void UnofficialDzUnityAction::executeAction()
 	 // If the Accept button was pressed, start the export
 	 if (dlg->exec() == QDialog::Accepted)
 	 {
+		  // DB 2021-10-11: Progress Bar
+		  DzProgress exportProgress( "Sending to Unity...", 5 );
+
 		  //Create Daz3D folder if it doesn't exist
 		  QDir dir;
 		  ImportFolder = dlg->assetsFolderEdit->text() + "/Daz3D";
@@ -157,6 +161,7 @@ void UnofficialDzUnityAction::executeAction()
 		  InstallUnityFiles = dlg->installUnityFilesCheckBox->isChecked();
 
 		  CreateUnityFiles(true);
+		  exportProgress.step();
 
 		  SubdivisionDialog = DzUnitySubdivisionDialog::Get(dlg);
 		  FBXVersion = QString("FBX 2014 -- Binary");
@@ -167,20 +172,21 @@ void UnofficialDzUnityAction::executeAction()
 			  ExportBaseMesh = true;
 			  Export();
 			  SubdivisionDialog->UnlockSubdivisionProperties();
+			  exportProgress.step();
+
 		  }
-	  
+
+
 		  SubdivisionDialog->LockSubdivisionProperties(ExportSubdivisions);
 		  ExportBaseMesh = false;
 		  Export();
+		  exportProgress.step();
 
 		  if (ExportSubdivisions)
 		  {
               std::map<std::string, int>* pLookupTable = SubdivisionDialog->GetLookupTable();
               QString BaseCharacterFBX = CharacterFolder + CharacterName + "_base.fbx";
-			  //QString HDCharacterFBX = CharacterFolder + CharacterName + "_HD.fbx";
 			  // DB 2021-10-02: Upgrade HD
-			  int SubDLevel = 2;
-			  //UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
 			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, pLookupTable) == false)
 			  {
 				  QMessageBox::warning(0, tr("Error"),
@@ -196,6 +202,8 @@ void UnofficialDzUnityAction::executeAction()
 				  }
 			  }
               delete(pLookupTable);
+			  exportProgress.step();
+
 		  }
 
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
@@ -205,10 +213,10 @@ void UnofficialDzUnityAction::executeAction()
 		  QDir textureDir(CharacterFolder + "/" + CharacterName + ".images");
 		  textureDir.rename(CharacterFolder + "/" + CharacterName + ".images", CharacterFolder + "/Textures");
 
+		  // DB 2021-10-11: Progress Bar
+		  exportProgress.finish();
+
 		  // DB 2021-09-02: messagebox "Export Complete"
-		  //QMessageBox msgBox;
-		  //msgBox.setText(tr("Unofficial DTU Bridge export from Daz Studio complete. Please switch to Unity to continue."));
-		  //msgBox.exec();
 		  QMessageBox::information(0, "Unofficial DTU Bridge", tr("Export phase from Daz Studio complete. Please switch to Unity to begin Import phase."), QMessageBox::Ok);
 
 	 }
