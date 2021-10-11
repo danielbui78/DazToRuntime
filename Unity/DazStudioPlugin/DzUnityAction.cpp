@@ -39,7 +39,7 @@
 #include "SubdivideMesh.h"
 
 
-bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, int SubDLevel)
+bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, std::map<std::string, int>* pLookupTable)
 {
 	FbxManager* lSdkManager = NULL;
 	FbxScene* baseMeshScene = NULL;
@@ -58,7 +58,7 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 	}
 
 	// subdivide
-	lResult = ProcessScene(baseMeshScene, SubDLevel);
+	lResult = ProcessScene(baseMeshScene, pLookupTable);
 
 	// load HD mesh scene
 	FbxScene* hdMeshScene = FbxScene::Create(lSdkManager, "HD Mesh Scene");
@@ -94,29 +94,6 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 
 	return true;
 }
-
-//bool UpgradeToHD(std::string fbxFilePath)
-//{
-//	std::string baseFilePath(fbxFilePath);
-//	int pos = baseFilePath.find(".fbx");
-//	if (pos <= 0)
-//	{
-//		printf("FBX filepath is invalid (extension must be .fbx)");
-//		return false;
-//	}
-//
-//	int len = strlen("_base.fbx");
-//	baseFilePath.replace(pos, len, "_base.fbx");
-//
-//	std::string  hdFilePath(fbxFilePath);
-//	len = strlen("_HD.fbx");
-//	hdFilePath.replace(pos, len, "_HD.fbx");
-//
-//	if (UpgradeToHD(baseFilePath.c_str(), hdFilePath.c_str(), fbxFilePath.c_str(), 0) == false)
-//		return false;
-//
-//	return true;
-//}
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,6 +170,7 @@ void UnofficialDzUnityAction::executeAction()
 		  }
 	  
 		  SubdivisionDialog->LockSubdivisionProperties(ExportSubdivisions);
+		  std::map<std::string, int>* pLookupTable = SubdivisionDialog->GetLookupTable();
 		  ExportBaseMesh = false;
 		  Export();
 
@@ -203,7 +181,7 @@ void UnofficialDzUnityAction::executeAction()
 			  // DB 2021-10-02: Upgrade HD
 			  int SubDLevel = 2;
 			  //UpgradeToHD(BaseCharacterFBX, HDCharacterFBX, CharacterFBX, SubDLevel);
-			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, SubDLevel) == false)
+			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, pLookupTable) == false)
 			  {
 				  QMessageBox::warning(0, tr("Error"),
 					  tr("There was an error during the Subdivision Surface refinement operation, the exported Daz model may not work correctly."), QMessageBox::Ok);
@@ -218,7 +196,8 @@ void UnofficialDzUnityAction::executeAction()
 				  }
 			  }
 		  }
- 
+		  delete(pLookupTable);
+
 		  // DB 2021-09-02: Unlock and Undo subdivision changes
 		  SubdivisionDialog->UnlockSubdivisionProperties();
 

@@ -44,6 +44,7 @@ public:
 
 	void WriteSubdivisions(DzJsonWriter& Writer);
 	DzNode* FindObject(DzNode* Node, QString Name);
+	std::map<std::string, int>* DzUnitySubdivisionDialog::GetLookupTable();
 
 public slots:
 	void HandleSubdivisionLevelChanged(const QString& text);

@@ -354,7 +354,7 @@ FbxMesh* SubdivideMesh(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, F
 //    return -1;
 //}
 
-bool ProcessNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, int SubDLevel)
+bool ProcessNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, std::map<std::string, int>* pLookupTable)
 {
     FbxNodeAttribute::EType lAttributeType;
 
@@ -380,7 +380,16 @@ bool ProcessNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, int Sub
         {
             std::string name = pNode->GetName();
             //int nodeSubdLevel = GetNodeSubdivisionLevel(name);
-            int nodeSubdLevel = SubDLevel;
+            int nodeSubdLevel = -1;
+            try
+            {
+                nodeSubdLevel = pLookupTable->at(name);
+            }
+            catch (std::out_of_range)
+            {
+                nodeSubdLevel = -1;
+            }
+            //int nodeSubdLevel = SubDLevel;
             if (nodeSubdLevel > 0)
             {
                 //DisplayString("Interpolating skin weights of mesh: ", name.c_str());
@@ -408,13 +417,13 @@ bool ProcessNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, int Sub
 
     for (int i = 0; i < pNode->GetChildCount(); i++)
     {
-        ProcessNode(pScene, pNode, pNode->GetChild(i), SubDLevel);
+        ProcessNode(pScene, pNode, pNode->GetChild(i), pLookupTable);
     }
 
     return true;
 }
 
-bool ProcessScene(FbxScene* pScene, int SubDLevel)
+bool ProcessScene(FbxScene* pScene, std::map<std::string, int>* pLookupTable)
 {
     int i;
     FbxNode* lNode = pScene->GetRootNode();
@@ -423,7 +432,7 @@ bool ProcessScene(FbxScene* pScene, int SubDLevel)
     {
         for (i = 0; i < lNode->GetChildCount(); i++)
         {
-            ProcessNode(pScene, lNode, lNode->GetChild(i), SubDLevel);
+            ProcessNode(pScene, lNode, lNode->GetChild(i), pLookupTable);
         }
     }
 

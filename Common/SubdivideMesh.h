@@ -100,7 +100,7 @@ private:
 
 FbxMesh* SubdivideMesh(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, FbxMesh* pMesh, int subdLevel);
 bool ProcessNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, int SubDLevel=-1);
-bool ProcessScene(FbxScene* pScene, int SubDLevel=-1);
+bool ProcessScene(FbxScene* pScene, std::map<std::string, int>* pLookupTable);
 
 FbxMesh* SaveClustersToMesh(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode, FbxMesh* pMesh);
 bool SaveClustersToNode(FbxScene* pScene, FbxNode* pParentNode, FbxNode* pNode);

@@ -157,9 +157,6 @@ void DzUnitySubdivisionDialog::CreateList(DzNode* Node)
 		}
 		connect(subdivisionLevelCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(HandleSubdivisionLevelChanged(const QString &)));
 
-		// DB 2021-10-03: DEBUG Testing: Hardcode to SubD 2 by default
-		subdivisionLevelCombo->setCurrentIndex(2);
-
 		if (Geo)
 		{
 			int VertCount = Geo->getNumVertices();
@@ -297,5 +294,22 @@ void DzUnitySubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 		//stream << "1, " << Name << ", " << targetValue << endl;
 	}
 }
+
+std::map<std::string, int>* DzUnitySubdivisionDialog::GetLookupTable()
+{
+	std::map<std::string, int>* pLookupTable = new std::map<std::string, int>();
+
+	foreach(QComboBox * combo, SubdivisionCombos)
+	{
+		std::string name(combo->property("Object").toString().toLocal8Bit().data());
+		name = name + ".Shape";
+		int targetValue = combo->currentText().toInt();
+		(*pLookupTable)[name] = targetValue;
+
+	}
+
+	return pLookupTable;
+}
+
 
 #include "moc_DzUnitySubdivisionDialog.cpp"
