@@ -159,6 +159,68 @@ set(DZSDK_QT_NETWORK_TARGET Qt4::QtNetwork)
 set(DZSDK_QT_SQL_TARGET	Qt4::QtSql)
 set(DZSDK_QT_XML_TARGET	Qt4::QtXml)
 
+############################
+# FBX SETTINGS
+############################
+IF(NOT WIN32)
+	set(FBX_ARCH "x64")
+	SET(CMAKE_CXX_FLAGS "-m64 ${CMAKE_CXX_FLAGS}")
+	SET(CMAKE_C_FLAGS "-m64 ${CMAKE_C_FLAGS}")
+	SET(FBX_TMP_TARGET_LIBS ${FBX_TMP_TARGET_LIBS} dl pthread)
+	SET(CMAKE_CXX_FLAGS "-D_NDEBUG -Os ${CMAKE_CXX_FLAGS}")
+	SET(CMAKE_C_FLAGS "-D_NDEBUG -Os ${CMAKE_C_FLAGS}")
+	SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wall")
+	SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall")
+
+	IF(APPLE)
+		IF(NOT FBX_CLANG)
+			SET(FBX_LINKER_FLAGS "-framework Carbon -framework SystemConfiguration ${FBX_LINKER_FLAGS}")
+		ELSE(NOT FBX_CLANG)
+			SET(FBX_LINKER_FLAGS "-framework CoreFoundation -framework SystemConfiguration ${FBX_LINKER_FLAGS}")
+		ENDIF(NOT FBX_CLANG)
+		SET(FBX_TMP_TARGET_LIBS ${FBX_TMP_TARGET_LIBS} iconv)
+	ENDIF()
+
+	SET(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")       
+
+ENDIF(NOT WIN32)
+
+set(FBX_SDK_DIR "" CACHE PATH "Path to FBX SDK" )
+if(NOT FBX_SDK_DIR)
+	message(FATAL_ERROR "Missing path to FBX SDK folder")
+	return()
+endif()
+
+set(FBX_SDK_INCLUDE "${FBX_SDK_DIR}/include" CACHE PATH "Path to FBX SDK Includes" )
+if(WIN32)
+	set(FBX_PLATFORM "vs2017/x64/release")
+	set(FBX_SDK_LIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libfbxsdk-md.lib" CACHE FILEPATH "Path to FBX SDK static library (libfbx-md.lib)" )
+	set(FBX_SDK_XMLLIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libxml2-md.lib" CACHE FILEPATH "Path to FBX SDK XML library (libxml2-md.lib)" )
+	set(FBX_IMPORT_LIBS 
+		${FBX_SDK_LIB} 
+		${FBX_SDK_XMLLIB})
+elseif(APPLE)
+	set(FBX_PLATFORM "stdlib/release")
+	set(FBX_SDK_LIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libfbxsdk-md.lib" CACHE FILEPATH "Path to FBX SDK static library (libfbxsdk.a)" )
+	set(FBX_IMPORT_LIBS "${FBX_SDK_LIB}")
+endif()
+
+############################
+# Opensubdiv SETTINGS
+############################
+set(OPENSUBDIV_DIR "" CACHE PATH "Path to Opensubdiv folder" )
+if(NOT OPENSUBDIV_DIR)
+	message(FATAL_ERROR "Missing path to Opensubdiv folder")
+	return()
+endif()
+set(OPENSUBDIV_INCLUDE "${OPENSUBDIV_DIR}" CACHE PATH "Path to Opensubdiv include folder (usually same as root folder)" )
+if(WIN32)
+	set(OPENSUBDIV_LIB "${OPENSUBDIV_DIR}/build/lib/Release/osdCPU.lib" CACHE FILEPATH "Path to Opensubdiv CPU static library (osdCPU.lib)" )
+elseif(APPLE)
+	set(OPENSUBDIV_LIB "${OPENSUBDIV_DIR}/build/lib/Release/libosdCPU.a" CACHE FILEPATH "Path to Opensubdiv CPU static library (libosdCPU.a)" )
+endif()
+
+
 list(APPEND CMAKE_AUTOMOC_MOC_OPTIONS -i)
 
 add_subdirectory("Common")

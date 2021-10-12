@@ -53,7 +53,18 @@ add_library( ${DZ_PLUGIN_TGT_NAME} SHARED
 	${OS_SOURCES}
 )
 
-target_include_directories(common PUBLIC ${COMMON_LIB_INCLUDE_DIR})
+target_include_directories(common 
+	PUBLIC 
+	${COMMON_LIB_INCLUDE_DIR} 
+	${FBX_SDK_INCLUDE}
+	${OPENSUBDIV_INCLUDE}
+)
+
+target_include_directories(${DZ_PLUGIN_TGT_NAME}
+	PUBLIC 
+	${FBX_SDK_INCLUDE}
+	${OPENSUBDIV_INCLUDE}
+)
 
 target_link_libraries(${DZ_PLUGIN_TGT_NAME}
 	PRIVATE 
@@ -63,6 +74,8 @@ target_link_libraries(${DZ_PLUGIN_TGT_NAME}
 	${DZSDK_QT_GUI_TARGET}
 	${DZSDK_QT_SCRIPT_TARGET}
 	${DZSDK_QT_NETWORK_TARGET}
+	${FBX_IMPORT_LIBS}
+	${OPENSUBDIV_LIB}
 )
 
 set_target_properties (${DZ_PLUGIN_TGT_NAME}
