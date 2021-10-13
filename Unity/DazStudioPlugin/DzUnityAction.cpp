@@ -36,52 +36,33 @@
 #ifdef __APPLE__
     #define USING_LIBSTDCPP 1
 #endif
-#include "FbxSdkManager.h"
-#include "SubdivideMesh.h"
+#include "OpenFBXInterface.h"
+#include "OpenSubdivInterface.h"
 
 
 bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, std::map<std::string, int>* pLookupTable)
 {
-	FbxManager* lSdkManager = NULL;
-	FbxScene* baseMeshScene = NULL;
-	bool lResult;
-
-	// Prepare the FBX SDK and load base mesh scene
-	InitializeSdkObjects(lSdkManager, baseMeshScene);
-	QByteArray base_ba = baseFilePath.toLocal8Bit();
-	lResult = LoadScene(lSdkManager, baseMeshScene, base_ba.data(), false);
-	if (lResult == false)
+	OpenFBXInterface* openFBX = OpenFBXInterface::GetInterface();
+	FbxScene* baseMeshScene = openFBX->CreateScene("Base Mesh Scene");
+	if (openFBX->LoadScene(baseMeshScene, baseFilePath.toLocal8Bit().data()) == false)
 	{
 		QMessageBox::warning(0, "Error",
 			"An error occurred while loading the base scene...", QMessageBox::Ok);
 		printf("\n\nAn error occurred while loading the base scene...");
 		return false;
 	}
-
-	// subdivide
-	lResult = ProcessScene(baseMeshScene, pLookupTable);
-
-	// load HD mesh scene
-	FbxScene* hdMeshScene = FbxScene::Create(lSdkManager, "HD Mesh Scene");
-	QByteArray HD_ba = hdFilePath.toLocal8Bit();
-	lResult = LoadScene(lSdkManager, hdMeshScene, HD_ba.data(), false);
-	if (lResult == false)
+	SubdivideFbxScene subdivider = SubdivideFbxScene(baseMeshScene, pLookupTable);
+	subdivider.ProcessScene();
+	FbxScene* hdMeshScene = openFBX->CreateScene("HD Mesh Scene");
+	if (openFBX->LoadScene(hdMeshScene, hdFilePath.toLocal8Bit().data()) == false)
 	{
 		QMessageBox::warning(0, "Error",
-			"An error occurred while loading the HD scene...", QMessageBox::Ok);
-
-		printf("\n\nAn error occurred while loading the HD scene...");
+			"An error occurred while loading the base scene...", QMessageBox::Ok);
+		printf("\n\nAn error occurred while loading the base scene...");
 		return false;
 	}
-
-	// save clusters to the scene object
-	lResult = SaveClustersToScene(hdMeshScene);
-
-	//DisplayString("Saving the output mesh FBX file:  ", outFilePath);
-	int fileFormat = lSdkManager->GetIOPluginRegistry()->GetNativeWriterFormat(); // binary file format
-	QByteArray final_ba = outFilePath.toLocal8Bit();
-	lResult = SaveScene(lSdkManager, hdMeshScene, final_ba.data(), fileFormat);
-	if (lResult == false)
+	subdivider.SaveClustersToScene(hdMeshScene);
+	if (openFBX->SaveScene(hdMeshScene, outFilePath.toLocal8Bit().data()) == false)
 	{
 		QMessageBox::warning(0, "Error",
 			"An error occurred while saving the scene...", QMessageBox::Ok);
@@ -90,10 +71,8 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 		return false;
 	}
 
-	// Destroy all objects created by the FBX SDK.
-	DestroySdkObjects(lSdkManager, lResult);
-
 	return true;
+
 }
 
 
