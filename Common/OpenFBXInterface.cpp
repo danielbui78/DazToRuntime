@@ -28,7 +28,7 @@ OpenFBXInterface::OpenFBXInterface()
 	m_fbxManager = FbxManager::Create();
 	if (!m_fbxManager)
 	{
-		throw (std::exception("OpenFBXInterface: could not create FbxManager"));
+		throw (std::runtime_error("OpenFBXInterface: could not create FbxManager"));
 	}
 
 	// Create FbxIOSettings

@@ -173,6 +173,7 @@ IF(NOT WIN32)
 	SET(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -Wall")
 
 	IF(APPLE)
+		set(FBX_LINKER_FLAGS "-lz -lxml2 -liconv")
 		IF(NOT FBX_CLANG)
 			SET(FBX_LINKER_FLAGS "-framework Carbon -framework SystemConfiguration ${FBX_LINKER_FLAGS}")
 		ELSE(NOT FBX_CLANG)
@@ -181,7 +182,7 @@ IF(NOT WIN32)
 		SET(FBX_TMP_TARGET_LIBS ${FBX_TMP_TARGET_LIBS} iconv)
 	ENDIF()
 
-	SET(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")       
+	SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib\=libstdc++ ${CMAKE_CXX_FLAGS}")       
 
 ENDIF(NOT WIN32)
 
@@ -198,11 +199,14 @@ if(WIN32)
 	set(FBX_SDK_XMLLIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libxml2-md.lib" CACHE FILEPATH "Path to FBX SDK XML library (libxml2-md.lib)" )
 	set(FBX_IMPORT_LIBS 
 		${FBX_SDK_LIB} 
-		${FBX_SDK_XMLLIB})
+		${FBX_SDK_XMLLIB}
+		${FBX_LINKER_FLAGS})
 elseif(APPLE)
-	set(FBX_PLATFORM "stdlib/release")
-	set(FBX_SDK_LIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libfbxsdk-md.lib" CACHE FILEPATH "Path to FBX SDK static library (libfbxsdk.a)" )
-	set(FBX_IMPORT_LIBS "${FBX_SDK_LIB}")
+	set(FBX_PLATFORM "clang/libstdcpp/release")
+	set(FBX_SDK_LIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libfbxsdk.a" CACHE FILEPATH "Path to FBX SDK static library (libfbxsdk.a)" )
+	set(FBX_IMPORT_LIBS 
+		${FBX_SDK_LIB}
+		${FBX_LINKER_FLAGS})
 endif()
 
 ############################
