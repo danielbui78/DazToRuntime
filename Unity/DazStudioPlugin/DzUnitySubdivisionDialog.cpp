@@ -272,6 +272,8 @@ void DzUnitySubdivisionDialog::UnlockSubdivisionProperties()
 		undoIterator++;
 	}
 
+	// Clear subdivision map after processing undo
+	UndoSubdivisionOverrides.clear();
 }
 
 
