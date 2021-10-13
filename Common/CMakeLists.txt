@@ -12,8 +12,8 @@ set(COMMON_LIB_INCLUDE_DIR
 include_directories(${COMMON_LIB_INCLUDE_DIR})
 set(LIB_SRCS 
 	"DzRuntimePluginAction.cpp"
-	"FbxSdkManager.cxx"
-	"SubdivideMesh.cxx")
+	"OpenFBXInterface.cpp"
+	"OpenSubdivInterface.cpp")
 
 add_library(common STATIC ${LIB_SRCS})
 
