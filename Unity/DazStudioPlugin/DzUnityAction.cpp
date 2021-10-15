@@ -40,13 +40,13 @@
 #include "OpenSubdivInterface.h"
 
 
-bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, std::map<std::string, int>* pLookupTable)
+bool UnofficialDzUnityAction::UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, std::map<std::string, int>* pLookupTable)
 {
 	OpenFBXInterface* openFBX = OpenFBXInterface::GetInterface();
 	FbxScene* baseMeshScene = openFBX->CreateScene("Base Mesh Scene");
 	if (openFBX->LoadScene(baseMeshScene, baseFilePath.toLocal8Bit().data()) == false)
 	{
-		QMessageBox::warning(0, "Error",
+		if (NonInteractiveMode == 0) QMessageBox::warning(0, "Error",
 			"An error occurred while loading the base scene...", QMessageBox::Ok);
 		printf("\n\nAn error occurred while loading the base scene...");
 		return false;
@@ -56,7 +56,7 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 	FbxScene* hdMeshScene = openFBX->CreateScene("HD Mesh Scene");
 	if (openFBX->LoadScene(hdMeshScene, hdFilePath.toLocal8Bit().data()) == false)
 	{
-		QMessageBox::warning(0, "Error",
+		if (NonInteractiveMode == 0) QMessageBox::warning(0, "Error",
 			"An error occurred while loading the base scene...", QMessageBox::Ok);
 		printf("\n\nAn error occurred while loading the base scene...");
 		return false;
@@ -64,7 +64,7 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 	subdivider.SaveClustersToScene(hdMeshScene);
 	if (openFBX->SaveScene(hdMeshScene, outFilePath.toLocal8Bit().data()) == false)
 	{
-		QMessageBox::warning(0, "Error",
+		if (NonInteractiveMode == 0) QMessageBox::warning(0, "Error",
 			"An error occurred while saving the scene...", QMessageBox::Ok);
 
 		printf("\n\nAn error occurred while saving the scene...");
@@ -83,66 +83,85 @@ bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, 
 UnofficialDzUnityAction::UnofficialDzUnityAction() :
 	 UnofficialDzRuntimePluginAction(tr("&Unofficial DTU (Daz To Unity)"), tr("Send the selected node to Unity."))
 {
+	 NonInteractiveMode = 0;
+	 BridgeDialog = nullptr;
+	 MorphSelectionDialog = nullptr;
 	 SubdivisionDialog = nullptr;
 	 QAction::setIcon(QIcon(":/UnofficialDaz/Images/icon"));
 }
 
+bool UnofficialDzUnityAction::CreateUI()
+{
+	// Check if the main window has been created yet.
+	// If it hasn't, alert the user and exit early.
+	DzMainWindow* mw = dzApp->getInterface();
+	if (!mw)
+	{
+		if (NonInteractiveMode == 0) QMessageBox::warning(0, tr("Error"), 
+			tr("The main window has not been created yet."), QMessageBox::Ok);
+
+		return false;
+	}
+
+	// SubdivisionDialog creation REQUIRES valid Character or Prop selected
+	if (dzScene->getNumSelectedNodes() != 1)
+	{
+		if (NonInteractiveMode == 0) QMessageBox::warning(0, tr("Error"), 
+			tr("Please select one Character or Prop to send."), QMessageBox::Ok);
+
+		return false;
+	}
+
+	 // Create the dialog
+	BridgeDialog = new UnofficialDzUnityDialog(mw);
+	SubdivisionDialog = DzUnitySubdivisionDialog::Get(BridgeDialog);
+	MorphSelectionDialog = DzUnityMorphSelectionDialog::Get(BridgeDialog);
+
+	return true;
+}
+
 void UnofficialDzUnityAction::executeAction()
 {
-	 // Check if the main window has been created yet.
-	 // If it hasn't, alert the user and exit early.
-	 DzMainWindow* mw = dzApp->getInterface();
-	 if (!mw)
-	 {
-		  QMessageBox::warning(0, tr("Error"),
-				tr("The main window has not been created yet."), QMessageBox::Ok);
-
-		  return;
-	 }
 
 	 // Create and show the dialog. If the user cancels, exit early,
 	 // otherwise continue on and do the thing that required modal
 	 // input from the user.
-
-	 if (dzScene->getNumSelectedNodes() != 1)
-	 {
-		  QMessageBox::warning(0, tr("Error"),
-				tr("Please select one Character or Prop to send."), QMessageBox::Ok);
-		  return;
-	 }
-
-	 // Create the dialog
-	 UnofficialDzUnityDialog* dlg = new UnofficialDzUnityDialog(mw);
+	 if (CreateUI() == false)
+		 return;
 
 	 // If the Accept button was pressed, start the export
-	 if (dlg->exec() == QDialog::Accepted)
+	 int dlgResult = 0;
+	 if (NonInteractiveMode == 0)
+	 {
+		 dlgResult = BridgeDialog->exec();
+	 }
+	 if (NonInteractiveMode == 1 || dlgResult == QDialog::Accepted)
 	 {
 		  // DB 2021-10-11: Progress Bar
 		  DzProgress exportProgress( "Sending to Unity...", 5 );
 
 		  //Create Daz3D folder if it doesn't exist
 		  QDir dir;
-		  ImportFolder = dlg->assetsFolderEdit->text() + "/Daz3D";
+		  ImportFolder = BridgeDialog->assetsFolderEdit->text() + "/Daz3D";
 		  dir.mkpath(ImportFolder);
 
 		  // Collect the values from the dialog fields
-		  CharacterName = dlg->assetNameEdit->text();
+		  CharacterName = BridgeDialog->assetNameEdit->text();
 		  CharacterFolder = ImportFolder + "/" + CharacterName + "/";
 		  CharacterFBX = CharacterFolder + CharacterName + ".fbx";
-		  AssetType = dlg->assetTypeCombo->currentText().replace(" ", "");
-		  MorphString = dlg->GetMorphString();
-		  ExportMorphs = dlg->morphsEnabledCheckBox->isChecked();
-		  ExportSubdivisions = dlg->subdivisionEnabledCheckBox->isChecked();
-		  MorphMapping = dlg->GetMorphMapping();
+		  AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
+		  MorphString = BridgeDialog->GetMorphString();
+		  ExportMorphs = BridgeDialog->morphsEnabledCheckBox->isChecked();
+		  ExportSubdivisions = BridgeDialog->subdivisionEnabledCheckBox->isChecked();
+		  MorphMapping = BridgeDialog->GetMorphMapping();
 #ifdef FBXOPTIONS
-		  ShowFbxDialog = dlg->showFbxDialogCheckBox->isChecked();
+		  ShowFbxDialog = BridgeDialog->showFbxDialogCheckBox->isChecked();
 #endif
-		  InstallUnityFiles = dlg->installUnityFilesCheckBox->isChecked();
+		  InstallUnityFiles = BridgeDialog->installUnityFilesCheckBox->isChecked();
 
 		  CreateUnityFiles(true);
 		  exportProgress.step();
 
-		  SubdivisionDialog = DzUnitySubdivisionDialog::Get(dlg);
 		  FBXVersion = QString("FBX 2014 -- Binary");
 
 		  if (ExportSubdivisions)
@@ -168,8 +187,8 @@ void UnofficialDzUnityAction::executeAction()
 			  // DB 2021-10-02: Upgrade HD
 			  if (UpgradeToHD(BaseCharacterFBX, CharacterFBX, CharacterFBX, pLookupTable) == false)
 			  {
-				  QMessageBox::warning(0, tr("Error"),
-					  tr("There was an error during the Subdivision Surface refinement operation, the exported Daz model may not work correctly."), QMessageBox::Ok);
+				  if (NonInteractiveMode == 0) QMessageBox::warning(0, tr("Error"),
+						  tr("There was an error during the Subdivision Surface refinement operation, the exported Daz model may not work correctly."), QMessageBox::Ok);
 			  }
 			  else
 			  {
@@ -196,7 +215,8 @@ void UnofficialDzUnityAction::executeAction()
 		  exportProgress.finish();
 
 		  // DB 2021-09-02: messagebox "Export Complete"
-		  QMessageBox::information(0, "Unofficial DTU Bridge", tr("Export phase from Daz Studio complete. Please switch to Unity to begin Import phase."), QMessageBox::Ok);
+		  if (NonInteractiveMode == 0) QMessageBox::information(0, "Unofficial DTU Bridge", 
+			  tr("Export phase from Daz Studio complete. Please switch to Unity to begin Import phase."), QMessageBox::Ok);
 
 	 }
 }
@@ -1071,7 +1091,8 @@ void UnofficialDzUnityAction::WriteWeightMaps(DzNode* Node, DzJsonWriter& Writer
 								{
 									// write error
 									QString errString = rawWeight.errorString();
-									QMessageBox::warning(0, tr("Error writing dforce weightmap. Incorrect number of bytes written."),
+									if (NonInteractiveMode == 0) QMessageBox::warning(0, 
+										tr("Error writing dforce weightmap. Incorrect number of bytes written."), 
 										errString, QMessageBox::Ok);
 								}
 								rawWeight.close();

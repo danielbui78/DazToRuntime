@@ -6,11 +6,19 @@
 #include <QtCore/qtextstream.h>
 #include <DzRuntimePluginAction.h>
 #include "DzUnitySubdivisionDialog.h"
+#include "DzUnityMorphSelectionDialog.h"
+#include "DzUnityDialog.h"
 
 #include "dzweightmap.h"
 
 class UnofficialDzUnityAction : public UnofficialDzRuntimePluginAction {
 	 Q_OBJECT
+	 Q_PROPERTY(bool InstallUnityFiles READ getInstallUnityFiles WRITE setInstallUnityFiles)
+	 Q_PROPERTY(DzBasicDialog* BridgeDialog READ getBridgeDialog)
+	 Q_PROPERTY(DzBasicDialog* SubdivisionDialog READ getSubdivisionDialog)
+     Q_PROPERTY(DzBasicDialog* MorphSelectionDialog READ getMorphSelectionDialog)
+	 Q_PROPERTY(int NonInteractiveMode READ getNonInteractiveMode WRITE setNonInteractiveMode)
+
 public:
 	 UnofficialDzUnityAction();
 
@@ -42,20 +50,33 @@ public:
 
 	 };
 
+	void setInstallUnityFiles(bool arg) { InstallUnityFiles = arg; }
+	bool getInstallUnityFiles() { return InstallUnityFiles; }
+	UnofficialDzUnityDialog* getBridgeDialog() { return BridgeDialog; }
+	DzUnitySubdivisionDialog* getSubdivisionDialog() { return SubdivisionDialog; }
+	DzUnityMorphSelectionDialog* getMorphSelectionDialog() { return MorphSelectionDialog; }
+	void setNonInteractiveMode(int arg) { NonInteractiveMode = arg; }
+	int getNonInteractiveMode() { return NonInteractiveMode; }
+
 protected:
+	 int NonInteractiveMode;
+	 UnofficialDzUnityDialog* BridgeDialog;
+	 DzUnityMorphSelectionDialog* MorphSelectionDialog;
 	 DzUnitySubdivisionDialog* SubdivisionDialog;
 	 bool InstallUnityFiles;
 
 	 void executeAction();
-	 void WriteMaterials(DzNode* Node, DzJsonWriter& Stream);
-	 void WriteWeightMaps(DzNode* Node, DzJsonWriter& Stream);
-	 void WriteConfiguration();
-	 void SetExportOptions(DzFileIOSettings& ExportOptions);
-	 void CreateUnityFiles(bool replace = true);
+	 Q_INVOKABLE bool UpgradeToHD(QString baseFilePath, QString hdFilePath, QString outFilePath, std::map<std::string, int>* pLookupTable);
+	 Q_INVOKABLE bool CreateUI();
+	 Q_INVOKABLE void WriteMaterials(DzNode* Node, DzJsonWriter& Stream);
+	 Q_INVOKABLE void WriteWeightMaps(DzNode* Node, DzJsonWriter& Stream);
+	 Q_INVOKABLE void WriteConfiguration();
+	 Q_INVOKABLE void SetExportOptions(DzFileIOSettings& ExportOptions);
+	 Q_INVOKABLE void CreateUnityFiles(bool replace = true);
 
 	 bool metaInvokeMethod(QObject* object, const char* methodSig, void** returnPtr);
-	 DzWeightMapPtr getWeightMapPtr(DzNode* Node);
+	 Q_INVOKABLE DzWeightMapPtr getWeightMapPtr(DzNode* Node);
 
-	 bool CopyFile(QFile *file, QString *dst, bool replace = true, bool compareFiles = true);
-	 QString GetMD5(const QString &path);
+	 Q_INVOKABLE bool CopyFile(QFile *file, QString *dst, bool replace = true, bool compareFiles = true);
+	 Q_INVOKABLE QString GetMD5(const QString &path);
 };
