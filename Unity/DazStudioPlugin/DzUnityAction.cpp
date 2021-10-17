@@ -113,9 +113,9 @@ bool UnofficialDzUnityAction::CreateUI()
 	}
 
 	 // Create the dialog
-	BridgeDialog = new UnofficialDzUnityDialog(mw);
-	SubdivisionDialog = DzUnitySubdivisionDialog::Get(BridgeDialog);
-	MorphSelectionDialog = DzUnityMorphSelectionDialog::Get(BridgeDialog);
+	if (!BridgeDialog) BridgeDialog = new UnofficialDzUnityDialog(mw);
+	if (!SubdivisionDialog) SubdivisionDialog = DzUnitySubdivisionDialog::Get(BridgeDialog);
+	if (!MorphSelectionDialog) MorphSelectionDialog = DzUnityMorphSelectionDialog::Get(BridgeDialog);
 
 	return true;
 }

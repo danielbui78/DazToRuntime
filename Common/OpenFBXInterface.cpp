@@ -41,6 +41,7 @@ OpenFBXInterface::OpenFBXInterface()
 
 	m_ErrorCode = 0;
 	m_ErrorString = "";
+	m_DefaultScene = CreateScene("DefaultScene");
 
 }
 
@@ -48,6 +49,8 @@ OpenFBXInterface::OpenFBXInterface()
 OpenFBXInterface::~OpenFBXInterface()
 {
 	if (m_fbxManager) m_fbxManager->Destroy();
+	if (m_fbxIOSettings) m_fbxIOSettings->Destroy();
+	if (m_DefaultScene) m_DefaultScene->Destroy();
 }
 
 bool OpenFBXInterface::SaveScene(FbxScene* pScene, QString sFilename, int nFileFormat, bool bEmbedMedia)
@@ -134,3 +137,5 @@ FbxScene* OpenFBXInterface::CreateScene(QString sSceneName)
 
 	return pNewScene;
 }
+
+#include "moc_OpenFBXInterface.cpp"

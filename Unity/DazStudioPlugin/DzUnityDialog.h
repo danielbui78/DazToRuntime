@@ -9,13 +9,35 @@ class QCheckBox;
 class QComboBox;
 class QGroupBox;
 class QLabel;
+class QWidget;
 
 class UnofficialDzUnityDialog : public DzBasicDialog {
 	Q_OBJECT
+	Q_PROPERTY(QWidget* assetNameEdit READ getAssetNameEdit)
+	Q_PROPERTY(QWidget* assetsFolderEdit READ getAssetsFolderEdit)
+	Q_PROPERTY(QWidget* assetsTypeCombo READ getAssetTypeCombo)
+	Q_PROPERTY(QWidget* morphsEnabledCheckBox READ getMorphsEnabledCheckBox)
+	Q_PROPERTY(QWidget* subdivisionEnabledCheckBox READ getSubdivisionEnabledCheckBox)
+	Q_PROPERTY(QWidget* showFbxDialogCheckBox READ getShowFbxDialogCheckBox)
+
 public:
+	Q_INVOKABLE void addButton(QAbstractButton* btn, int index = 1) { DzBasicDialog::addButton(btn, index); }
+	Q_INVOKABLE void addLayout(QLayout* layout, int stretch = 0) { DzBasicDialog::addLayout(layout, stretch); }
+	Q_INVOKABLE void addSpacing(int spacing) { DzBasicDialog::addSpacing(spacing); }
+	Q_INVOKABLE void addStretch(int stretch=0) { DzBasicDialog::addStretch(stretch); }
+	Q_INVOKABLE void addWidget(QWidget* child, int stretch=0, Qt::Alignment alignment=0) { DzBasicDialog::addWidget(child, stretch, alignment); }
+
+	QLineEdit* getAssetNameEdit() { return assetNameEdit; }
+	QLineEdit* getAssetsFolderEdit() { return assetsFolderEdit; }
+	QComboBox* getAssetTypeCombo() { return assetTypeCombo; }
+	QCheckBox* getMorphsEnabledCheckBox() { return morphsEnabledCheckBox; }
+	QCheckBox* getSubdivisionEnabledCheckBox() { return subdivisionEnabledCheckBox; }
+	QCheckBox* getShowFbxDialogCheckBox() { return showFbxDialogCheckBox; }
+
+
 
 	/** Constructor **/
-	 UnofficialDzUnityDialog(QWidget *parent);
+	 UnofficialDzUnityDialog(QWidget *parent=nullptr);
 
 	/** Destructor **/
 	virtual ~UnofficialDzUnityDialog() {}
@@ -38,10 +60,10 @@ public:
 	QCheckBox* installUnityFilesCheckBox;
 
 	// Pass so the DazTRoUnityAction can access it from the morph dialog
-	QString GetMorphString();
+	Q_INVOKABLE QString GetMorphString();
 
 	// Pass so the DazTRoUnityAction can access it from the morph dialog
-	QMap<QString,QString> GetMorphMapping() { return morphMapping; }
+	Q_INVOKABLE QMap<QString,QString> GetMorphMapping() { return morphMapping; }
 
 	void Accepted();
 private slots:

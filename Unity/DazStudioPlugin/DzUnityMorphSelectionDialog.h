@@ -40,7 +40,7 @@ class DzUnityMorphSelectionDialog : public DzBasicDialog {
 	 Q_OBJECT
 public:
 
-	 DzUnityMorphSelectionDialog(QWidget* parent);
+	 DzUnityMorphSelectionDialog(QWidget* parent=nullptr);
 	 virtual ~DzUnityMorphSelectionDialog() {}
 
 	 // Setup the dialog

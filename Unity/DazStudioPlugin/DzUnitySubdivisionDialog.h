@@ -20,7 +20,7 @@ class DzUnitySubdivisionDialog : public DzBasicDialog {
 public:
 
 	/** Constructor **/
-	 DzUnitySubdivisionDialog(QWidget *parent);
+	 DzUnitySubdivisionDialog(QWidget *parent=nullptr);
 
 	void PrepareDialog();
 

@@ -14,9 +14,9 @@
 class UnofficialDzUnityAction : public UnofficialDzRuntimePluginAction {
 	 Q_OBJECT
 	 Q_PROPERTY(bool InstallUnityFiles READ getInstallUnityFiles WRITE setInstallUnityFiles)
-	 Q_PROPERTY(DzBasicDialog* BridgeDialog READ getBridgeDialog)
-	 Q_PROPERTY(DzBasicDialog* SubdivisionDialog READ getSubdivisionDialog)
-     Q_PROPERTY(DzBasicDialog* MorphSelectionDialog READ getMorphSelectionDialog)
+	 Q_PROPERTY(UnofficialDzUnityDialog* BridgeDialog READ getBridgeDialog)
+	 Q_PROPERTY(DzUnitySubdivisionDialog* SubdivisionDialog READ getSubdivisionDialog)
+     Q_PROPERTY(DzUnityMorphSelectionDialog* MorphSelectionDialog READ getMorphSelectionDialog)
 	 Q_PROPERTY(int NonInteractiveMode READ getNonInteractiveMode WRITE setNonInteractiveMode)
 
 public:
