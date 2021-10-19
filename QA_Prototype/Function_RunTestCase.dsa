@@ -82,17 +82,46 @@
 						print("Output files found: " + sDtuOut + ", " + sFbxOut)
 						sReturnString += "Output files created: " + sDtuOut + ", " + sFbxOut + " [OK].\n"
 
-						var sDtuMD5 = oUDTU.GetMD5(sAssetFolder + sDtuOut)
+						// Load and validate DTU format
+						var sDtuMD5 = "";
+						var sDTU_contents = Load_DTU( sAssetFolder + sDtuOut )
+						if (!sDTU_contents)
+						{
+							bPassed = false;
+						}
+						else
+						{
+							var oDTU = Validate_DTU( sDTU_contents )
+							if (!oDTU)
+							{
+								sReturnString += "DTU file: Invalid fileformat [FAILED].\n"
+								bPassed = false;
+							}
+							else
+							{
+								sReturnString += "DTU file: Valid fileformat [OK].\n"
+							}
+							Clean_DTU( oDTU )
+							// output temp file to run with GetMD5
+							var oTempFile = DzFile(sAssetFolder + sDtuOut + ".temp")
+							oTempFile.open( DzFile.WriteOnly )
+							oTempFile.write( JSON.stringify( oDTU ) )
+							oTempFile.close()
+							sDtuMD5 = oUDTU.GetMD5(sAssetFolder + sDtuOut + ".temp")
+							var oTempInfo = DzFileInfo(sAssetFolder + sDtuOut + ".temp")
+							oTempInfo.remove()
+						}								
+
 						print ("MD5(" + sDtuOut + "): " + sDtuMD5)
 						if (sDtuMD5 == sMD5_expectedDTU)
 						{
 							print("MD5 DTU matched.")
-							sReturnString += "DTU MD5 Hash: matched: \"" + sDtuMD5 + "\" [OK].\n"
+							sReturnString += "(Cleaned) DTU MD5 Hash: matched: \"" + sDtuMD5 + "\" [OK].\n"
 						}
 						else
 						{
 							print("MD5 DTU check failed.")
-							sReturnString += "DTU MD5 Hash: mismatched: \"" + sDtuMD5 + "\" [FAILED].\n"
+							sReturnString += "(Cleaned) DTU MD5 Hash: mismatched: \"" + sDtuMD5 + "\" [FAILED].\n"
 							bPassed = false;
 						}
 		
@@ -145,6 +174,90 @@
 		
 		Global_ReturnString += sReturnString
 	}
+
+
+	/*************************************
+	DTU Validation Functions
+	**************************************/
+	function Load_DTU(sDtuFilename)
+	{
+		var oFile = new DzFile( sDtuFilename )
+		if ( !oFile.exists() )
+		{
+			print("DTU File not found [FAILED].")
+			return false;
+		}
+		
+		oFile.open( DzFile.ReadOnly )
+		if (!oFile)
+		{
+			print("Unable to open DTU file [FAILED].")
+			return false;
+		}
+		
+		var sDTU_contents = oFile.read()
+		if (!sDTU_contents)
+		{
+			print("Unable to read file [FAILED].")
+			return false;
+		}
+				
+		return sDTU_contents;
+	}	
+	function Validate_DTU( sDTU_contents )
+	{
+		var oDTU = {}
+		try
+		{
+			oDTU = JSON.parse(sDTU_contents)
+		}
+		catch (e)
+		{
+			oDTU = false
+		}
+		
+		if (!oDTU)
+		{
+			print("DTU: Invalid JSON format [FAILED].")
+			return false;
+		}
+		else
+		{
+			print("DTU: Valid JSON format [OK].")
+		}		
+		return oDTU;
+	}	
+	function Clean_DTU( oDTU )
+	{
+		print("oDTU: " + oDTU["Asset Name"])
+	
+		var sFBXFile = oDTU["FBX File"]
+		var oFbxFileInfo = DzFileInfo(	 sFBXFile )
+		oDTU["FBX File"] = oFbxFileInfo.fileName()
+	
+		var sImportFolder = oDTU["Import Folder"]
+		var aFolderArray = sImportFolder.split("/")
+		var sFolderName = aFolderArray[aFolderArray.length-2]
+		oDTU["Import Folder"] = sFolderName	
+		
+		var oMaterialList = oDTU["Materials"]
+		var oNumMaterials = oMaterialList.length
+		for (var i = 0; i < oNumMaterials; i++)
+		{
+			var oPropertiesList = oMaterialList[i]["Properties"]
+			var oNumProperties = oPropertiesList.length
+			for (var j = 0; j < oNumProperties; j++ )
+			{
+				var sTextureName = oPropertiesList[j]["Texture"]
+				if (sTextureName)
+				{
+					var oFileInfo = DzFileInfo(sTextureName)
+					oPropertiesList[j]["Texture"] = oFileInfo.fileName()
+				}
+			}
+		}
+	}	
+
 	
 	/*************************************
 	Main script body
