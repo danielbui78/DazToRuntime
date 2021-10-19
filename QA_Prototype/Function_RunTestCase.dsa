@@ -1,0 +1,186 @@
+// DAZ Studio version 4.15.0.30 filetype DAZ Script
+(function(){
+
+	/**********************************
+	RunTestCase(sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx)
+		sAssetPath = relative asset path for the asset to be loaded
+		sOutputStem = relative path and filename stem (ie, no extenstion) for output files
+		sMD5_dtu = MD5 hash string to compare against DTU output file
+		sMD5_fbx = MD5 hash string to compare against FBX output file
+	**********************************/
+	function RunTestCase(sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx) {
+		var bPassed = true
+		var sReturnString = ""		
+		
+		if ( (sAssetPath == "") || (sOutputStem == "") )
+			return;
+		
+		Scene.clear()
+		var oContentMgr = App.getContentMgr()
+		
+		var sMD5_expectedDTU = sMD5_dtu
+		var sMD5_expectedFBX = sMD5_fbx
+		
+		var sDtuOut = sOutputStem + ".dtu"
+		var sFbxOut = sOutputStem + ".fbx"
+		
+		var sFullPath = oContentMgr.findFile(sAssetPath)		
+		if (sFullPath)
+		{
+			print("Path: [" + sFullPath + "]")
+			oContentMgr.openFile(sFullPath)
+			
+			var oUDTU = new UnofficialDzUnityAction()
+			if (oUDTU)
+			{
+				print("ready to export to anything")
+				oUDTU.NonInteractiveMode = 1
+				oUDTU.CreateUI()
+				var wMainBridge = oUDTU.BridgeDialog
+				if (wMainBridge)
+				{
+					var wAssetFolder = wMainBridge.assetsFolderEdit
+					if (wAssetFolder)
+					{
+						wAssetFolder.text = App.getDocumentsPath() + "/qa-test"
+						print("Target Asset Folder: " + wAssetFolder.text )
+						var sAssetFolder = wAssetFolder.text
+						var oDir = new DzDir(sAssetFolder)
+						if (oDir.exists())
+						{
+							print("Asset Folder found.")
+						}
+						else
+						{
+							print("Asset Folder does not exist, creating...")
+							oDir.mkpath(sAssetFolder)
+							if (oDir.exists() == false)
+							{
+								print("ERROR! could not create path, exiting")
+								sReturnString += "Unable to create Asset Folder found: " + sAssetFolder + ", aborting [FAILED]." + "\n"
+								Global_ReturnString += sReturnString
+								return;
+							}
+						}
+					}
+					sReturnString += "Asset Folder found: " + sAssetFolder + " [OK].\n"
+		
+					var wAssetTypeCombo = wMainBridge.assetsTypeCombo
+					wAssetTypeCombo.currentIndex = 0
+					wAssetTypeCombo.activated(0)
+		
+					wMainBridge.morphsEnabledCheckBox.checked = false
+					wMainBridge.subdivisionEnabledCheckBox.checked = false
+					wMainBridge.showFbxDialogCheckBox.checked = false
+					wMainBridge.showFbxDialogCheckBox.enabled = false
+					
+					oUDTU.executeAction()
+					var dtuFile = new DzFile(sAssetFolder + sDtuOut)
+					var fbxFile = new DzFile(sAssetFolder + sFbxOut)
+					if (dtuFile.exists() && fbxFile.exists())
+					{
+						print("Output files found: " + sDtuOut + ", " + sFbxOut)
+						sReturnString += "Output files created: " + sDtuOut + ", " + sFbxOut + " [OK].\n"
+
+						var sDtuMD5 = oUDTU.GetMD5(sAssetFolder + sDtuOut)
+						print ("MD5(" + sDtuOut + "): " + sDtuMD5)
+						if (sDtuMD5 == sMD5_expectedDTU)
+						{
+							print("MD5 DTU matched.")
+							sReturnString += "DTU MD5 Hash: matched: \"" + sDtuMD5 + "\" [OK].\n"
+						}
+						else
+						{
+							print("MD5 DTU check failed.")
+							sReturnString += "DTU MD5 Hash: mismatched: \"" + sDtuMD5 + "\" [FAILED].\n"
+							bPassed = false;
+						}
+		
+						var oFBXi = new OpenFBXInterface()
+						var result = oFBXi.LoadScene(sAssetFolder + sFbxOut)
+						if (result)
+						{
+							print("FBX fileformat check passed: valid FBX file");
+							sReturnString += "FBX file: Valid fileformat [OK].\n"
+						}
+						else
+						{
+							print("FBX fileformat check failed: invalid FBX file");
+							sReturnString += "FBX file: Invalid fileformat [FAILED].\n"
+							bPassed = false;
+						}
+					}
+					else
+					{
+						print("QA Test failed, output files not found: " + sDtuOut + ", " + sFbxOut)
+						sReturnString += "Output files not found: " + sDtuOut + ", " + sFbxOut + " [FAILED].\n"
+						bPassed = false;
+					}
+		
+				}
+				else
+				{
+					print("wMainBridge is NULL")
+					sReturnString += "Could not create Main Bridge Dialog: [FAILED].\n"
+					bPassed = false;
+				}
+			}	
+			
+		}
+		else
+		{
+			print("Asset could not be found: " + sAsset)
+			sReturnString += "Asset could not be found or loaded: [FAILED].\n"
+			bPassed = false;
+		}
+
+		if (bPassed)
+		{
+			sReturnString += "TestCase [PASSED]\n"
+		}
+		else
+		{
+			sReturnString += "TestCase [FAILED]\n"
+		}
+		
+		Global_ReturnString += sReturnString
+	}
+	
+	/*************************************
+	Main script body
+	**************************************/
+	function main()
+	{
+		var aArgsList = getArguments()
+	
+		var nArgCount = aArgsList.length
+		print("argCount = " + nArgCount)
+	
+		var sAssetPath = ""
+		var sOutputStem = ""
+		var sMD5_dtu = ""
+		var sMD5_fbx = ""
+	
+		if (nArgCount == 4)
+		{
+			sAssetPath = aArgsList[0]
+			sOutputStem = aArgsList[1]
+			sMD5_dtu = aArgsList[2]
+			sMD5_fbx = aArgsList[3]
+		}
+		else
+		{
+			print("Usage: Function_RunTestCase [Asset_Path] [Output_Stem] [dtu MD5 hash] [fbx MD5 hash]")
+			Global_ReturnString = "TESTING: invalid test case arguments";
+			return;
+		}
+		
+		Global_ReturnString += "TESTING: [" + sAssetPath + "] \n";
+		RunTestCase(sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx);
+		Global_ReturnString += "\n"
+		
+	}
+
+	main()
+	
+})();

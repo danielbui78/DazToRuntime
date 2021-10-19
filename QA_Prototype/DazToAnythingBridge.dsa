@@ -1,0 +1,74 @@
+// DAZ Studio version 4.15.0.30 filetype DAZ Script
+
+var oUDTU = new UnofficialDzUnityAction()
+if (oUDTU)
+{
+	print("ready to export to anything")
+	oUDTU.NonInteractiveMode = 0
+	oUDTU.CreateUI()
+	var wMainBridge = oUDTU.BridgeDialog
+	if (wMainBridge)
+	{
+		/////////////////////////////////////////
+		// Main Dialog Window Title
+		////////////////////////////////////////
+		wMainBridge.windowTitle = "Scripted Daz To Anything Bridge"
+
+		var wAssetFolder = wMainBridge.assetsFolderEdit
+		if (wAssetFolder)
+		{
+			wAssetFolder.text = App.getDocumentsPath() + "/qa-test"
+			print("Target Asset Folder: " + wAssetFolder.text )
+			var sAssetFolder = wAssetFolder.text
+			var oDir = new DzDir(sAssetFolder)
+			if (oDir.exists())
+			{
+				print("Asset Folder found.")
+			}
+			else
+			{
+				print("Asset Folder does not exist, creating...")
+				oDir.mkpath(sAssetFolder)
+				if (oDir.exists() == false)
+				{
+					print("ERROR! could not create path, exiting")
+					return;
+				}
+			}
+		}
+
+		///////////////////////////////////////
+		// Set, Edit or Populate Asset Types
+		///////////////////////////////////////
+		var wAssetTypeCombo = wMainBridge.assetsTypeCombo
+		wAssetTypeCombo.currentIndex = 0
+		wAssetTypeCombo.activated(0)
+
+		wMainBridge.morphsEnabledCheckBox.checked = false
+		wMainBridge.subdivisionEnabledCheckBox.checked = false
+		wMainBridge.showFbxDialogCheckBox.checked = false
+		wMainBridge.showFbxDialogCheckBox.enabled = false
+		
+		/////////////////////////////////////////
+		// Add Custom Widgets
+		/////////////////////////////////////////
+		var widget = new DzWidget(wMainBridge)
+		var wColor = new DzColorWgt( widget )
+		wMainBridge.addWidget( wColor.getWidget() )
+		
+		var userChoice = wMainBridge.exec()
+		if (userChoice)
+		{
+			print("*************Call Export Function Here*************")
+		}
+		else
+		{
+			print("***************Cancel Button Clicked****************")
+		}
+
+	}
+	else
+	{
+		print("wMainBridge is NULL")
+	}
+}	

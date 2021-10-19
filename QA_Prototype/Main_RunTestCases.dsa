@@ -1,0 +1,92 @@
+// DAZ Studio version 4.15.0.30 filetype DAZ Script
+// hardcode absolute path when using IDE
+var sIDE_SCRIPT_PATH = "D:/dev/DazToRuntime/QA_Prototype/";
+(function(){
+
+	/********************************
+	ExecuteScript_RunTestCase(sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx)
+		sAssetPath = relative asset path for the asset to be loaded
+		sOutputStem = relative path and filename stem (ie, no extenstion) for output files
+		sMD5_dtu = MD5 hash string to compare against DTU output file
+		sMD5_fbx = MD5 hash string to compare against FBX output file
+	*********************************/
+	function ExecuteScript_RunTestCase(sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx)
+	{
+		print ("Script filename: " + getScriptFileName() )
+		var sScriptFileName = getScriptFileName()
+		var sScriptPath = ""
+		if (sScriptFileName)
+		{
+			var oFileInfo = new DzFileInfo( sScriptFileName )
+			sScriptPath = oFileInfo.path()
+		}
+		else
+		{
+			sScriptPath = sIDE_SCRIPT_PATH
+		}
+
+		print ("ScriptPath: " + sScriptPath )
+
+		sScriptFile = "Function_RunTestCase.dsa"
+		var oScript = new DzScript()
+		if( oScript.loadFromFile( sScriptPath + "/" + sScriptFile ) )
+		{
+			oScript.execute( new Array (sAssetPath, sOutputStem, sMD5_dtu, sMD5_fbx) );
+		}
+		else
+		{
+			print("error loading script: " + sScriptPath + "/" + sScriptFile )
+		}
+
+	}
+
+	/*************************************
+	Main script body
+	**************************************/
+	function main()
+	{
+		var sAssetPath = ""
+		var sOutputStem = ""
+		var sMD5_dtu = ""
+		var sMD5_fbx = ""
+
+		var sOutputPath = "/Daz3D/"
+
+		var sG81F_base = "/people/genesis 8 female/genesis 8.1 basic female.duf"
+		var sG81F_output = sOutputPath + "Genesis81Female/Genesis81Female"
+		var sG81F_dtu_MD5 = "fe0374cf025134e7046d6a3abeccd3e7"
+
+		var sVictoria81 = "/people/genesis 8 female/characters/victoria 8.1.duf"
+		var sVictoria81_output = sOutputPath + "Victoria81/Victoria81"
+		var sVictoria81_dtu_MD5 = "652d5a57d64e26baa3b1b4a7a875c033"
+
+		var sG8F_base = "/people/genesis 8 female/genesis 8 basic female.duf"
+		var sG8F_output = sOutputPath + "Genesis8Female/Genesis8Female"
+		var sG8F_dtu_MD5 = "e4a0c8d5aa4777b9fbc16a8325a40199"
+
+		var sMonique8 = "/people/genesis 8 female/characters/monique 8.duf"
+		var sMonique8_output = sOutputPath + "Monique8/Monique8"
+		var sMonique8_dtu_MD5 = "78ecfbbcb5a62d4349a1743e62a6cdec"
+
+		var sTwosret8 = "/people/genesis 8 female/characters/twosret 8.duf"
+		var sTwosret8_output = sOutputPath + "Twosret8/Twosret8"
+		var sTwosret8_dtu_MD5 = "e26b1ced88ba9d841430db2318d199a9"
+
+		Global_ReturnString = ""
+		Global_ReturnString += "\n"
+		Global_ReturnString += "///////////////////////////////////\n";
+		Global_ReturnString += "\n"
+		ExecuteScript_RunTestCase(sG81F_base, sG81F_output, sG81F_dtu_MD5, "")
+		ExecuteScript_RunTestCase(sVictoria81, sVictoria81_output, sVictoria81_dtu_MD5, "")
+		ExecuteScript_RunTestCase(sG8F_base, sG8F_output, sG8F_dtu_MD5, "")
+		ExecuteScript_RunTestCase(sMonique8, sMonique8_output, sMonique8_dtu_MD5, "")
+		ExecuteScript_RunTestCase(sTwosret8, sTwosret8_output, sTwosret8_dtu_MD5, "")
+		Global_ReturnString += "///////////////////////////////////\n";
+
+
+		print("Test Cases complete. Return String: \n" + Global_ReturnString)
+	}
+
+	main();
+
+})();
