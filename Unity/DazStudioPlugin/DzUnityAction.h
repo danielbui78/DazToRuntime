@@ -28,7 +28,7 @@ public:
 			vertex_count = -1;
 		}
 
-		bool operator< (MaterialGroupExportOrderMetaData b)
+		bool operator< (MaterialGroupExportOrderMetaData b) const
 		{
 			if (vertex_offset < b.vertex_offset)
 			{

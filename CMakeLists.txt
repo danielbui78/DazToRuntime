@@ -182,7 +182,8 @@ IF(NOT WIN32)
 		SET(FBX_TMP_TARGET_LIBS ${FBX_TMP_TARGET_LIBS} iconv)
 	ENDIF()
 
-	SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib\=libstdc++ ${CMAKE_CXX_FLAGS}")       
+#	SET(CMAKE_CXX_FLAGS "-std=c++11 -stdlib\=libstdc++ ${CMAKE_CXX_FLAGS}")
+    SET(CMAKE_CXX_FLAGS "-std=gnu++11 ${CMAKE_CXX_FLAGS}")
 
 ENDIF(NOT WIN32)
 
@@ -202,7 +203,8 @@ if(WIN32)
 		${FBX_SDK_XMLLIB}
 		${FBX_LINKER_FLAGS})
 elseif(APPLE)
-	set(FBX_PLATFORM "clang/libstdcpp/release")
+#	set(FBX_PLATFORM "clang/libstdcpp/release")
+    set(FBX_PLATFORM "clang/release")
 	set(FBX_SDK_LIB "${FBX_SDK_DIR}/lib/${FBX_PLATFORM}/libfbxsdk.a" CACHE FILEPATH "Path to FBX SDK static library (libfbxsdk.a)" )
 	set(FBX_IMPORT_LIBS 
 		${FBX_SDK_LIB}
