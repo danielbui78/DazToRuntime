@@ -16,7 +16,8 @@ namespace Daz3D
     public class Daz3DBridge : EditorWindow
     {
         public static bool DetectRP_RunOnce = false;
-        
+        public static bool AddDiffusionPrompt_RunOnce = false;
+
         private Vector2 _scrollPos;
         //Tuple<UnityEngine.Object, Texture> thumbnail = null;
         public static readonly Color ThemedColor = new Color(.7f, 1f, .8f);
@@ -61,6 +62,36 @@ namespace Daz3D
 #endif
         }
 
+        public static void AddDiffusionProfilePrompt()
+        {
+#if USING_HDRP
+            string diffusionProfileSettingsPath = "Project/HDRP Default Settings";
+            if (Application.unityVersion.Contains("2019"))
+            {
+                diffusionProfileSettingsPath = "Project/Quality/HDRP";
+            }
+
+            EditorWindow settingspanel = UnityEditor.SettingsService.OpenProjectSettings(diffusionProfileSettingsPath);
+
+            string diffusionProfileInstructions = "In order to use the HDRP Daz skin shaders, " +
+                "you must manually add the IrayUberSkinDiffusionProfile to the Default Diffusion Profile Assets list.\n\n" +
+                "This list is found at the bottom of the HDRP Default Settings panel in the Project Settings dialog.\n\n" +
+                "Until this is done, materials using the HDRP Daz skin shader will have a Green Tint.";
+
+            if (Application.unityVersion.Contains("2019"))
+            {
+                diffusionProfileInstructions = "In order to use the HDRP Daz skin shaders, " +
+                "you must manually add the IrayUberSkinDiffusionProfile to the Diffusion Profile List.\n\n" +
+                "For Unity 2019, this list is found in the Material section of each HD RenderPipeline Asset, " +
+                "which can be found in the Quality->HDRP panel of the Project Settings dialog.\n\n" +
+                "Until this is done, materials using the HDRP Daz skin shader will have a Green Tint.";
+            }
+
+            UnityEditor.EditorUtility.DisplayDialog("Required User Action - uDTU Bridge",
+                diffusionProfileInstructions, "OK");
+#endif
+        }
+
         void OnEnable()
         {
 #if USING_HDRP || USING_URP || USING_BUILTIN
@@ -92,6 +123,16 @@ namespace Daz3D
                         {
                             //Debug.LogError("File NOT found: [" + dtuPath + "] " + dtuPath.Length);
                         }
+                    }
+
+                }
+                else 
+                {
+                    // only run if no dtu_toload.txt does not exist
+                    if (Daz3DBridge.AddDiffusionPrompt_RunOnce == false)
+                    {
+                        Daz3DBridge.AddDiffusionPrompt_RunOnce = true;
+                        Daz3DBridge.AddDiffusionProfilePrompt();
                     }
 
                 }
