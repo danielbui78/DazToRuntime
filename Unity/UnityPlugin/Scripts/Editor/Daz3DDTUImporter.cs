@@ -279,11 +279,7 @@ namespace Daz3D
             // DB 2021-09-02: Show DTUImport complete dialog
             EditorUtility.DisplayDialog("DTU Bridge Import", "Import Completed for " + dtuPath, "OK");
 
-            if (Daz3DBridge.AddDiffusionPrompt_RunOnce == false)
-            {
-                Daz3DBridge.AddDiffusionPrompt_RunOnce = true;
-                Daz3DBridge.AddDiffusionProfilePrompt();
-            }
+            Daz3DBridge.AddDiffusionProfilePrompt();
 
             yield break;
         }
