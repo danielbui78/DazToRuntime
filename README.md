@@ -32,7 +32,7 @@ Unzip the "libunofficialdzunitybridge.dylib.v1_2.zip" file and move the "libunof
 
 Windows Installation Instructions:
 ==========================
-The "unofficialdzunitybridge_v1_2.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial DTU. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.
+The "unofficialdzunitybridge_v1_2.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4\plugins"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial DTU. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.
 
 
 HDRP-ONLY: Adding HDRP Diffusion Profile (aka subsurface-scattering):
