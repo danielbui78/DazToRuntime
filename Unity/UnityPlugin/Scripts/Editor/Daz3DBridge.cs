@@ -15,8 +15,7 @@ namespace Daz3D
     /// </summary>
     public class Daz3DBridge : EditorWindow
     {
-        public static bool DetectRP_RunOnce = false;
-        
+
         private Vector2 _scrollPos;
         //Tuple<UnityEngine.Object, Texture> thumbnail = null;
         public static readonly Color ThemedColor = new Color(.7f, 1f, .8f);
@@ -61,42 +60,76 @@ namespace Daz3D
 #endif
         }
 
+        public static void AddDiffusionProfilePrompt()
+        {
+#if USING_HDRP
+            if (System.IO.File.Exists("Assets/Daz3D/Resources/do_once.cfg"))
+            {
+                return;
+            }
+            byte[] buffer = { 0 };
+            System.IO.File.WriteAllBytes("Assets/Daz3D/Resources/do_once.cfg", buffer);
+
+
+            string diffusionProfileSettingsPath = "Project/HDRP Default Settings";
+            if (Application.unityVersion.Contains("2019"))
+            {
+                diffusionProfileSettingsPath = "Project/Quality/HDRP";
+            }
+
+            EditorWindow settingspanel = UnityEditor.SettingsService.OpenProjectSettings(diffusionProfileSettingsPath);
+
+            string diffusionProfileInstructions = "In order to use the HDRP Daz skin shaders, " +
+                "you must manually add the IrayUberSkinDiffusionProfile to the Default Diffusion Profile Assets list.\n\n" +
+                "This list is found at the bottom of the HDRP Default Settings panel in the Project Settings dialog.\n\n" +
+                "Until this is done, materials using the HDRP Daz skin shader will have a Green Tint.";
+
+            if (Application.unityVersion.Contains("2019"))
+            {
+                diffusionProfileInstructions = "In order to use the HDRP Daz skin shaders, " +
+                "you must manually add the IrayUberSkinDiffusionProfile to the Diffusion Profile List.\n\n" +
+                "For Unity 2019, this list is found in the Material section of each HD RenderPipeline Asset, " +
+                "which can be found in the Quality->HDRP panel of the Project Settings dialog.\n\n" +
+                "Until this is done, materials using the HDRP Daz skin shader will have a Green Tint.";
+            }
+
+            UnityEditor.EditorUtility.DisplayDialog("Required User Action: Add Iray Uber Diffusion Profile",
+                diffusionProfileInstructions, "OK");
+#endif
+        }
+
         void OnEnable()
         {
 #if USING_HDRP || USING_URP || USING_BUILTIN
-            if (DetectRP_RunOnce == false)
+
+            // check for to_load file
+            if (System.IO.File.Exists("Assets/Daz3D/Resources/dtu_toload.txt"))
             {
-                DetectRP_RunOnce = true;
-
-                // check for to_load file
-                if (System.IO.File.Exists("Assets/Daz3D/Resources/dtu_toload.txt"))
+                byte[] byteBuffer = System.IO.File.ReadAllBytes("Assets/Daz3D/Resources/dtu_toload.txt");
+                if (byteBuffer != null || byteBuffer.Length > 0)
                 {
-                    byte[] byteBuffer = System.IO.File.ReadAllBytes("Assets/Daz3D/Resources/dtu_toload.txt");
-                    if (byteBuffer != null || byteBuffer.Length > 0)
+                    string dtuPath = System.Text.Encoding.UTF8.GetString(byteBuffer);
+
+                    System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt");
+                    System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt.meta");
+
+                    if (System.IO.File.Exists(dtuPath))
                     {
-                        string dtuPath = System.Text.Encoding.UTF8.GetString(byteBuffer);
-
-                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt");
-                        System.IO.File.Delete("Assets/Daz3D/Resources/dtu_toload.txt.meta");
-
-                        if (System.IO.File.Exists(dtuPath))
+                        //Debug.LogError("Found file: [" + dtuPath + "] " + dtuPath.Length);
+                        if (dtuPath.Contains(".dtu"))
                         {
-                            //Debug.LogError("Found file: [" + dtuPath + "] " + dtuPath.Length);
-                            if (dtuPath.Contains(".dtu"))
-                            {
-                                var fbxPath = dtuPath.Replace(".dtu", ".fbx");
-                                Daz3DDTUImporter.Import(dtuPath, fbxPath);
-                            }
-                        }
-                        else
-                        {
-                            //Debug.LogError("File NOT found: [" + dtuPath + "] " + dtuPath.Length);
+                            var fbxPath = dtuPath.Replace(".dtu", ".fbx");
+                            Daz3DDTUImporter.Import(dtuPath, fbxPath);
                         }
                     }
-
+                    else
+                    {
+                        //Debug.LogError("File NOT found: [" + dtuPath + "] " + dtuPath.Length);
+                    }
                 }
 
             }
+
 #endif
         }
 

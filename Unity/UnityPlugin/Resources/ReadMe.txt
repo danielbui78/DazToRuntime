@@ -1,32 +1,65 @@
-Unofficial DTU Bridge version 1.1
+Unofficial DTU Bridge version 1.2
 
 This is an unofficial update project for the opensource Daz To Unity Bridge released by Daz3D.  It contains a number of bugfixes and feature additions not yet incorporated in the official Daz To Unity project.
 
 New in this version:
 ====================
-- MacOS filesystem support.
-- Experimental uDTU shaders added for HDRP and URP, made from refactored and unified shadersubgraph codebase.
-   - "Use New Shaders" option added to DTU Bridge Options panel (disabled by default).
-   - Translucency Map, SSS, Dual Lobe Specular, Glossy Specular, Specular Strength, Top Coat implemented.
-   - URP Transparency support via URP-Transparent shading mode.
-   - Dual Lobe Specular and Glossy Specular simultaneously supported in all shading modes (SSS, Metallic, Specular, URP-Transparent).
-   - Metallic emulation implemented in Specular and URP-Transparent shading modes.
-   - SSS supported for all non-transparent materials (previously only Skin).
-- Fixed Alpha Clip Threshold bug in URP: affected depth-testing, especially hair.
-- Glossy Anisotropy, Roughness and Weight fixes.
-- "eyelash" material assigned to Hair shader.
-- Changed window titles to "uDTU".
+- Bugfixed crash when exporting subdivisions for more than one figure in a single session.
+- Initial refactoring for planned open-source FBX and OpenSubdiv Daz-plugins.
+- Updated CMakeFiles for more convenient building of FBX/OpenSubdiv/Mac support.
+- Full MacOS support on versions 10.9 to 11.
+- (Baked) Subdivision support, up to Subdivision Level 4.  Based on https://github.com/cocktailboy/DazToRuntime implementation.
+- FBX SDK and OpenSubDiv are static linked into the Unofficial DTU Bridge and requires both libraries to build the Daz Plugin.
+- OpenSubDiv is used under a Modified Apache License 2.0: https://github.com/PixarAnimationStudios/OpenSubdiv/blob/release/LICENSE.txt
+- FBX SDK is used under the Autodesk® FBX® SDK 2020 license: https://www.autodesk.com/developer-network/platform-technologies/fbx-sdk-2020-2
 
 Known Issues:
 =============
+- Subdivision procedure is currently only single-threaded CPU-based and may take several minutes to bake Subdivision level 3 and 4.
 - dForce strand-based hair is not yet supported.
 - dForce clothing with high poly counts will cause heavy performance slowdowns in Unity.
-- Exporting Subdivisions levels are not yet supported.
 - Geograft morphs are not yet supported.
 - Genesis 8/8.1 prop rigging is not yet 100% accurately converted.
 - Identical / duplicate materials are not yet detected for merger in Unity.
 - Cloth physics colliders are not yet resized to Daz figures.
 - Daz dForce weight maps are not yet converted properly to Unity Cloth physics weight maps.
+
+macOS Installation Instructions:
+==========================
+Unzip the "libunofficialdzunitybridge.dylib.v1_2.zip" file and move the "libunofficialdzunitybridge.dylib" file into the plugins folder of Daz Studio.  The plugin folder is found in the same folder containing the main Daz Studio application icon. The bridge can then be accessed from the main menu: File->Send To->Unofficial DTU. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.  Once the Unity plugin is installed, be sure to follow directions to add the IrayUberSkinDiffusionProfile if you are using HDRP.
+
+
+Windows Installation Instructions:
+==========================
+The "unofficialdzunitybridge_v1_2.7z" file should be unzipped and the "unofficialdaztounitybridge.dll" file should be placed in the plugins folder of Daz Studio (example: "\Daz 3D\Applications\64-bit\DAZ 3D\DAZStudio4"). Daz Studio can then be started, and the bridge can be accessed from the main menu: File->Send To->Unofficial DTU. The embedded Unity plugin can be installed with the "Install Unity Files" option, just like the official DazToUnity Bridge.  Once the Unity plugin is installed, be sure to follow directions to add the IrayUberSkinDiffusionProfile if you are using HDRP.
+
+
+HDRP-ONLY: Adding HDRP Diffusion Profile (aka subsurface-scattering):
+==========================
+In order to use the HDRP Daz skin shaders, you must manually add the IrayUberSkinDiffusionProfile to the Diffusion Profile List.  Until this is done, materials using the HDRP Daz skin shader will have a Green Tint.
+Unity 2019: This list is found in the Material section of each HD RenderPipeline Asset, which can be found in the Quality->HDRP panel of the Project Settings dialog.
+Unity 2020 and above: This list is found at the bottom of the HDRP Default Settings panel in the Project Settings dialog.
+
+
+To Test New Shader support:
+==========================
+1. In the Unity Editor, select main menu "Daz3D->Open DazToUnity Bridge Window".
+2. The DTU Bridge window should open.  Click the "Options" tab.
+3. Check the box next to "Use New Shaders (experimental)".
+4a. Go to Daz and import your figure as usual
+OR
+4b. To update an already imported figure to use the New Shaders: In the Project pane, find the folder for your previously imported Daz figure. Right-click the DTU file and select "Reimport".
+
+
+To Test Subdivision support:
+=========================
+1. Load Daz Figure.
+2. Select "File->Send To->Unofficial DTU".  The "Unofficial DTU Bridge" main dialog window should appear.
+3. If the "Enable Subdivision" checkbox is unchecked, click to place a checkmark.
+4. Click "Choose Subdivisions". The "Choose Subdivision Levels" dialog window should appear.
+5. Set the desired Subdivision Level for each Object/Figure by clicking the corresponding "Subdivision Level" drop-down menu and selecting a subdivision level from 0 to 4.
+6. Click Accept for the "Choose Subdivision Levels" dialog.
+7. Click Accept for the "Unofficial DTU Bridge" dialog.
 
 
 To Test dForce Clothing to Unity Cloth Physics support:
@@ -66,6 +99,20 @@ Tips: if clothing falls off or explodes, try decreasing the Dynamics Strength in
 
 Change Log:
 ===========
+Version 1.1:
+- MacOS filesystem support.
+- Experimental uDTU shaders added for HDRP and URP, made from refactored and unified shadersubgraph codebase.
+   - "Use New Shaders" option added to DTU Bridge Options panel (disabled by default).
+   - Translucency Map, SSS, Dual Lobe Specular, Glossy Specular, Specular Strength, Top Coat implemented.
+   - URP Transparency support via URP-Transparent shading mode.
+   - Dual Lobe Specular and Glossy Specular simultaneously supported in all shading modes (SSS, Metallic, Specular, URP-Transparent).
+   - Metallic emulation implemented in Specular and URP-Transparent shading modes.
+   - SSS supported for all non-transparent materials (previously only Skin).
+- Fixed Alpha Clip Threshold bug in URP: affected depth-testing, especially hair.
+- Glossy Anisotropy, Roughness and Weight fixes.
+- "eyelash" material assigned to Hair shader.
+- Changed window titles to "uDTU".
+
 Version 1.0:
 - Bugfix: Imported asset files with different hash values are appropriately overwritten.
 - Bugfix: Emission strength values are properly set for IrayUber materials.
@@ -94,6 +141,17 @@ Version 0.3-alpha:
 Version 0.1-alpha:
 - Combined support for all three rendering pipelines and an autodetection/configuration system.
 
+
+Copyright Notice:
+==========
+This product is based on software by DAZ 3D, Inc. Copyright 2002-2021 DAZ 3D, Inc., used under modified Apache 2.0 License.  All rights reserved.
+
+This software contains Autodesk® FBX® code developed by Autodesk, Inc. Copyright 2019 Autodesk, Inc. All rights, reserved. Such code is provided “as is” and Autodesk, Inc. disclaims any and all warranties, whether express or implied, including without limitation the implied warranties of merchantability, fitness for a particular purpose or non-infringement of third party rights. In no event shall Autodesk, Inc. be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of such code.
+
+It also uses the following libraries:
+Qt 4.8, Copyright 2015 The Qt Company Ltd.  All rights reserved.
+
+OpenSubdiv, Copyright 2013 Pixar.  All rights reserved.
 
 ----------------------------------------------------------------------------------------------
 End of Unofficial DTU Bridge ReadMe
