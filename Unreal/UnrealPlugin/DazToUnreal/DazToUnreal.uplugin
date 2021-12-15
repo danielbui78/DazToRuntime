@@ -1,11 +1,11 @@
 {
 	"FileVersion": 3,
 	"Version": 4,
-	"VersionName": "4.2.0",
+	"VersionName": "pre-4.3.0-collab-01",
 	"FriendlyName": "DazToUnreal",
 	"Description": "",
 	"Category": "Other",
-	"CreatedBy": "David Vodhanel",
+	"CreatedBy": "David Vodhanel, et al",
 	"CreatedByURL": "",
 	"DocsURL": "",
 	"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/070a312bc04c48bcb1a4d193aaddf73e",
