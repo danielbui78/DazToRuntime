@@ -367,14 +367,14 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 	 FString LocalCharacterMaterialFolder = CharacterMaterialFolder.Replace(TEXT("/Game/"), *ContentDirectory);
 
 	 // Make any needed folders.  If any of these fail, don't continue
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportDirectory)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportCharacterFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportCharacterTexturesFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalDAZImportFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalDAZAnimationImportFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterTexturesFolder)) return false;
-	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterMaterialFolder)) return false;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportDirectory)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportCharacterFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(ImportCharacterTexturesFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalDAZImportFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalDAZAnimationImportFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterTexturesFolder)) return nullptr;
+	 if (!FDazToUnrealUtils::MakeDirectoryAndCheck(LocalCharacterMaterialFolder)) return nullptr;
 
 	 if (AssetType == DazAssetType::Environment)
 	 {
@@ -391,7 +391,7 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 	 // If there isn't an FBX file, stop
 	 if (!FPaths::FileExists(FBXFile))
 	 {
-		  return false;
+		  return nullptr;
 	 }
 
 	 // Load subdivision info
@@ -967,12 +967,12 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 	 // Make folders for saving the updated FBX file
 	 FString UpdatedFBXFolder = FPaths::GetPath(FBXFile) / TEXT("UpdatedFBX");
 	 FString UpdatedFBXFile = FPaths::GetPath(FBXFile) / TEXT("UpdatedFBX") / FPaths::GetCleanFilename(FBXPath);
-	 if (!MakeDirectoryAndCheck(UpdatedFBXFolder)) return false;
+	 if (!MakeDirectoryAndCheck(UpdatedFBXFolder)) return nullptr;
 
 	 // Initialize the exporter by providing a filename.
 	 if (!Exporter->Initialize(TCHAR_TO_UTF8(*UpdatedFBXFile), FileFormat, SdkManager->GetIOSettings()))
 	 {
-		  return false;
+		  return nullptr;
 	 }
 
 	 // Export the scene.

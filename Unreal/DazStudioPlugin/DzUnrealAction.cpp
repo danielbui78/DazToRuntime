@@ -80,7 +80,7 @@ void DzUnrealAction::executeAction()
         // Collect the values from the dialog fields
         CharacterName = dlg->assetNameEdit->text();
         ImportFolder = dlg->intermediateFolderEdit->text();
-        CharacterFolder = ImportFolder + "\\" + CharacterName + "\\";
+        CharacterFolder = ImportFolder + "/" + CharacterName + "/";
         CharacterFBX = CharacterFolder + CharacterName + ".fbx";
         CharacterBaseFBX = CharacterFolder + CharacterName + "_base.fbx";
         CharacterHDFBX = CharacterFolder + CharacterName + "_HD.fbx";

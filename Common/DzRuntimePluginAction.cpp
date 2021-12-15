@@ -75,7 +75,7 @@ void DzRuntimePluginAction::Export()
 			AssetType = "StaticMesh";
 			CharacterName = iter.key();
 			CharacterName = CharacterName.remove(QRegExp("[^A-Za-z0-9_]"));
-			CharacterFolder = ImportFolder + "\\" + CharacterName + "\\";
+			CharacterFolder = ImportFolder + "/" + CharacterName + "/";
 			CharacterFBX = CharacterFolder + CharacterName + ".fbx";
 			DzNode* Node = iter.value();
 
@@ -118,7 +118,7 @@ void DzRuntimePluginAction::Export()
 
 		// After the props have been exported, export the environment
 		CharacterName = OriginalCharacterName;
-		CharacterFolder = ImportFolder + "\\" + CharacterName + "\\";
+		CharacterFolder = ImportFolder + "/" + CharacterName + "/";
 		CharacterFBX = CharacterFolder + CharacterName + ".fbx";
 		Selection = OriginalSelection;
 		AssetType = "Environment";
