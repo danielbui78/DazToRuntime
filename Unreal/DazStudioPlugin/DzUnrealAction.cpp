@@ -267,15 +267,28 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 				DzMaterial* Material = Shape->getMaterial(i);
 				if (Material)
 				{
-					 DzPresentation* presentation = Node->getPresentation();
+					Writer.startObject(true);
+					Writer.addMember("Version", 2);
+					Writer.addMember("Asset Name", Node->getLabel());
+					Writer.addMember("Material Name", Material->getName());
+					Writer.addMember("Material Type", Material->getMaterialName());
+					DzPresentation* presentation = Node->getPresentation();
+					if (presentation)
+					{
+						const QString presentationType = presentation->getType();
+						Writer.addMember("Value", presentationType);
+					}
+					else
+					{
+						Writer.addMember("Value", QString("Unknown"));
+					}
+
+					 Writer.startMemberArray("Properties", true);
+					 // Presentation node is stored as first element in Property array for compatibility with UE plugin's basematerial search algorithm
 					 if (presentation)
 					 {
 						  const QString presentationType = presentation->getType();
 						  Writer.startObject(true);
-						  Writer.addMember("Version", 2);
-						  Writer.addMember("Asset Name", Node->getLabel());
-						  Writer.addMember("Material Name", Material->getName());
-						  Writer.addMember("Material Type", Material->getMaterialName());
 						  Writer.addMember("Name", QString("Asset Type"));
 						  Writer.addMember("Value", presentationType);
 						  Writer.addMember("Data Type", QString("String"));
@@ -303,10 +316,10 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 								}
 
 								Writer.startObject(true);
-								Writer.addMember("Version", 2);
-								Writer.addMember("Asset Name", Node->getLabel());
-								Writer.addMember("Material Name", Material->getName());
-								Writer.addMember("Material Type", Material->getMaterialName());
+//								Writer.addMember("Version", 2);
+//								Writer.addMember("Asset Name", Node->getLabel());
+//								Writer.addMember("Material Name", Material->getName());
+//								Writer.addMember("Material Type", Material->getMaterialName());
 								Writer.addMember("Name", Name);
 								Writer.addMember("Value", Material->getDiffuseColor().name());
 								Writer.addMember("Data Type", QString("Texture"));
@@ -331,10 +344,10 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 								}
 
 								Writer.startObject(true);
-								Writer.addMember("Version", 2);
-								Writer.addMember("Asset Name", Node->getLabel());
-								Writer.addMember("Material Name", Material->getName());
-								Writer.addMember("Material Type", Material->getMaterialName());
+//								Writer.addMember("Version", 2);
+//								Writer.addMember("Asset Name", Node->getLabel());
+//								Writer.addMember("Material Name", Material->getName());
+//								Writer.addMember("Material Type", Material->getMaterialName());
 								Writer.addMember("Name", Name);
 								Writer.addMember("Value", ColorProperty->getColorValue().name());
 								Writer.addMember("Data Type", QString("Color"));
@@ -359,10 +372,10 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 								}
 
 								Writer.startObject(true);
-								Writer.addMember("Version", 2);
-								Writer.addMember("Asset Name", Node->getLabel());
-								Writer.addMember("Material Name", Material->getName());
-								Writer.addMember("Material Type", Material->getMaterialName());
+//								Writer.addMember("Version", 2);
+//								Writer.addMember("Asset Name", Node->getLabel());
+//								Writer.addMember("Material Name", Material->getName());
+//								Writer.addMember("Material Type", Material->getMaterialName());
 								Writer.addMember("Name", Name);
 								Writer.addMember("Value", NumericProperty->getDoubleValue());
 								Writer.addMember("Data Type", QString("Double"));
@@ -373,7 +386,11 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 									Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << NumericProperty->getDoubleValue() << ", " << "Double" << ", " << TextureName << endl;
 								}
 						  }
-					 }
+					 } // for (int propertyIndex = 0;
+
+					 Writer.finishArray();
+
+					 Writer.finishObject();
 				}
 		  }
 	 }
