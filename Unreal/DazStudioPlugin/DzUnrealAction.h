@@ -11,8 +11,9 @@
 #include "DzUnrealSubdivisionDialog.h"
 
 class DzUnrealAction : public DzRuntimePluginAction {
-    Q_OBJECT
+	Q_OBJECT
     Q_PROPERTY(int NonInteractiveMode READ getNonInteractiveMode WRITE setNonInteractiveMode)
+	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
 public:
 	 DzUnrealAction();
 
@@ -20,6 +21,7 @@ protected:
 	 int Port;
      int NonInteractiveMode;
 	 DzUnrealSubdivisionDialog* SubdivisionDialog;
+	 QString AssetType;
 
 	 void executeAction();
 	 void WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStream& Stream);
@@ -29,4 +31,7 @@ protected:
 	 void SetExportOptions(DzFileIOSettings& ExportOptions);
      int getNonInteractiveMode();
      void setNonInteractiveMode(int);
+	 QString getAssetType();
+	 void setAssetType(QString arg_AssetType);
+
 };

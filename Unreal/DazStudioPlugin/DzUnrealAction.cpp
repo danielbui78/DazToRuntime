@@ -32,6 +32,7 @@ DzUnrealAction::DzUnrealAction() :
 	 Port = 0;
 	 SubdivisionDialog = nullptr;
      NonInteractiveMode = 0;
+	 AssetType = QString("SkeletalMesh");
 	 //Setup Icon
 	 QString iconName = "icon";
 	 QPixmap basePixmap = QPixmap::fromImage(getEmbeddedImage(iconName.toLatin1()));
@@ -448,5 +449,14 @@ int DzUnrealAction::getNonInteractiveMode() {
     return this->NonInteractiveMode;
 }
 
+void DzUnrealAction::setAssetType(QString arg_AssetType) 
+{
+	this->AssetType = arg_AssetType;
+}
+
+QString DzUnrealAction::getAssetType() 
+{
+	return this->AssetType;
+}
 
 #include "moc_DzUnrealAction.cpp"
