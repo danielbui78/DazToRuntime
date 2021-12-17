@@ -432,6 +432,9 @@ void UnofficialDzUnityAction::WriteConfiguration()
 	 writer.addMember("FBX File", CharacterFBX);
 	 writer.addMember("Import Folder", CharacterFolder);
 
+	 WriteModifiers(Selection, writer);
+
+
 	 writer.startMemberArray("Materials", true);
 	 WriteMaterials(Selection, writer);
 	 writer.finishArray();
@@ -1227,5 +1230,21 @@ bool UnofficialDzUnityAction::metaInvokeMethod(QObject* object, const char* meth
 	return false;
 }
 
+void UnofficialDzUnityAction::WriteModifiers(DzNode* Node, DzJsonWriter& Writer)
+{
+	DzObject* Object = Node->getObject();
+	DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
+
+	if (Shape)
+	{
+		DzModifierIterator modIter = Object->modifierIterator();
+		while (modIter.hasNext())
+		{
+			DzModifier* modifier = modIter.next();
+			QString mod_Class = modifier->className();
+		}
+	}
+
+}
 
 #include "moc_DzUnityAction.cpp"

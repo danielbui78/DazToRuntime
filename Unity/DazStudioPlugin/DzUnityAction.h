@@ -73,6 +73,7 @@ protected:
 	 Q_INVOKABLE void WriteConfiguration();
 	 Q_INVOKABLE void SetExportOptions(DzFileIOSettings& ExportOptions);
 	 Q_INVOKABLE void CreateUnityFiles(bool replace = true);
+	 Q_INVOKABLE void WriteModifiers(DzNode* Node, DzJsonWriter& Stream);
 
 	 bool metaInvokeMethod(QObject* object, const char* methodSig, void** returnPtr);
 	 Q_INVOKABLE DzWeightMapPtr getWeightMapPtr(DzNode* Node);
