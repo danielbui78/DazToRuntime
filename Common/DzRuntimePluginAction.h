@@ -17,15 +17,17 @@ class DzRuntimePluginAction : public DzAction {
 	Q_OBJECT
 	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
 	Q_PROPERTY(QString ExportFilename READ getExportFilename WRITE setExportFilename)
+	Q_PROPERTY(QString ExportFolder READ getExportFolder WRITE setExportFolder)
+	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
 	 virtual ~DzRuntimePluginAction();
 
 protected:
-	 QString CharacterName;
-	 QString ImportFolder;
-	 QString CharacterFolder;
+	 QString CharacterName; // Exported filename without extension
+	 QString RootFolder; // The destination Root Folder
+	 QString DestinationPath; // Path to destination files: <RootFolder> + "/" + <CharacterName (folder)> + "/"
 	 QString CharacterFBX;
 	 QString CharacterBaseFBX;
 	 QString CharacterHDFBX;
@@ -34,6 +36,9 @@ protected:
 	 QString FBXVersion;
 	 QMap<QString,QString> MorphMapping;
 	 QList<QString> PoseList;
+
+	 // Used only by script system
+	 QString ExportFolder; // over-rides bridge use of <CharacterName> for the destination folder
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
@@ -77,5 +82,10 @@ protected:
 	 void setAssetType(QString arg_AssetType) { this->AssetType = arg_AssetType; };
 	 QString getExportFilename() { return this->CharacterName; };
 	 void setExportFilename(QString arg_Filename) { this->CharacterName = arg_Filename; };
+
+	 QString getExportFolder() { return this->ExportFolder; };
+	 void setExportFolder(QString arg_Folder) { this->ExportFolder = arg_Folder; };
+	 QString getRootFolder() { return this->RootFolder; };
+	 void setRootFolder(QString arg_Root) { this->RootFolder = arg_Root; };
 
 };

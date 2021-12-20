@@ -75,8 +75,8 @@ void DzRuntimePluginAction::Export()
 			AssetType = "StaticMesh";
 			CharacterName = iter.key();
 			CharacterName = CharacterName.remove(QRegExp("[^A-Za-z0-9_]"));
-			CharacterFolder = ImportFolder + "/" + CharacterName + "/";
-			CharacterFBX = CharacterFolder + CharacterName + ".fbx";
+			DestinationPath = RootFolder + "/" + CharacterName + "/";
+			CharacterFBX = DestinationPath + CharacterName + ".fbx";
 			DzNode* Node = iter.value();
 
 			// If this is a figure, send it as a skeletal mesh
@@ -118,8 +118,8 @@ void DzRuntimePluginAction::Export()
 
 		// After the props have been exported, export the environment
 		CharacterName = OriginalCharacterName;
-		CharacterFolder = ImportFolder + "/" + CharacterName + "/";
-		CharacterFBX = CharacterFolder + CharacterName + ".fbx";
+		DestinationPath = RootFolder + "/" + ExportFolder + "/";
+		CharacterFBX = DestinationPath + CharacterName + ".fbx";
 		Selection = OriginalSelection;
 		AssetType = "Environment";
 		ExportNode(Selection);
@@ -276,7 +276,7 @@ void DzRuntimePluginAction::ExportNode(DzNode* Node)
 	 if (AssetType == "Environment")
 	 {
 		 QDir dir;
-		 dir.mkpath(CharacterFolder);
+		 dir.mkpath(DestinationPath);
 		 WriteConfiguration();
 		 return;
 	 }
@@ -342,7 +342,7 @@ void DzRuntimePluginAction::ExportNode(DzNode* Node)
 		  RenameDuplicateMaterials(Parent, MaterialNames, OriginalMaterialNames);
 
 		  QDir dir;
-		  dir.mkpath(CharacterFolder);
+		  dir.mkpath(DestinationPath);
 
 		  SetExportOptions(ExportOptions);
 

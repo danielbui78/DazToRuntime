@@ -76,18 +76,27 @@ void DzUnrealAction::executeAction()
 	//////////////////////////////////////
 	// Connect bridge dialog to exposed properties for scripting
 	//////////////////////////////////////
-	if (NonInteractiveMode == 1)
+	if (true)
 	{
 		// 1) dialog AssetType to get/setAssetType
 		connect(BridgeDialog->assetTypeCombo, SIGNAL(static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated)), this, SLOT(setAssetType()));
 		// TODO: add "Data" field with sanitized AssetType string to comboBox
 		// TODO: then, change findText to findData
-		BridgeDialog->assetTypeCombo->setCurrentIndex(BridgeDialog->assetTypeCombo->findText(AssetType));
+		//BridgeDialog->assetTypeCombo->setCurrentIndex(BridgeDialog->assetTypeCombo->findText(AssetType));
 
 		// 2) dialog AssetName to get/setExportFilename
 		connect(BridgeDialog->assetNameEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setExportFilename()));
 		// TODO: assess whether ValidateText is needed below
 		if (CharacterName != "") BridgeDialog->assetNameEdit->setText( CharacterName );
+
+		// 3) ?? to get/setExportFolder
+		// n/a: Not accessible by Bridge UI, ExportFolder is script-only for now
+		// TODO: Folder name validation on ExportFolder
+
+		// 4) dialog intermediateFolder (aka RootFolder) to get/setRootFolder
+		connect(BridgeDialog->intermediateFolderEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setRootFolder()));
+		// TODO: Folder name validation on RootFolder
+		if (RootFolder != "") BridgeDialog->intermediateFolderEdit->setText( RootFolder );
 
 	}
 
@@ -101,11 +110,12 @@ void DzUnrealAction::executeAction()
     {
         // Collect the values from the dialog fields
         CharacterName = BridgeDialog->assetNameEdit->text();
-        ImportFolder = BridgeDialog->intermediateFolderEdit->text();
-        CharacterFolder = ImportFolder + "/" + CharacterName + "/";
-        CharacterFBX = CharacterFolder + CharacterName + ".fbx";
-        CharacterBaseFBX = CharacterFolder + CharacterName + "_base.fbx";
-        CharacterHDFBX = CharacterFolder + CharacterName + "_HD.fbx";
+		RootFolder = BridgeDialog->intermediateFolderEdit->text();
+		if (ExportFolder == "" || NonInteractiveMode == 0) ExportFolder = CharacterName;
+		DestinationPath = RootFolder + "/" + ExportFolder + "/";
+        CharacterFBX = DestinationPath + CharacterName + ".fbx";
+        CharacterBaseFBX = DestinationPath + CharacterName + "_base.fbx";
+        CharacterHDFBX = DestinationPath + CharacterName + "_HD.fbx";
 
 		// TODO: consider removing once findData( ) method above is completely implemented
 		if (NonInteractiveMode == 0) AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
@@ -136,7 +146,7 @@ void DzUnrealAction::executeAction()
 
 void DzUnrealAction::WriteConfiguration()
 {
-	 QString DTUfilename = CharacterFolder + CharacterName + ".dtu";
+	 QString DTUfilename = DestinationPath + CharacterName + ".dtu";
 	 QFile DTUfile(DTUfilename);
 	 DTUfile.open(QIODevice::WriteOnly);
 	 DzJsonWriter writer(&DTUfile);
@@ -146,13 +156,13 @@ void DzUnrealAction::WriteConfiguration()
 	 writer.addMember("FBX File", CharacterFBX);
 	 writer.addMember("Base FBX File", CharacterBaseFBX);
 	 writer.addMember("HD FBX File", CharacterHDFBX);
-	 writer.addMember("Import Folder", CharacterFolder);
+	 writer.addMember("Import Folder", DestinationPath);
 
 	 if (AssetType != "Environment")
 	 {
 		 if (ExportMaterialPropertiesCSV)
 		 {
-			 QString filename = CharacterFolder + CharacterName + "_Maps.csv";
+			 QString filename = DestinationPath + CharacterName + "_Maps.csv";
 			 QFile file(filename);
 			 file.open(QIODevice::WriteOnly);
 			 QTextStream stream(&file);
