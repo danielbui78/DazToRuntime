@@ -14,7 +14,8 @@ struct AttachmentInfo
 };
 
 class DzRuntimePluginAction : public DzAction {
-	 Q_OBJECT
+	Q_OBJECT
+	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -70,4 +71,8 @@ protected:
 
 	 // Need to be able to move asset instances to origin during environment export
 	 void UnlockTranform(DzNode* NodeToUnlock);
+
+	 QString getAssetType() { return this->AssetType; };
+	 void setAssetType(QString arg_AssetType) { this->AssetType = arg_AssetType; };
+
 };

@@ -45,11 +45,11 @@ void DzUnrealAction::executeAction()
 {
 	 // Check if the main window has been created yet.
 	 // If it hasn't, alert the user and exit early.
-     int nonInteractiveFlag = getNonInteractiveMode();
 	 DzMainWindow* mw = dzApp->getInterface();
 	 if (!mw)
 	 {
-         if (nonInteractiveFlag == 0) {
+         if (NonInteractiveMode == 0) 
+		 {
              QMessageBox::warning(0, tr("Error"),
                  tr("The main window has not been created yet."), QMessageBox::Ok);
          }
@@ -62,7 +62,8 @@ void DzUnrealAction::executeAction()
 	 // input from the user.
     if (dzScene->getNumSelectedNodes() != 1)
     {
-        if (nonInteractiveFlag == 0) {
+        if (NonInteractiveMode == 0) 
+		{
             QMessageBox::warning(0, tr("Error"),
                 tr("Please select one Character or Prop to send."), QMessageBox::Ok);
         }
@@ -70,31 +71,48 @@ void DzUnrealAction::executeAction()
     }
 
     // Create the dialog
-    DzUnrealDialog* dlg = new DzUnrealDialog(mw);
+    DzUnrealDialog* BridgeDialog = new DzUnrealDialog(mw);
+
+	//////////////////////////////////////
+	// Connect bridge dialog to exposed properties for scripting
+	//////////////////////////////////////
+	if (NonInteractiveMode == 1)
+	{
+		// 1) dialog AssetType to get/setAssetType
+		connect(BridgeDialog->assetTypeCombo, SIGNAL(static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated)), this, SLOT(setAssetType()));
+		// TODO: add "Data" field with sanitized AssetType string to comboBox
+		// TODO: then, change findText to findData
+		BridgeDialog->assetTypeCombo->setCurrentIndex(BridgeDialog->assetTypeCombo->findText(AssetType));
+	}
 
     // If the Accept button was pressed, start the export
-    int dlgRes = -1;
-    if (!nonInteractiveFlag)
-            dlgRes = dlg->exec();
-    if (nonInteractiveFlag == 1 || dlgRes == QDialog::Accepted)
+    int dialog_choice = -1;
+	if (NonInteractiveMode == 0)
+	{
+		dialog_choice = BridgeDialog->exec();
+	}
+    if (NonInteractiveMode == 1 || dialog_choice == QDialog::Accepted)
     {
         // Collect the values from the dialog fields
-        CharacterName = dlg->assetNameEdit->text();
-        ImportFolder = dlg->intermediateFolderEdit->text();
+        CharacterName = BridgeDialog->assetNameEdit->text();
+        ImportFolder = BridgeDialog->intermediateFolderEdit->text();
         CharacterFolder = ImportFolder + "/" + CharacterName + "/";
         CharacterFBX = CharacterFolder + CharacterName + ".fbx";
         CharacterBaseFBX = CharacterFolder + CharacterName + "_base.fbx";
         CharacterHDFBX = CharacterFolder + CharacterName + "_HD.fbx";
-        AssetType = dlg->assetTypeCombo->currentText().replace(" ", "");
-        MorphString = dlg->GetMorphString();
-        Port = dlg->portEdit->text().toInt();
-        ExportMorphs = dlg->morphsEnabledCheckBox->isChecked();
-        ExportSubdivisions = dlg->subdivisionEnabledCheckBox->isChecked();
-        MorphMapping = dlg->GetMorphMapping();
-        ShowFbxDialog = dlg->showFbxDialogCheckBox->isChecked();
-        ExportMaterialPropertiesCSV = dlg->exportMaterialPropertyCSVCheckBox->isChecked();
-        SubdivisionDialog = DzUnrealSubdivisionDialog::Get(dlg);
-        FBXVersion = dlg->fbxVersionCombo->currentText();
+
+		// TODO: consider removing once findData( ) method above is completely implemented
+		if (NonInteractiveMode == 0) AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
+
+        MorphString = BridgeDialog->GetMorphString();
+        Port = BridgeDialog->portEdit->text().toInt();
+        ExportMorphs = BridgeDialog->morphsEnabledCheckBox->isChecked();
+        ExportSubdivisions = BridgeDialog->subdivisionEnabledCheckBox->isChecked();
+        MorphMapping = BridgeDialog->GetMorphMapping();
+        ShowFbxDialog = BridgeDialog->showFbxDialogCheckBox->isChecked();
+        ExportMaterialPropertiesCSV = BridgeDialog->exportMaterialPropertyCSVCheckBox->isChecked();
+        SubdivisionDialog = DzUnrealSubdivisionDialog::Get(BridgeDialog);
+        FBXVersion = BridgeDialog->fbxVersionCombo->currentText();
 
         if (AssetType == "SkeletalMesh" && ExportSubdivisions)
         {
@@ -466,14 +484,5 @@ int DzUnrealAction::getNonInteractiveMode() {
     return this->NonInteractiveMode;
 }
 
-void DzUnrealAction::setAssetType(QString arg_AssetType) 
-{
-	this->AssetType = arg_AssetType;
-}
-
-QString DzUnrealAction::getAssetType() 
-{
-	return this->AssetType;
-}
 
 #include "moc_DzUnrealAction.cpp"
