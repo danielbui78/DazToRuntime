@@ -16,6 +16,7 @@ struct AttachmentInfo
 class DzRuntimePluginAction : public DzAction {
 	Q_OBJECT
 	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
+	Q_PROPERTY(QString ExportFilename READ getExportFilename WRITE setExportFilename)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -74,5 +75,7 @@ protected:
 
 	 QString getAssetType() { return this->AssetType; };
 	 void setAssetType(QString arg_AssetType) { this->AssetType = arg_AssetType; };
+	 QString getExportFilename() { return this->CharacterName; };
+	 void setExportFilename(QString arg_Filename) { this->CharacterName = arg_Filename; };
 
 };

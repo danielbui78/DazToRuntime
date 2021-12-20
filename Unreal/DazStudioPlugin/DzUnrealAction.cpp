@@ -83,6 +83,12 @@ void DzUnrealAction::executeAction()
 		// TODO: add "Data" field with sanitized AssetType string to comboBox
 		// TODO: then, change findText to findData
 		BridgeDialog->assetTypeCombo->setCurrentIndex(BridgeDialog->assetTypeCombo->findText(AssetType));
+
+		// 2) dialog AssetName to get/setExportFilename
+		connect(BridgeDialog->assetNameEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setExportFilename()));
+		// TODO: assess whether ValidateText is needed below
+		if (CharacterName != "") BridgeDialog->assetNameEdit->setText( CharacterName );
+
 	}
 
     // If the Accept button was pressed, start the export
