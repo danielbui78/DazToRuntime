@@ -98,6 +98,28 @@ void DzUnrealAction::executeAction()
 		// TODO: Folder name validation on RootFolder
 		if (RootFolder != "") BridgeDialog->intermediateFolderEdit->setText( RootFolder );
 
+		// 5) ScriptOnly_MorphList to MorphString
+		if (ScriptOnly_MorphList.isEmpty() == false)
+		{
+			ExportMorphs = true;
+			MorphString = ScriptOnly_MorphList.join("\n1\n");
+			MorphString += "\n1\n.CTRLVS\n2\nAnything\n0";
+			DzUnrealMorphSelectionDialog* MorphSelectionDialog = DzUnrealMorphSelectionDialog::Get(BridgeDialog);
+			MorphMapping.clear();
+			foreach(QString morphName, ScriptOnly_MorphList)
+			{
+				QString label = MorphSelectionDialog->GetMorphLabelFromName(morphName);
+				MorphMapping.insert(morphName, label);
+			}
+
+		}
+		else
+		{
+			ExportMorphs = false;
+			MorphString = "";
+			MorphMapping.clear();
+		}
+
 	}
 
     // If the Accept button was pressed, start the export
@@ -117,14 +139,18 @@ void DzUnrealAction::executeAction()
         CharacterBaseFBX = DestinationPath + CharacterName + "_base.fbx";
         CharacterHDFBX = DestinationPath + CharacterName + "_HD.fbx";
 
-		// TODO: consider removing once findData( ) method above is completely implemented
-		if (NonInteractiveMode == 0) AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
+		if (NonInteractiveMode == 0 )
+		{
+			// TODO: consider removing once findData( ) method above is completely implemented
+			AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
 
-        MorphString = BridgeDialog->GetMorphString();
-        Port = BridgeDialog->portEdit->text().toInt();
-        ExportMorphs = BridgeDialog->morphsEnabledCheckBox->isChecked();
+			MorphString = BridgeDialog->GetMorphString();
+			MorphMapping = BridgeDialog->GetMorphMapping();
+			ExportMorphs = BridgeDialog->morphsEnabledCheckBox->isChecked();
+		}
+
+		Port = BridgeDialog->portEdit->text().toInt();
         ExportSubdivisions = BridgeDialog->subdivisionEnabledCheckBox->isChecked();
-        MorphMapping = BridgeDialog->GetMorphMapping();
         ShowFbxDialog = BridgeDialog->showFbxDialogCheckBox->isChecked();
         ExportMaterialPropertiesCSV = BridgeDialog->exportMaterialPropertyCSVCheckBox->isChecked();
         SubdivisionDialog = DzUnrealSubdivisionDialog::Get(BridgeDialog);

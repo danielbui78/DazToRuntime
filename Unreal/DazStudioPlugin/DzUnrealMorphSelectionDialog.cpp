@@ -1017,4 +1017,20 @@ QMap<QString,QString> DzUnrealMorphSelectionDialog::GetMorphRenaming()
 	return morphNameMapping;
 }
 
+QString DzUnrealMorphSelectionDialog::GetMorphLabelFromName(QString morphName)
+{
+	if (morphs.isEmpty()) return QString();
+
+	if (morphs.contains(morphName))
+	{
+		MorphInfo morph = morphs[morphName];
+		return morph.Label;
+	}
+	else
+	{
+		return QString();
+	}
+
+}
+
 #include "moc_DzUnrealMorphSelectionDialog.cpp"

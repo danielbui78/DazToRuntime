@@ -21,6 +21,7 @@ class DzRuntimePluginAction : public DzAction {
 	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
 	Q_PROPERTY(QString ProductName READ getProductName WRITE setProductName)
 	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
+	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -43,6 +44,7 @@ protected:
 	 QString ExportFolder; // over-rides bridge use of <CharacterName> for the destination folder
 	 QString ProductName; // Daz Store Product Name, can contain spaces and special characters
 	 QString ProductComponentName; // Friendly name of Component of Daz Store Product, can contain spaces and special characters
+	 QStringList ScriptOnly_MorphList; // 
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
@@ -96,5 +98,8 @@ protected:
 	 void setProductName(QString arg_ProductName) { this->ProductName = arg_ProductName; };
 	 QString getProductComponentName() { return this->ProductComponentName; };
 	 void setProductComponentName(QString arg_ProductComponentName) { this->ProductComponentName = arg_ProductComponentName; };
+
+	 QStringList getMorphList() { return ScriptOnly_MorphList; };
+	 void setMorphList(QStringList arg_MorphList) { this->ScriptOnly_MorphList = arg_MorphList; };
 
 };

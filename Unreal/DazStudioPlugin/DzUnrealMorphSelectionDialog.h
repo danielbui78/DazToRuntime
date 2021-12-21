@@ -89,6 +89,10 @@ public:
 	 // Recursive function for finding all active JCM morphs for a node
 	 QList<JointLinkInfo> GetActiveJointControlledMorphs(DzNode* Node = nullptr);
 
+	 // Retrieve label based on morph name
+	 // DB Dec-21-2021, Created for scripting.
+	 QString GetMorphLabelFromName(QString morphName);
+
 public slots:
 	 void FilterChanged(const QString& filter);
 	 void ItemSelectionChanged();
