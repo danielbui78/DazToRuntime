@@ -157,6 +157,9 @@ void DzUnrealAction::WriteConfiguration()
 	 writer.addMember("Base FBX File", CharacterBaseFBX);
 	 writer.addMember("HD FBX File", CharacterHDFBX);
 	 writer.addMember("Import Folder", DestinationPath);
+	 // DB Dec-21-2021: additional metadata
+	 writer.addMember("Product Name", ProductName);
+	 writer.addMember("Product Component Name", ProductComponentName);
 
 	 if (AssetType != "Environment")
 	 {
