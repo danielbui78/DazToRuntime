@@ -28,6 +28,7 @@ enum DazAssetType
 class FDazToUnrealModule : public IModuleInterface
 {
 public:
+	static int BatchConversionMode;
 
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
