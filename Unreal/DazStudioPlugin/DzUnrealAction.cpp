@@ -131,8 +131,8 @@ void DzUnrealAction::executeAction()
     if (NonInteractiveMode == 1 || dialog_choice == QDialog::Accepted)
     {
         // Collect the values from the dialog fields
-        CharacterName = BridgeDialog->assetNameEdit->text();
-		RootFolder = BridgeDialog->intermediateFolderEdit->text();
+		if (CharacterName == "" || NonInteractiveMode == 0) CharacterName = BridgeDialog->assetNameEdit->text();
+		if (RootFolder == "" || NonInteractiveMode == 0) RootFolder = BridgeDialog->intermediateFolderEdit->text();
 		if (ExportFolder == "" || NonInteractiveMode == 0) ExportFolder = CharacterName;
 		DestinationPath = RootFolder + "/" + ExportFolder + "/";
         CharacterFBX = DestinationPath + CharacterName + ".fbx";
