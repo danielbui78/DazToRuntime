@@ -18,6 +18,7 @@
 #include <dzfigure.h>
 #include <dzfacetmesh.h>
 #include <dzbone.h>
+#include <dzcontentmgr.h>
 //#include <dznodeinstance.h>
 #include "idzsceneasset.h"
 #include "dzuri.h"
@@ -76,25 +77,32 @@ void DzUnrealAction::executeAction()
 	//////////////////////////////////////
 	// Connect bridge dialog to exposed properties for scripting
 	//////////////////////////////////////
-	if (true)
+	if (NonInteractiveMode == 1)
 	{
 		// 1) dialog AssetType to get/setAssetType
-		connect(BridgeDialog->assetTypeCombo, SIGNAL(static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated)), this, SLOT(setAssetType()));
+		//connect(BridgeDialog->assetTypeCombo, SIGNAL(static_cast<void(QComboBox::*)(const QString&)>(&QComboBox::activated)), this, SLOT(setAssetType()));
 		// TODO: add "Data" field with sanitized AssetType string to comboBox
 		// TODO: then, change findText to findData
 		//BridgeDialog->assetTypeCombo->setCurrentIndex(BridgeDialog->assetTypeCombo->findText(AssetType));
 
 		// 2) dialog AssetName to get/setExportFilename
-		connect(BridgeDialog->assetNameEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setExportFilename()));
+		//connect(BridgeDialog->assetNameEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setExportFilename()));
 		// TODO: assess whether ValidateText is needed below
-		if (CharacterName != "") BridgeDialog->assetNameEdit->setText( CharacterName );
+		if (CharacterName != "")
+		{
+			BridgeDialog->assetNameEdit->setText(CharacterName);
+		}
+		else
+		{
+			BridgeDialog->assetNameEdit->setText(dzScene->getPrimarySelection()->getLabel().remove(QRegExp("[^A-Za-z0-9_]")));
+		}
 
 		// 3) ?? to get/setExportFolder
 		// n/a: Not accessible by Bridge UI, ExportFolder is script-only for now
 		// TODO: Folder name validation on ExportFolder
 
 		// 4) dialog intermediateFolder (aka RootFolder) to get/setRootFolder
-		connect(BridgeDialog->intermediateFolderEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setRootFolder()));
+		//connect(BridgeDialog->intermediateFolderEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setRootFolder()));
 		// TODO: Folder name validation on RootFolder
 		if (RootFolder != "") BridgeDialog->intermediateFolderEdit->setText( RootFolder );
 
@@ -132,7 +140,7 @@ void DzUnrealAction::executeAction()
     {
         // Collect the values from the dialog fields
 		if (CharacterName == "" || NonInteractiveMode == 0) CharacterName = BridgeDialog->assetNameEdit->text();
-		if (RootFolder == "" || NonInteractiveMode == 0) RootFolder = BridgeDialog->intermediateFolderEdit->text();
+		if (RootFolder == "" || NonInteractiveMode == 0) RootFolder = BridgeDialog->intermediateFolderEdit->text().replace("\\","/");
 		if (ExportFolder == "" || NonInteractiveMode == 0) ExportFolder = CharacterName;
 		DestinationPath = RootFolder + "/" + ExportFolder + "/";
         CharacterFBX = DestinationPath + CharacterName + ".fbx";
@@ -177,6 +185,7 @@ void DzUnrealAction::WriteConfiguration()
 	 DTUfile.open(QIODevice::WriteOnly);
 	 DzJsonWriter writer(&DTUfile);
 	 writer.startObject(true);
+	 writer.addMember("DTU Version", 3);
 	 writer.addMember("Asset Name", CharacterName);
 	 writer.addMember("Asset Type", AssetType);
 	 writer.addMember("FBX File", CharacterFBX);
@@ -331,7 +340,7 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 				if (Material)
 				{
 					Writer.startObject(true);
-					Writer.addMember("Version", 2);
+					Writer.addMember("Version", 3);
 					Writer.addMember("Asset Name", Node->getLabel());
 					Writer.addMember("Material Name", Material->getName());
 					Writer.addMember("Material Type", Material->getMaterialName());
@@ -367,88 +376,76 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 					 for (int propertyIndex = 0; propertyIndex < Material->getNumProperties(); propertyIndex++)
 					 {
 						  DzProperty* Property = Material->getProperty(propertyIndex);
+						  QString Name = Property->getName();
+						  QString TextureName = "";
+						  QString dtuPropType = "";
+						  QString dtuPropValue = "";
+						  double dtuPropNumericValue = 0.0;
+						  bool bUseNumeric = false;
+
 						  DzImageProperty* ImageProperty = qobject_cast<DzImageProperty*>(Property);
+						  DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
+						  DzColorProperty* ColorProperty = qobject_cast<DzColorProperty*>(Property);
 						  if (ImageProperty)
 						  {
-								QString Name = Property->getName();
-								QString TextureName = "";
-
 								if (ImageProperty->getValue())
 								{
 									 TextureName = ImageProperty->getValue()->getFilename();
 								}
-
-								Writer.startObject(true);
-//								Writer.addMember("Version", 2);
-//								Writer.addMember("Asset Name", Node->getLabel());
-//								Writer.addMember("Material Name", Material->getName());
-//								Writer.addMember("Material Type", Material->getMaterialName());
-								Writer.addMember("Name", Name);
-								Writer.addMember("Value", Material->getDiffuseColor().name());
-								Writer.addMember("Data Type", QString("Texture"));
-								Writer.addMember("Texture", TextureName);
-								Writer.finishObject();
-								if (ExportMaterialPropertiesCSV)
-								{
-									Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << Material->getDiffuseColor().name() << ", " << "Texture" << ", " << TextureName << endl;
-								}
-								continue;
+								dtuPropValue = Material->getDiffuseColor().name();
+								dtuPropType = QString("Texture");
 						  }
-
-						  DzColorProperty* ColorProperty = qobject_cast<DzColorProperty*>(Property);
-						  if (ColorProperty)
+						  // DzColorProperty is subclass of DzNumericProperty
+						  else if (ColorProperty)
 						  {
-								QString Name = Property->getName();
-								QString TextureName = "";
-
 								if (ColorProperty->getMapValue())
 								{
 									 TextureName = ColorProperty->getMapValue()->getFilename();
 								}
-
-								Writer.startObject(true);
-//								Writer.addMember("Version", 2);
-//								Writer.addMember("Asset Name", Node->getLabel());
-//								Writer.addMember("Material Name", Material->getName());
-//								Writer.addMember("Material Type", Material->getMaterialName());
-								Writer.addMember("Name", Name);
-								Writer.addMember("Value", ColorProperty->getColorValue().name());
-								Writer.addMember("Data Type", QString("Color"));
-								Writer.addMember("Texture", TextureName);
-								Writer.finishObject();
-								if (ExportMaterialPropertiesCSV)
-								{
-									Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << ColorProperty->getColorValue().name() << ", " << "Color" << ", " << TextureName << endl;
-								}
-								continue;
+								dtuPropValue = ColorProperty->getColorValue().name();
+								dtuPropType = QString("Color");
 						  }
-
-						  DzNumericProperty* NumericProperty = qobject_cast<DzNumericProperty*>(Property);
-						  if (NumericProperty)
+						  else if (NumericProperty)
 						  {
-								QString Name = Property->getName();
-								QString TextureName = "";
-
-								if (NumericProperty->getMapValue())
-								{
-									 TextureName = NumericProperty->getMapValue()->getFilename();
-								}
-
-								Writer.startObject(true);
-//								Writer.addMember("Version", 2);
-//								Writer.addMember("Asset Name", Node->getLabel());
-//								Writer.addMember("Material Name", Material->getName());
-//								Writer.addMember("Material Type", Material->getMaterialName());
-								Writer.addMember("Name", Name);
-								Writer.addMember("Value", NumericProperty->getDoubleValue());
-								Writer.addMember("Data Type", QString("Double"));
-								Writer.addMember("Texture", TextureName);
-								Writer.finishObject();
-								if (ExportMaterialPropertiesCSV)
-								{
-									Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << NumericProperty->getDoubleValue() << ", " << "Double" << ", " << TextureName << endl;
-								}
+							  if (NumericProperty->getMapValue())
+							  {
+								  TextureName = NumericProperty->getMapValue()->getFilename();
+							  }
+							  dtuPropType = QString("Double");
+							  dtuPropNumericValue = NumericProperty->getDoubleValue();
+							  bUseNumeric = true;
 						  }
+						  else
+						  {
+							  // unsupported property type
+							  continue;
+						  }
+
+						  QString dtuTextureName = TextureName;
+						  if (this->UseRelativePaths)
+						  {
+							  dtuTextureName = dzApp->getContentMgr()->getRelativePath(TextureName, true);
+						  }
+						  if (IsTemporaryFile(TextureName))
+						  {
+							  dtuTextureName = ExportWithDTU(TextureName, Node->getLabel() + "_" + Material->getName());
+						  }
+						  if (bUseNumeric)
+							  WriteJSON_PropertyTexture(Writer, Name, dtuPropNumericValue, dtuPropType, dtuTextureName);
+						  else
+							  WriteJSON_PropertyTexture(Writer, Name, dtuPropValue, dtuPropType, dtuTextureName);
+
+						  if (ExportMaterialPropertiesCSV)
+						  {
+							  if (bUseNumeric)
+								  Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << dtuPropNumericValue << ", " << dtuPropType << ", " << TextureName << endl;
+							  else
+								  Stream << "2, " << Node->getLabel() << ", " << Material->getName() << ", " << Material->getMaterialName() << ", " << Name << ", " << dtuPropValue << ", " << dtuPropType << ", " << TextureName << endl;
+						  }
+						  continue;
+
+
+
 					 } // for (int propertyIndex = 0;
 
 					 Writer.finishArray();
