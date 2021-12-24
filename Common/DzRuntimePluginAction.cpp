@@ -641,4 +641,97 @@ void DzRuntimePluginAction::UnlockTranform(DzNode* NodeToUnlock)
 	Property->lock(false);
 }
 
+bool DzRuntimePluginAction::IsTemporaryFile(QString sFilename)
+{
+	QString cleanedFilename = sFilename.toLower().replace("\\", "/");
+	QString cleanedTempPath = dzApp->getTempPath().toLower().replace("\\", "/");
+
+	if (cleanedFilename.contains(cleanedTempPath))
+	{
+		return true;
+	}
+
+	return false;
+}
+
+QString DzRuntimePluginAction::ExportWithDTU(QString sFilename, QString sAssetMaterialName)
+{
+	if (sFilename.isEmpty()) 
+		return sFilename;
+
+	QString cleanedFilename = sFilename.toLower().replace("\\", "/");
+	QString cleanedTempPath = dzApp->getTempPath().toLower().replace("\\", "/");
+	QString cleanedAssetMaterialName = sAssetMaterialName;
+	cleanedAssetMaterialName.remove(QRegExp("[^A-Za-z0-9_]"));
+
+	QString exportPath = this->RootFolder.replace("\\","/") + "/" + this->ExportFolder.replace("\\", "/");
+	QString fileStem = QFileInfo(sFilename).fileName();
+
+	exportPath += "/ExportTextures/";
+	QDir().mkpath(exportPath);
+//	QString exportFilename = exportPath + cleanedAssetMaterialName + "_" + fileStem;
+	QString exportFilename = exportPath + fileStem;
+
+	exportFilename = MakeUniqueFilename(exportFilename);
+
+	if (QFile(sFilename).copy(exportFilename) == true)
+	{
+		return exportFilename;
+	}
+
+	// copy method may fail if file already exists,
+	// if exists and same file size, then proceed as if successful
+	if ( QFileInfo(exportFilename).exists() &&
+		QFileInfo(sFilename).size() == QFileInfo(exportFilename).size())
+	{
+		return exportFilename;
+	}
+
+	// return original source string if failed
+	return sFilename;
+
+}
+
+QString DzRuntimePluginAction::MakeUniqueFilename(QString sFilename)
+{
+	if (QFileInfo(sFilename).exists() != true)
+		return sFilename;
+
+	QString newFilename = sFilename;
+	int duplicate_count = 0;
+
+	while ( 
+		QFileInfo(newFilename).exists() &&
+		QFileInfo(sFilename).size() != QFileInfo(newFilename).size()
+		)
+	{
+		newFilename = sFilename + QString("_%i").arg(duplicate_count++);
+	}
+
+	return newFilename;
+
+}
+
+void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture)
+{
+	Writer.startObject(true);
+	Writer.addMember("Name", sName);
+	Writer.addMember("Value", sValue);
+	Writer.addMember("Data Type", sType);
+	Writer.addMember("Texture", sTexture);
+	Writer.finishObject();
+
+}
+
+void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture)
+{
+	Writer.startObject(true);
+	Writer.addMember("Name", sName);
+	Writer.addMember("Value", dValue);
+	Writer.addMember("Data Type", sType);
+	Writer.addMember("Texture", sTexture);
+	Writer.finishObject();
+
+}
+
 #include "moc_DzRuntimePluginAction.cpp"

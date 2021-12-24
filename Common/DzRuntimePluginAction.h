@@ -2,6 +2,7 @@
 #include <dzaction.h>
 #include <dznode.h>
 #include <DzFileIOSettings.h>
+#include <dzjsonwriter.h>
 
 #include "QtCore/qfile.h"
 #include "QtCore/qtextstream.h"
@@ -22,6 +23,7 @@ class DzRuntimePluginAction : public DzAction {
 	Q_PROPERTY(QString ProductName READ getProductName WRITE setProductName)
 	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
 	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
+	Q_PROPERTY(bool UseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -44,7 +46,8 @@ protected:
 	 QString ExportFolder; // over-rides bridge use of <CharacterName> for the destination folder
 	 QString ProductName; // Daz Store Product Name, can contain spaces and special characters
 	 QString ProductComponentName; // Friendly name of Component of Daz Store Product, can contain spaces and special characters
-	 QStringList ScriptOnly_MorphList; // 
+	 QStringList ScriptOnly_MorphList; // overrides Morph Selection Dialog
+	 bool UseRelativePaths;
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
@@ -101,5 +104,14 @@ protected:
 
 	 QStringList getMorphList() { return ScriptOnly_MorphList; };
 	 void setMorphList(QStringList arg_MorphList) { this->ScriptOnly_MorphList = arg_MorphList; };
+
+	 bool getUseRelativePaths() { return this->UseRelativePaths; };
+	 void setUseRelativePaths(bool arg_UseRelativePaths) { this->UseRelativePaths = arg_UseRelativePaths; };
+
+	 bool IsTemporaryFile(QString sFilename);
+	 QString ExportWithDTU(QString sFilename, QString sAssetMaterialName = "");
+	 void WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture);
+	 void WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture);
+	 QString MakeUniqueFilename(QString sFilename);
 
 };
