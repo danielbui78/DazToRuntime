@@ -514,6 +514,93 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 
 		  // Version 2 "Version, ObjectName, Material, Type, Color, Opacity, File"
 		  if (Version == 2)
+		  {
+			  FString ObjectName = material->GetStringField(TEXT("Asset Name"));
+			  ObjectName = FDazToUnrealUtils::SanitizeName(ObjectName);
+			  IntermediateMaterials.AddUnique(ObjectName + TEXT("_BaseMat"));
+			  FString ShaderName = material->GetStringField(TEXT("Material Type"));
+			  FString MaterialName;
+			  if (CachedSettings->UseOriginalMaterialName)
+			  {
+				  MaterialName = material->GetStringField(TEXT("Material Name"));
+			  }
+			  else
+			  {
+				  MaterialName = AssetName + TEXT("_") + material->GetStringField(TEXT("Material Name"));
+			  }
+
+			  MaterialName = FDazToUnrealUtils::SanitizeName(MaterialName);
+			  FString TexturePath = material->GetStringField(TEXT("Texture"));
+			  FString TextureName = FDazToUnrealUtils::SanitizeName(FPaths::GetBaseFilename(TexturePath));
+
+			  if (!MaterialProperties.Contains(MaterialName))
+			  {
+				  MaterialProperties.Add(MaterialName, TArray<FDUFTextureProperty>());
+			  }
+			  FDUFTextureProperty Property;
+			  Property.Name = material->GetStringField(TEXT("Name"));
+			  Property.Type = material->GetStringField(TEXT("Data Type"));
+			  Property.Value = material->GetStringField(TEXT("Value"));
+			  Property.ObjectName = ObjectName;
+			  Property.ShaderName = ShaderName;
+			  if (Property.Type == TEXT("Texture"))
+			  {
+				  Property.Type = TEXT("Color");
+			  }
+
+			  // Properties that end with Enabled are switches for functionality
+			  if (Property.Name.EndsWith(TEXT(" Enable")))
+			  {
+				  Property.Type = TEXT("Switch");
+				  if (Property.Value == TEXT("0"))
+				  {
+					  Property.Value = TEXT("false");
+				  }
+				  else
+				  {
+					  Property.Value = TEXT("true");
+				  }
+			  }
+
+			  MaterialProperties[MaterialName].Add(Property);
+			  if (!TextureName.IsEmpty())
+			  {
+				  // If a texture is attached add a texture property
+				  FDUFTextureProperty TextureProperty;
+				  TextureProperty.Name = material->GetStringField(TEXT("Name")) + TEXT(" Texture");
+				  TextureProperty.Type = TEXT("Texture");
+				  TextureProperty.ObjectName = ObjectName;
+				  TextureProperty.ShaderName = ShaderName;
+
+				  if (!TextureFileSourceToTarget.Contains(TexturePath))
+				  {
+					  int32 TextureCount = 0;
+					  FString NewTextureName = FString::Printf(TEXT("%s_%02d_%s"), *TextureName, TextureCount, *AssetName);
+					  while (TextureFileSourceToTarget.FindKey(NewTextureName) != nullptr)
+					  {
+						  TextureCount++;
+						  NewTextureName = FString::Printf(TEXT("%s_%02d_%s"), *TextureName, TextureCount, *AssetName);
+					  }
+					  TextureFileSourceToTarget.Add(TexturePath, NewTextureName);
+				  }
+
+				  TextureProperty.Value = TextureFileSourceToTarget[TexturePath];
+				  MaterialProperties[MaterialName].Add(TextureProperty);
+				  //TextureFiles.AddUnique(TexturePath);
+
+				  // and a switch property for things like Specular that could come from different channels
+				  FDUFTextureProperty SwitchProperty;
+				  SwitchProperty.Name = material->GetStringField(TEXT("Name")) + TEXT(" Texture Active");
+				  SwitchProperty.Type = TEXT("Switch");
+				  SwitchProperty.Value = TEXT("true");
+				  SwitchProperty.ObjectName = ObjectName;
+				  SwitchProperty.ShaderName = ShaderName;
+				  MaterialProperties[MaterialName].Add(SwitchProperty);
+			  }
+		  }
+
+		  // Version 3 "Version, ObjectName, Material, [Type, Color, Opacity, File]"
+		  if (Version == 3)
 		  {		
 				FString ObjectName = material->GetStringField(TEXT("Asset Name"));
 				ObjectName = FDazToUnrealUtils::SanitizeName(ObjectName);
