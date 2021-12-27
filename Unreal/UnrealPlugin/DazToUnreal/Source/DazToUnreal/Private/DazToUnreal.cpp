@@ -631,17 +631,17 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 				TArray<TSharedPtr<FJsonValue>> propList = material->GetArrayField(TEXT("Properties"));
 				for (int32 propIndex = 0; propIndex < propList.Num(); propIndex++)
 				{
-					TSharedPtr<FJsonObject> prop_Json = propList[propIndex]->AsObject();
+					TSharedPtr<FJsonObject> propListElement = propList[propIndex]->AsObject();
 
 					FDUFTextureProperty Property;
 //					Property.Name = material->GetStringField(TEXT("Name"));
 //					Property.Type = material->GetStringField(TEXT("Data Type"));
 //					Property.Value = material->GetStringField(TEXT("Value"));
-					Property.Name = prop_Json->GetStringField(TEXT("Name"));
-					Property.Type = prop_Json->GetStringField(TEXT("Data Type"));
-					Property.Value = prop_Json->GetStringField(TEXT("Value"));
+					Property.Name = propListElement->GetStringField(TEXT("Name"));
+					Property.Type = propListElement->GetStringField(TEXT("Data Type"));
+					Property.Value = propListElement->GetStringField(TEXT("Value"));
 					// Moved from "per material" execution above
-					FString TexturePath = prop_Json->GetStringField(TEXT("Texture"));
+					FString TexturePath = propListElement->GetStringField(TEXT("Texture"));
 					FString TextureName = FDazToUnrealUtils::SanitizeName(FPaths::GetBaseFilename(TexturePath));
 
 					Property.ObjectName = ObjectName;
@@ -670,7 +670,7 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 					{
 						// If a texture is attached add a texture property
 						FDUFTextureProperty TextureProperty;
-						TextureProperty.Name = prop_Json->GetStringField(TEXT("Name")) + TEXT(" Texture");
+						TextureProperty.Name = propListElement->GetStringField(TEXT("Name")) + TEXT(" Texture");
 						TextureProperty.Type = TEXT("Texture");
 						TextureProperty.ObjectName = ObjectName;
 						TextureProperty.ShaderName = ShaderName;
@@ -693,7 +693,7 @@ UObject* FDazToUnrealModule::ImportFromDaz(TSharedPtr<FJsonObject> JsonObject)
 
 						// and a switch property for things like Specular that could come from different channels
 						FDUFTextureProperty SwitchProperty;
-						SwitchProperty.Name = prop_Json->GetStringField(TEXT("Name")) + TEXT(" Texture Active");
+						SwitchProperty.Name = propListElement->GetStringField(TEXT("Name")) + TEXT(" Texture Active");
 						SwitchProperty.Type = TEXT("Switch");
 						SwitchProperty.Value = TEXT("true");
 						SwitchProperty.ObjectName = ObjectName;
