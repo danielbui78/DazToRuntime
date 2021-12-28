@@ -46,6 +46,7 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 	 ExportSubdivisions = false;
 	 ShowFbxDialog = false;
 	 ControllersToDisconnect.append("facs_bs_MouthClose_div2");
+	 UseRelativePaths = false;
 }
 
 DzRuntimePluginAction::~DzRuntimePluginAction()

@@ -72,6 +72,12 @@ function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, s
 	obj = new DzUnrealAction()
 	obj.NonInteractiveMode = 1
 	
+	// obj.UseRelativePaths: set true for relative Daz Library runtime paths
+	//                       set false for absolute filepath
+	// Default to true to work with interactive mode
+	// obj.UseRelativePaths = true;
+	obj.UseRelativePaths = false;
+ 	
 	// obj.ExportFilename: filename stem for DTU and FBX file
 	// Can not have spaces or hyphen.  Underscore is OK
 	// Leave blank to default to sanitized Scene Node Label
