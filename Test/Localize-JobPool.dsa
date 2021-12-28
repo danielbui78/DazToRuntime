@@ -1,0 +1,132 @@
+// DAZ Studio version 4.16.0.3 filetype DAZ Script
+
+/////////////////////////////
+// Localize-JobPool
+/////////////////////////////
+//
+// Converts all DTU files in a jobpool to Aboslute Paths.
+//
+function RelativeToAbsolute( sDtuPath )
+{
+	var oContentMgr = App.getContentMgr()
+	var oFile = new DzFile( sDtuPath )
+	if ( !oFile.exists() )
+	{
+		return false;
+	}
+	if ( !oFile.open(DzFile.ReadOnly) )
+	{
+		return false;
+	}
+	var sDtuContents = oFile.read()
+	oFile.close()
+	if (!sDtuContents)
+	{
+		return false;
+	}
+	var oDTU = {}
+	try
+	{
+		oDTU = JSON.parse(sDtuContents);
+	}
+	catch (e)
+	{
+		oDTU = false;
+	}
+	if (!oDTU)
+	{
+		return false;
+	}
+
+	var arrKeys = Object.keys(oDTU);
+//	for (i = 0; i < arrKeys.length; i++)
+//	{
+//		print("Key[" + i + "]: " + arrKeys[i]);
+//	}
+
+	var MaterialList = oDTU["Materials"];
+//	print ("Material Keys: " + Object.keys(MaterialList[0]))
+	for (i = 0; i < MaterialList.length; i++)
+	{
+		var matObj = MaterialList[i];
+//		print("Material[" + i + "]: " + matObj["Material Name"])
+		var propList = matObj["Properties"];
+		for (j = 0; j < propList.length; j++)
+		{
+			var property = propList[j];
+			if (property["Texture"] != "")
+			{
+//				print ("Name: " + property["Name"]);
+//				print ("Texture: " + property["Texture"]);
+				var sTextureName = property["Texture"];
+				var sFullPath = oContentMgr.findFile(sTextureName)
+				if (sTextureName != sFullPath)
+				{
+					print("Texture renamed: " + sFullPath)
+				}
+				property["Texture"] = sFullPath
+			}
+		}
+	}
+
+	var newContents = JSON.stringify(oDTU)
+	oFile.open(DzFile.WriteOnly)
+	oFile.write(newContents);
+	oFile.close()
+
+	return true;
+}
+
+function ProcessJobFile ( sJobFile )
+{
+
+	print("Reading jobfile: " + sJobFile)
+
+	var oFile = new DzFile( sJobFile )
+	if ( !oFile.exists() )
+	{
+		return false;
+	}
+	if ( !oFile.open(DzFile.ReadOnly) )
+	{
+		return false;
+	}
+	oFile.close()
+
+	var sJobContents = ""
+	while (sJobContents = oFile.readLine())
+	{
+		if (!sJobContents)
+		{
+			break;
+		}
+		print ("Localizing: " + sJobContents)
+		RelativeToAbsolute(sJobContents)
+	}
+
+}
+
+function main()
+{
+	var aArgList = getArguments()
+	var nArgCount = aArgList.length
+
+	if (nArgCount == 0)
+	{
+		print();
+		print("Usage: Localize-JobPool.dsa <jobpool-file>");
+		print();
+		return;
+	}
+
+	print("DEBUG: num args:" + nArgCount + ", arglist is: " + aArgList)
+
+	for (i = 0; i < nArgCount; i++)
+	{
+		sJobfile = aArgList[i];
+		ProcessJobFile(sJobfile)
+	}
+
+}
+
+main();
