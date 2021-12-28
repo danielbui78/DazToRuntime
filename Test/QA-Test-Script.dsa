@@ -1,0 +1,160 @@
+// DAZ Studio version 4.16.0.3 filetype DAZ Script
+
+/////////////////////////////////////
+// Validation functions
+/////////////////////////////////////
+function Validate_DTU_file( sDtuFilename )
+{
+	var oFile = new DzFile( sDtuFilename )
+	if ( !oFile.exists() )
+	{
+		print("DTU File not found [FAILED].")
+		return false;
+	}
+	
+	oFile.open( DzFile.ReadOnly )
+	if (!oFile)
+	{
+		print("Unable to open DTU file [FAILED].")
+		return false;
+	}
+	
+	var sDTU_contents = oFile.read()
+	if (!sDTU_contents)
+	{
+		print("Unable to read file [FAILED].")
+		return false;
+	}
+
+	var oDTU = {}
+	try
+	{
+		oDTU = JSON.parse(sDTU_contents)
+	}
+	catch (e)
+	{
+		oDTU = false
+	}
+	
+	if (!oDTU)
+	{
+		print("DTU: Invalid JSON format [FAILED].")
+		return false;
+	}
+	else
+	{
+		print("DTU: Valid JSON format [OK].")
+		return true;
+	}		
+	return false;
+}	
+function Validate_FBX_file (sFbxFilename)
+{	
+	var oFBXi = new OpenFBXInterface()
+	var result = oFBXi.LoadScene(sFbxFilename)
+	if (result)
+	{
+		print("FBX fileformat check passed: valid FBX file");
+		return true;
+	}
+	else
+	{
+		print("FBX fileformat check failed: invalid FBX file");
+		return false;
+	}	
+	return false;
+}	
+/////////////////////////////////////
+// Run Test Case function
+/////////////////////////////////////
+function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
+{
+	obj = new DzUnrealAction()
+	obj.NonInteractiveMode = 1
+	
+	// obj.ExportFilename: filename stem for DTU and FBX file
+	// Can not have spaces or hyphen.  Underscore is OK
+	// Leave blank to default to sanitized Scene Node Label
+	obj.ExportFilename = sExportFilename
+	
+	// obj.AssetType: "SkeletalMesh" [DEFAULT], "StaticMesh", "Animation", "Environment", "Pose"
+	obj.AssetType = sAssetType
+	
+	// obj.RootFolder: path to destination root
+	// If folder or path doesn't exist, it will be created
+	obj.RootFolder = sRootFolder
+	
+	// obj.ExportFolder: name folder containing DTU/FBX
+	// Leave blank to default to sanitized Scene Node Label like ExportFilename
+	obj.ExportFolder = sExportFolder
+	
+	// obj.ProductName: Daz Store Product Name (or anything you want), can have spaces & special characters
+	obj.ProductName = sProductName
+	
+	// obj.ProductComponentName: Friendly Name for component within Product
+	// Put frienldy pose name or material name here
+	obj.ProductComponentName = sComponentName
+	
+	// obj.MorphList: String array of morphs to convert into blendshapes within FBX.
+	// Leave empty if you do not want to export any blendshapes.
+	//obj.MorphList = ["CTRLVictoria8_1", "FHMVictoria8_1", "FBMVictoria8_1"]
+	obj.MorphList = arrayMorphList
+
+	obj.executeAction()
+	
+	var sReturnString = obj.RootFolder + "/" + obj.ExportFolder + "/" + obj.ExportFilename + ".dtu"
+	
+	return sReturnString;
+}
+function Run_TestCase_11(sTestAsset)
+{
+
+	sExportFilename = "CustomAsset"
+	sAssetType = "SkeletalMesh"
+	sRootFolder = "C:/CustomRoot"
+	sExportFolder = "CustomFolder"
+	sProductName = ""
+	sComponentName = ""
+	arrayMorphList = []
+	
+	print("Running Test Case 11:")
+	
+	Scene.clear()
+	var oContentMgr = App.getContentMgr()
+	var sFullPath = oContentMgr.findFile(sTestAsset)
+	oContentMgr.openFile(sFullPath)
+	
+	var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
+	
+	var sDtuFilename = sReturnString
+	print("Exported DTU = " + sDtuFilename);
+	if (Validate_DTU_file(sDtuFilename) == false)
+	{
+		return false;
+	}
+	
+	var sFbxFilename = sDtuFilename;
+	sFbxFilename = sFbxFilename.replace(".dtu",".fbx");
+	print("Exported DTU = " + sFbxFilename);
+	
+	if (Validate_FBX_file(sFbxFilename) == false)
+	{
+		return false;
+	}
+
+	return true;	
+}
+
+/////////////////////////////////////
+// MAIN SCRIPT
+/////////////////////////////////////
+
+var sTestAsset = "/people/genesis 8 female/genesis 8.1 basic female.duf"
+if (Run_TestCase_11(sTestAsset) == true)
+{
+	print("Test Case 11: PASSED");
+}
+else
+{
+	print("Test Case 11: FAILED");	
+}
