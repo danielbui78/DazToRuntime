@@ -422,13 +422,16 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 						  }
 
 						  QString dtuTextureName = TextureName;
-						  if (this->UseRelativePaths)
+						  if (TextureName != "")
 						  {
-							  dtuTextureName = dzApp->getContentMgr()->getRelativePath(TextureName, true);
-						  }
-						  if (IsTemporaryFile(TextureName))
-						  {
-							  dtuTextureName = ExportWithDTU(TextureName, Node->getLabel() + "_" + Material->getName());
+							  if (this->UseRelativePaths)
+							  {
+								  dtuTextureName = dzApp->getContentMgr()->getRelativePath(TextureName, true);
+							  }
+							  if (IsTemporaryFile(TextureName))
+							  {
+								  dtuTextureName = ExportWithDTU(TextureName, Node->getLabel() + "_" + Material->getName());
+							  }
 						  }
 						  if (bUseNumeric)
 							  WriteJSON_PropertyTexture(Writer, Name, dtuPropNumericValue, dtuPropType, dtuTextureName);
