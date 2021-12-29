@@ -6,40 +6,33 @@
 //
 // Converts all DTU files in a jobpool to Aboslute Paths.
 //
-function RelativeToAbsolute( sDtuPath )
-{
+function RelativeToAbsolute( sDtuPath ) {
 
 	var oContentMgr = App.getContentMgr();
 	print("Reading DTU file: [" + sDtuPath + "]");
 	var oFile = new DzFile( sDtuPath );
-	if ( !oFile.exists() )
-	{
+	if ( !oFile.exists() ) {
 		print("DTU file does not exist: " + sDtuPath);
 		return false;
 	}
-	if ( !oFile.open(DzFile.ReadOnly) )
-	{
+	if ( !oFile.open(DzFile.ReadOnly) ) {
 		print("Unable to open DTU file for reading: " + sDtuPath);
 		return false;
 	}
-	var sDtuContents = oFile.read()
-	oFile.close()
-	if (!sDtuContents)
-	{
+	var sDtuContents = oFile.read();
+	oFile.close();
+	if (!sDtuContents) {
 		print("Error reading DTU file: " + sDtuPath);
 		return false;
 	}
 	var oDTU = {}
-	try
-	{
+	try {
 		oDTU = JSON.parse(sDtuContents);
 	}
-	catch (e)
-	{
+	catch (e) {
 		oDTU = false;
 	}
-	if (!oDTU)
-	{
+	if (!oDTU) {
 		print("Error parsing DTU file. May be invalid JSON format: " + sDtuPath);
 		return false;
 	}
@@ -51,98 +44,106 @@ function RelativeToAbsolute( sDtuPath )
 //	}
 
 	var MaterialList = oDTU["Materials"];
+	// pre def for memory handling
+	var matObj;
+	var propList;
+	var property;
+	var sTextureName;
+	var sFullPath;
+
+	if (MaterialList == undefined) {
+		print("Empty materials list");
+		return false;
+	}
+
 //	print ("Material Keys: " + Object.keys(MaterialList[0]))
-	for (i = 0; i < MaterialList.length; i++)
-	{
-		var matObj = MaterialList[i];
-//		print("Material[" + i + "]: " + matObj["Material Name"])
-		var propList = matObj["Properties"];
-		for (j = 0; j < propList.length; j++)
-		{
-			var property = propList[j];
-			if (property["Texture"] != "")
-			{
-//				print ("Name: " + property["Name"]);
-//				print ("Texture: " + property["Texture"]);
-				var sTextureName = property["Texture"];
-				var sFullPath = oContentMgr.findFile(sTextureName)
-				if (sTextureName != sFullPath)
-				{
-					print("Texture renamed: " + sFullPath)
+	for (var i = 0; i < MaterialList.length; i += 1) {
+		matObj = MaterialList[i];
+		if (matObj == undefined) {
+			print("Matobj @ index="+i+" undefined");
+			continue;
+		}
+
+		print("Material[" + i + "]: " + matObj["Material Name"])
+		propList = matObj["Properties"];
+		if (propList == undefined) {
+			print("propList @ index="+i+" undefined");
+			continue;
+		}
+		for (var j = 0; j < propList.length; j += 1) {
+			property = propList[j];
+			if (property == undefined) {
+				print("property @ index="+j+" undefined");
+				continue;
+			}
+			if (property["Texture"].length > 0) {
+				//print ("Name: " + property["Name"]);
+				//print ("Texture: " + property["Texture"]);
+				sTextureName = property["Texture"];
+				sFullPath = oContentMgr.findFile(sTextureName);
+				//print ("sFullPath: " + sFullPath);
+				if (sTextureName != sFullPath && sFullPath.length > 0) {
+					print("Texture renamed: " + sFullPath);
+					property["Texture"] = sFullPath;
 				}
-				property["Texture"] = sFullPath
 			}
 		}
 	}
 
-	var newContents = JSON.stringify(oDTU)
-	oFile.open(DzFile.WriteOnly)
+	var newContents = JSON.stringify(oDTU,  null, "\t");
+	oFile.open(DzFile.WriteOnly);
 	oFile.write(newContents);
-	oFile.close()
-
+	oFile.close();
 	return true;
 }
 
-function ProcessJobFile ( sJobFile )
-{
+function ProcessJobFile ( sJobFile ) {
 	print("Reading jobfile: " + sJobFile);
 	var oFile = new DzFile( sJobFile );
-	if ( !oFile.exists() )
-	{
+	if ( !oFile.exists() ) {
 		print("Jobpool file does not exist.");
 		return false;
 	}
-	if ( !oFile.open(DzFile.ReadOnly) )
-	{
+	if ( !oFile.open(DzFile.ReadOnly) ) {
 		print("Unable to open jobpool file for reading.");
 		return false;
 	}
 
-	var sJobLine = ""
-	while (sJobLine = oFile.readLine().replace("\n",""))
-	{
-		if (!sJobLine)
-		{
-			break;
+	var aLines = oFile.readLines();
+	var sJobLine;
+	for (var index=0; index<aLines.length; index += 1) {
+		sJobLine=aLines[index].trim();
+		if (sJobLine.length == 0) {
+			continue;
 		}
-		print ("Localizing: " + sJobLine)
-		if (RelativeToAbsolute(sJobLine) == false)
-		{
+		print ("Localizing: " + sJobLine);
+		if (RelativeToAbsolute(sJobLine) == false) {
 			print("Failed to localize DTU: " + sJobLine);
 		}
 	}
-	oFile.close()
-
+	oFile.close();
 	return true;
-
 }
 
-function main()
-{
-	//var aArgList = ["C:/CustomRoot/autoexec-jobpool.txt"]
+function main() {
+	var aArgList = ["C:/CustomRoot/autoexec-jobpool.txt"]
 	//var aArgList = App.scriptArgs;
-	var aArgList = getArguments()
+	//var aArgList = getArguments()
 	var nArgCount = aArgList.length;
 
-	if (nArgCount == 0)
-	{
-		print();
-		print("Usage: Localize-JobPool.dsa <jobpool-file>");
-		print();
+	if (nArgCount == 0) {
+		print("\nUsage: Localize-JobPool.dsa <jobpool-file>\n");
 		return;
 	}
 
-	print("DEBUG: num args:" + nArgCount + ", arglist is: " + aArgList)
+	print("DEBUG: num args:" + nArgCount + ", arglist is: " + aArgList);
 
-	for (i = 0; i < nArgCount; i++)
-	{
+	for (var i = 0; i < nArgCount; i += 1) {
 		sJobfile = aArgList[i];
-		if (ProcessJobFile(sJobfile) == false)
-		{
+		if (ProcessJobFile(sJobfile) == false) {
 			print("Convert jobpool failed: " + sJobfile);
 		}
 	}
 }
 
-//RelativeToAbsolute("C:/CustomRoot/CustomFolder/CustomAsset.dtu")
 main();

@@ -11,14 +11,14 @@ function Validate_DTU_file( sDtuFilename )
 		print("DTU File not found [FAILED].")
 		return false;
 	}
-	
+
 	oFile.open( DzFile.ReadOnly )
 	if (!oFile)
 	{
 		print("Unable to open DTU file [FAILED].")
 		return false;
 	}
-	
+
 	var sDTU_contents = oFile.read()
 	if (!sDTU_contents)
 	{
@@ -35,7 +35,7 @@ function Validate_DTU_file( sDtuFilename )
 	{
 		oDTU = false
 	}
-	
+
 	if (!oDTU)
 	{
 		print("DTU: Invalid JSON format [FAILED].")
@@ -45,11 +45,11 @@ function Validate_DTU_file( sDtuFilename )
 	{
 		print("DTU: Valid JSON format [OK].")
 		return true;
-	}		
+	}
 	return false;
-}	
+}
 function Validate_FBX_file (sFbxFilename)
-{	
+{
 	var oFBXi = new OpenFBXInterface()
 	var result = oFBXi.LoadScene(sFbxFilename)
 	if (result)
@@ -61,9 +61,9 @@ function Validate_FBX_file (sFbxFilename)
 	{
 		print("FBX fileformat check failed: invalid FBX file");
 		return false;
-	}	
+	}
 	return false;
-}	
+}
 /////////////////////////////////////
 // Run Test Case function
 /////////////////////////////////////
@@ -71,45 +71,45 @@ function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, s
 {
 	obj = new DzUnrealAction()
 	obj.NonInteractiveMode = 1
-	
+
 	// obj.UseRelativePaths: set true for relative Daz Library runtime paths
 	//                       set false for absolute filepath
 	// Default to true to work with interactive mode
-	// obj.UseRelativePaths = true;
 	obj.UseRelativePaths = false;
- 	
+	// obj.UseRelativePaths = true;
+
 	// obj.ExportFilename: filename stem for DTU and FBX file
 	// Can not have spaces or hyphen.  Underscore is OK
 	// Leave blank to default to sanitized Scene Node Label
 	obj.ExportFilename = sExportFilename
-	
+
 	// obj.AssetType: "SkeletalMesh" [DEFAULT], "StaticMesh", "Animation", "Environment", "Pose"
 	obj.AssetType = sAssetType
-	
+
 	// obj.RootFolder: path to destination root
 	// If folder or path doesn't exist, it will be created
 	obj.RootFolder = sRootFolder
-	
+
 	// obj.ExportFolder: name folder containing DTU/FBX
 	// Leave blank to default to sanitized Scene Node Label like ExportFilename
 	obj.ExportFolder = sExportFolder
-	
+
 	// obj.ProductName: Daz Store Product Name (or anything you want), can have spaces & special characters
 	obj.ProductName = sProductName
-	
+
 	// obj.ProductComponentName: Friendly Name for component within Product
 	// Put frienldy pose name or material name here
 	obj.ProductComponentName = sComponentName
-	
+
 	// obj.MorphList: String array of morphs to convert into blendshapes within FBX.
 	// Leave empty if you do not want to export any blendshapes.
 	//obj.MorphList = ["CTRLVictoria8_1", "FHMVictoria8_1", "FBMVictoria8_1"]
 	obj.MorphList = arrayMorphList
 
 	obj.executeAction()
-	
+
 	var sReturnString = obj.RootFolder + "/" + obj.ExportFolder + "/" + obj.ExportFilename + ".dtu"
-	
+
 	return sReturnString;
 }
 function Run_TestCase_11(sTestAsset)
@@ -122,33 +122,33 @@ function Run_TestCase_11(sTestAsset)
 	sProductName = ""
 	sComponentName = ""
 	arrayMorphList = []
-	
+
 	print("Running Test Case 11:")
-	
+
 	Scene.clear()
 	var oContentMgr = App.getContentMgr()
 	var sFullPath = oContentMgr.findFile(sTestAsset)
 	oContentMgr.openFile(sFullPath)
-	
+
 	var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
-	
+
 	var sDtuFilename = sReturnString
 	print("Exported DTU = " + sDtuFilename);
 	if (Validate_DTU_file(sDtuFilename) == false)
 	{
 		return false;
 	}
-	
+
 	var sFbxFilename = sDtuFilename;
 	sFbxFilename = sFbxFilename.replace(".dtu",".fbx");
 	print("Exported DTU = " + sFbxFilename);
-	
+
 	if (Validate_FBX_file(sFbxFilename) == false)
 	{
 		return false;
 	}
 
-	return true;	
+	return true;
 }
 
 /////////////////////////////////////
@@ -166,19 +166,19 @@ function Run_TestCase_01(sTestAsset)
 	sProductName = ""
 	sComponentName = ""
 	arrayMorphList = []
-	
+
 	print("Running Test Case 1:")
-	
+
 	// start with clean Daz Studio scene (TC1.1)
 	Scene.clear()
 	var oContentMgr = App.getContentMgr()
 	// load Genesis 8 Basic Female (TC1.5)
 	var sFullPath = oContentMgr.findFile(sTestAsset)
 	oContentMgr.openFile(sFullPath)
-	
+
 	// Send to Unreal with default settings (TC1.6)
 	var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
-	
+
 	var sDtuFilename = sReturnString
 
 	// check for expected root folder, export folder and export filename (TC1.10)
@@ -187,23 +187,23 @@ function Run_TestCase_01(sTestAsset)
 		print ("Test Case 1 FAILED: Incorrect output DTU filename");
 		return false;
 	}
-	
+
 	print("Exported DTU = " + sDtuFilename);
 	if (Validate_DTU_file(sDtuFilename) == false)
 	{
 		return false;
 	}
-	
+
 	var sFbxFilename = sDtuFilename;
 	sFbxFilename = sFbxFilename.replace(".dtu",".fbx");
 	print("Exported DTU = " + sFbxFilename);
-	
+
 	if (Validate_FBX_file(sFbxFilename) == false)
 	{
 		return false;
 	}
 
-	return true;	
+	return true;
 }
 
 
@@ -218,10 +218,11 @@ if (Run_TestCase_01("/people/genesis 8 female/genesis 8 basic female.duf") == tr
 }
 else
 {
-	print("Test Case 1: FAILED");	
+	print("Test Case 1: FAILED");
 }
 
-
+//Run_TestCase_01("/people/genesis 8 female/genesis 8.1 basic female.duf")
+//Run_TestCase_01("/people/genesis 8 female/characters/victoria 8.1.duf")
 
 var sTestAsset11 = "/people/genesis 8 female/genesis 8.1 basic female.duf"
 if (Run_TestCase_11(sTestAsset11) == true)
@@ -230,5 +231,5 @@ if (Run_TestCase_11(sTestAsset11) == true)
 }
 else
 {
-	print("Test Case 11: FAILED");	
+	print("Test Case 11: FAILED");
 }
