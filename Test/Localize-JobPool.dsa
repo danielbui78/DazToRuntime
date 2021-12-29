@@ -8,20 +8,25 @@
 //
 function RelativeToAbsolute( sDtuPath )
 {
-	var oContentMgr = App.getContentMgr()
-	var oFile = new DzFile( sDtuPath )
+
+	var oContentMgr = App.getContentMgr();
+	print("Reading DTU file: [" + sDtuPath + "]");
+	var oFile = new DzFile( sDtuPath );
 	if ( !oFile.exists() )
 	{
+		print("DTU file does not exist: " + sDtuPath);
 		return false;
 	}
 	if ( !oFile.open(DzFile.ReadOnly) )
 	{
+		print("Unable to open DTU file for reading: " + sDtuPath);
 		return false;
 	}
 	var sDtuContents = oFile.read()
 	oFile.close()
 	if (!sDtuContents)
 	{
+		print("Error reading DTU file: " + sDtuPath);
 		return false;
 	}
 	var oDTU = {}
@@ -35,6 +40,7 @@ function RelativeToAbsolute( sDtuPath )
 	}
 	if (!oDTU)
 	{
+		print("Error parsing DTU file. May be invalid JSON format: " + sDtuPath);
 		return false;
 	}
 
@@ -79,37 +85,44 @@ function RelativeToAbsolute( sDtuPath )
 
 function ProcessJobFile ( sJobFile )
 {
-
-	print("Reading jobfile: " + sJobFile)
-
-	var oFile = new DzFile( sJobFile )
+	print("Reading jobfile: " + sJobFile);
+	var oFile = new DzFile( sJobFile );
 	if ( !oFile.exists() )
 	{
+		print("Jobpool file does not exist.");
 		return false;
 	}
 	if ( !oFile.open(DzFile.ReadOnly) )
 	{
+		print("Unable to open jobpool file for reading.");
 		return false;
 	}
-	oFile.close()
 
-	var sJobContents = ""
-	while (sJobContents = oFile.readLine())
+	var sJobLine = ""
+	while (sJobLine = oFile.readLine().replace("\n",""))
 	{
-		if (!sJobContents)
+		if (!sJobLine)
 		{
 			break;
 		}
-		print ("Localizing: " + sJobContents)
-		RelativeToAbsolute(sJobContents)
+		print ("Localizing: " + sJobLine)
+		if (RelativeToAbsolute(sJobLine) == false)
+		{
+			print("Failed to localize DTU: " + sJobLine);
+		}
 	}
+	oFile.close()
+
+	return true;
 
 }
 
 function main()
 {
+	//var aArgList = ["C:/CustomRoot/autoexec-jobpool.txt"]
+	//var aArgList = App.scriptArgs;
 	var aArgList = getArguments()
-	var nArgCount = aArgList.length
+	var nArgCount = aArgList.length;
 
 	if (nArgCount == 0)
 	{
@@ -124,9 +137,12 @@ function main()
 	for (i = 0; i < nArgCount; i++)
 	{
 		sJobfile = aArgList[i];
-		ProcessJobFile(sJobfile)
+		if (ProcessJobFile(sJobfile) == false)
+		{
+			print("Convert jobpool failed: " + sJobfile);
+		}
 	}
-
 }
 
+//RelativeToAbsolute("C:/CustomRoot/CustomFolder/CustomAsset.dtu")
 main();
