@@ -12,9 +12,9 @@ DZ_PLUGIN_AUTHOR("Daz 3D, Inc");
 DZ_PLUGIN_VERSION(PLUGIN_MAJOR, PLUGIN_MINOR, PLUGIN_REV, PLUGIN_BUILD);
 
 DZ_PLUGIN_DESCRIPTION(QString(
-"<b>Pre-Release DazToUnreal Bridge</b><br>\
+"<b>Pre-Release DazToUnreal Bridge v1.3.1006 (normalmap-gen) </b><br>\
 Bridge Collaboration Project<br><br>\
-<a href = \"%1/aDazToUnreal/index.htm\">Documentation</a><br><br>"
-).arg(dzApp->getDocumentationPath()));
+<a href = \"https://github.com/danielbui78-bridge-collab/DazToRuntime/tree/unreal-main\">Github</a><br><br>"
+));
 
 DZ_PLUGIN_CLASS_GUID(DzUnrealAction, 99F42CAE-CD02-49BC-A7CE-C0CF4EDD7609);
