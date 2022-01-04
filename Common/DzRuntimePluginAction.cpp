@@ -64,7 +64,7 @@ DzRuntimePluginAction::~DzRuntimePluginAction()
 bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 {
 	DzProgress preProcessProgress = DzProgress("Daz Bridge Pre-Processing...", 0, false, true);
-	
+
 	///////////////////////
 	// Create JobPool
 	// Iterate through all children of "parentNode", create jobpool of nodes to process later
@@ -153,7 +153,7 @@ bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
 					}
 					else if (shaderName.contains("omubersurface"))
 					{
-						double bumpMin = -0.1; 
+						double bumpMin = -0.1;
 						double bumpMax = 0.1;
 						DzNumericProperty *bumpMinProp = qobject_cast<DzNumericProperty*>(material->findProperty("bump minimum", false));
 						DzNumericProperty *bumpMaxProp = qobject_cast<DzNumericProperty*>(material->findProperty("bump maximum", false));
@@ -1017,7 +1017,7 @@ void DzRuntimePluginAction::UnlockTranform(DzNode* NodeToUnlock)
 	Property = NodeToUnlock->getXPosControl();
 	Property->lock(false);
 	Property = NodeToUnlock->getYPosControl();
-	Property->lock(false);	
+	Property->lock(false);
 	Property = NodeToUnlock->getZPosControl();
 	Property->lock(false);
 
@@ -1051,7 +1051,7 @@ bool DzRuntimePluginAction::isTemporaryFile(QString sFilename)
 
 QString DzRuntimePluginAction::exportWithDTU(QString sFilename, QString sAssetMaterialName)
 {
-	if (sFilename.isEmpty()) 
+	if (sFilename.isEmpty())
 		return sFilename;
 
 	QString cleanedFilename = sFilename.toLower().replace("\\", "/");
@@ -1095,7 +1095,7 @@ QString DzRuntimePluginAction::makeUniqueFilename(QString sFilename)
 	QString newFilename = sFilename;
 	int duplicate_count = 0;
 
-	while ( 
+	while (
 		QFileInfo(newFilename).exists() &&
 		QFileInfo(sFilename).size() != QFileInfo(newFilename).size()
 		)
@@ -1133,7 +1133,7 @@ void DzRuntimePluginAction::writeJSON_Property_Texture(DzJsonWriter& Writer, QSt
 // ------------------------------------------------
 // PixelIntensity
 // ------------------------------------------------
-double DzRuntimePluginAction::getPixelIntensity(const  QRgb& pixel) 
+double DzRuntimePluginAction::getPixelIntensity(const  QRgb& pixel)
 {
 	const double r = double(qRed(pixel));
 	const double g = double(qGreen(pixel));
@@ -1145,7 +1145,7 @@ double DzRuntimePluginAction::getPixelIntensity(const  QRgb& pixel)
 // ------------------------------------------------
 // MapComponent
 // ------------------------------------------------
-uint8_t DzRuntimePluginAction::getNormalMapComponent(double pX) 
+uint8_t DzRuntimePluginAction::getNormalMapComponent(double pX)
 {
 	return (pX + 1.0) * (255.0 / 2.0);
 }
@@ -1163,7 +1163,7 @@ int DzRuntimePluginAction::getIntClamp(int x, int low, int high)
 // ------------------------------------------------
 // map_component
 // ------------------------------------------------
-QRgb DzRuntimePluginAction::getSafePixel(const QImage& img, int x, int y) 
+QRgb DzRuntimePluginAction::getSafePixel(const QImage& img, int x, int y)
 {
 	int ix = this->getIntClamp(x, 0, img.size().width() - 1);
 	int iy = this->getIntClamp(y, 0, img.size().height() - 1);
