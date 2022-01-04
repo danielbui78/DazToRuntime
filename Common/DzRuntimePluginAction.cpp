@@ -102,18 +102,7 @@ bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 					//////////////////
 					// Rename Duplicate Material
 					/////////////////
-					int nameIndex = 0;
-					QString newMaterialName = material->getName();
-					while (existingMaterialNameList.contains(newMaterialName) )
-					{
-						newMaterialName = material->getName() + QString("%1").arg(++nameIndex);
-					}
-					if (newMaterialName != material->getName())
-					{
-						m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
-						material->setName(newMaterialName);
-					}
-					existingMaterialNameList.append(newMaterialName);
+					renameDuplicateMaterial(material, &existingMaterialNameList);
 
 					/////////////////
 					// Inject Normal Maps
@@ -132,19 +121,16 @@ bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 	return true;
 }
 
-
 bool DzRuntimePluginAction::undoPreProcessScene()
 {
+	bool bResult = true;
 	// placeholder for settings
 	bool bUndoInjectNormalMaps = false;
 
-	// Undo Rename Duplicate Materials
-	QMap<DzMaterial*, QString>::iterator iter;
-	for (iter = m_undoTable_DuplicateMaterialRename.begin(); iter != m_undoTable_DuplicateMaterialRename.end(); ++iter)
+	if (undoRenameDuplicateMaterials() == false)
 	{
-		iter.key()->setName(iter.value());
+		bResult = false;
 	}
-	m_undoTable_DuplicateMaterialRename.clear();
 
 	// Undo Inject Normal Maps
 	if (bUndoInjectNormalMaps)
@@ -152,7 +138,38 @@ bool DzRuntimePluginAction::undoPreProcessScene()
 		// for each material in undotable for normalmap injection, remove normal map property
 	}
 
+	return bResult;
+}
+
+bool DzRuntimePluginAction::renameDuplicateMaterial(DzMaterial *material, QList<QString>* existingMaterialNameList)
+{
+	int nameIndex = 0;
+	QString newMaterialName = material->getName();
+	while (existingMaterialNameList->contains(newMaterialName))
+	{
+		newMaterialName = material->getName() + QString("_%1").arg(++nameIndex);
+	}
+	if (newMaterialName != material->getName())
+	{
+		m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
+		material->setName(newMaterialName);
+	}
+	existingMaterialNameList->append(newMaterialName);
+
 	return true;
+}
+
+bool DzRuntimePluginAction::undoRenameDuplicateMaterials()
+{
+	QMap<DzMaterial*, QString>::iterator iter;
+	for (iter = m_undoTable_DuplicateMaterialRename.begin(); iter != m_undoTable_DuplicateMaterialRename.end(); ++iter)
+	{
+		iter.key()->setName(iter.value());
+	}
+	m_undoTable_DuplicateMaterialRename.clear();
+
+	return true;
+
 }
 
 void DzRuntimePluginAction::Export()

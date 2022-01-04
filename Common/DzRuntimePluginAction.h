@@ -36,6 +36,9 @@ public slots:
 	bool preProcessScene(DzNode* parentNode = nullptr);
 	// Undo changes made by preProcessScene(), called by Export() after FbxExport operation.
 	bool undoPreProcessScene();
+	bool renameDuplicateMaterial(DzMaterial* material, QList<QString>* existingMaterialNameList);
+	bool undoRenameDuplicateMaterials();
+
 
 protected:
 	 QString CharacterName; // Exported filename without extension
