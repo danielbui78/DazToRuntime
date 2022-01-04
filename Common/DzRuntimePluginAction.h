@@ -29,6 +29,14 @@ public:
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
 	 virtual ~DzRuntimePluginAction();
 
+public slots:
+	// Normal Map Handling
+	QImage makeNormalMapFromBumpMap(const QImage& image, double normalStrength);
+	// Pre-Process Scene data to workaround FbxExporter issues, called by Export() before FbxExport operation.
+	bool preProcessScene(DzNode* parentNode = nullptr);
+	// Undo changes made by preProcessScene(), called by Export() after FbxExport operation.
+	bool undoPreProcessScene();
+
 protected:
 	 QString CharacterName; // Exported filename without extension
 	 QString RootFolder; // The destination Root Folder
@@ -108,10 +116,20 @@ protected:
 	 bool getUseRelativePaths() { return this->UseRelativePaths; };
 	 void setUseRelativePaths(bool arg_UseRelativePaths) { this->UseRelativePaths = arg_UseRelativePaths; };
 
-	 bool IsTemporaryFile(QString sFilename);
-	 QString ExportWithDTU(QString sFilename, QString sAssetMaterialName = "");
-	 void WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture);
-	 void WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture);
-	 QString MakeUniqueFilename(QString sFilename);
+	 bool isTemporaryFile(QString sFilename);
+	 QString exportWithDTU(QString sFilename, QString sAssetMaterialName = "");
+	 void writeJSON_Property_Texture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture);
+	 void writeJSON_Property_Texture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture);
+	 QString makeUniqueFilename(QString sFilename);
+
+private:
+	 // Undo data structures
+	 QMap<DzMaterial*, QString> m_undoTable_DuplicateMaterialRename;
+
+	 // NormalMap utility methods
+	 double getPixelIntensity(const  QRgb& pixel);
+	 uint8_t getNormalMapComponent(double pX);
+	 int getIntClamp(int x, int low, int high);
+	 QRgb getSafePixel(const QImage& img, int x, int y);
 
 };

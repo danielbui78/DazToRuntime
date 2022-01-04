@@ -28,6 +28,7 @@
 #include <dzpresentation.h>
 #include <dzmodifier.h>
 #include <dzmorph.h>
+#include <dzprogress.h>
 
 #include <QtCore/qdir.h>
 #include <QtGui/qlineedit.h>
@@ -51,6 +52,107 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 
 DzRuntimePluginAction::~DzRuntimePluginAction()
 {
+}
+
+bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
+{
+	// placeholder settings, TODO: move to member variable / Q_PROPERTY
+	bool bInjectNormalMaps = true;
+	
+	///////////////////////
+	// Create JobPool
+	// Iterate through all children of "parentNode", create jobpool of nodes to process later
+	// Nodes are added to nodeJobList in breadth-first order (parent,children,grandchildren)
+	///////////////////////
+	DzNodeList nodeJobList;
+	DzNodeList tempQueue;
+	DzNode *node_ptr = parentNode;
+	if (node_ptr == nullptr)
+		node_ptr = dzScene->getPrimarySelection();
+	tempQueue.append(node_ptr);
+	while (!tempQueue.isEmpty())
+	{
+		node_ptr = tempQueue.first();
+		tempQueue.removeFirst();
+		nodeJobList.append(node_ptr);
+		DzNodeListIterator Iterator = node_ptr->nodeChildrenIterator();
+		while (Iterator.hasNext())
+		{
+			DzNode* tempChild = Iterator.next();
+			tempQueue.append(tempChild);
+		}
+	}
+
+	///////////////////////
+	// Process JobPool (DzNodeList nodeJobList)
+	///////////////////////
+	QList<QString> existingMaterialNameList;
+	for (int i = 0; i < nodeJobList.length(); i++)
+	{
+		DzNode *node = nodeJobList[i];
+		DzObject* object = node->getObject();
+		DzShape* shape = object ? object->getCurrentShape() : NULL;
+		if (shape)
+		{
+			for (int i = 0; i < shape->getNumMaterials(); i++)
+			{
+				DzMaterial* material = shape->getMaterial(i);
+				if (material)
+				{
+					//////////////////
+					// Rename Duplicate Material
+					/////////////////
+					int nameIndex = 0;
+					QString newMaterialName = material->getName();
+					while (existingMaterialNameList.contains(newMaterialName) )
+					{
+						newMaterialName = material->getName() + QString("%1").arg(++nameIndex);
+					}
+					if (newMaterialName != material->getName())
+					{
+						m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
+						material->setName(newMaterialName);
+					}
+					existingMaterialNameList.append(newMaterialName);
+
+					/////////////////
+					// Inject Normal Maps
+					/////////////////
+					if (bInjectNormalMaps)
+					{
+						// Check if normal map missing
+						// Check if height map present
+						// Generate normal map from height map
+					}
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+
+bool DzRuntimePluginAction::undoPreProcessScene()
+{
+	// placeholder for settings
+	bool bUndoInjectNormalMaps = false;
+
+	// Undo Rename Duplicate Materials
+	QMap<DzMaterial*, QString>::iterator iter;
+	for (iter = m_undoTable_DuplicateMaterialRename.begin(); iter != m_undoTable_DuplicateMaterialRename.end(); ++iter)
+	{
+		iter.key()->setName(iter.value());
+	}
+	m_undoTable_DuplicateMaterialRename.clear();
+
+	// Undo Inject Normal Maps
+	if (bUndoInjectNormalMaps)
+	{
+		// for each material in undotable for normalmap injection, remove normal map property
+	}
+
+	return true;
 }
 
 void DzRuntimePluginAction::Export()
@@ -642,7 +744,7 @@ void DzRuntimePluginAction::UnlockTranform(DzNode* NodeToUnlock)
 	Property->lock(false);
 }
 
-bool DzRuntimePluginAction::IsTemporaryFile(QString sFilename)
+bool DzRuntimePluginAction::isTemporaryFile(QString sFilename)
 {
 	QString cleanedFilename = sFilename.toLower().replace("\\", "/");
 	QString cleanedTempPath = dzApp->getTempPath().toLower().replace("\\", "/");
@@ -655,7 +757,7 @@ bool DzRuntimePluginAction::IsTemporaryFile(QString sFilename)
 	return false;
 }
 
-QString DzRuntimePluginAction::ExportWithDTU(QString sFilename, QString sAssetMaterialName)
+QString DzRuntimePluginAction::exportWithDTU(QString sFilename, QString sAssetMaterialName)
 {
 	if (sFilename.isEmpty()) 
 		return sFilename;
@@ -673,7 +775,7 @@ QString DzRuntimePluginAction::ExportWithDTU(QString sFilename, QString sAssetMa
 //	QString exportFilename = exportPath + cleanedAssetMaterialName + "_" + fileStem;
 	QString exportFilename = exportPath + fileStem;
 
-	exportFilename = MakeUniqueFilename(exportFilename);
+	exportFilename = makeUniqueFilename(exportFilename);
 
 	if (QFile(sFilename).copy(exportFilename) == true)
 	{
@@ -693,7 +795,7 @@ QString DzRuntimePluginAction::ExportWithDTU(QString sFilename, QString sAssetMa
 
 }
 
-QString DzRuntimePluginAction::MakeUniqueFilename(QString sFilename)
+QString DzRuntimePluginAction::makeUniqueFilename(QString sFilename)
 {
 	if (QFileInfo(sFilename).exists() != true)
 		return sFilename;
@@ -713,7 +815,7 @@ QString DzRuntimePluginAction::MakeUniqueFilename(QString sFilename)
 
 }
 
-void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture)
+void DzRuntimePluginAction::writeJSON_Property_Texture(DzJsonWriter& Writer, QString sName, QString sValue, QString sType, QString sTexture)
 {
 	Writer.startObject(true);
 	Writer.addMember("Name", sName);
@@ -724,7 +826,7 @@ void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QStr
 
 }
 
-void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture)
+void DzRuntimePluginAction::writeJSON_Property_Texture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture)
 {
 	Writer.startObject(true);
 	Writer.addMember("Name", sName);
@@ -734,5 +836,108 @@ void DzRuntimePluginAction::WriteJSON_PropertyTexture(DzJsonWriter& Writer, QStr
 	Writer.finishObject();
 
 }
+
+
+// ------------------------------------------------
+// PixelIntensity
+// ------------------------------------------------
+double DzRuntimePluginAction::getPixelIntensity(const  QRgb& pixel) 
+{
+	const double r = double(qRed(pixel));
+	const double g = double(qGreen(pixel));
+	const double b = double(qBlue(pixel));
+	const double average = (r + g + b) / 3.0;
+	return average / 255.0;
+}
+
+// ------------------------------------------------
+// MapComponent
+// ------------------------------------------------
+uint8_t DzRuntimePluginAction::getNormalMapComponent(double pX) 
+{
+	return (pX + 1.0) * (255.0 / 2.0);
+}
+
+// ------------------------------------------------
+// intclamp
+// ------------------------------------------------
+int DzRuntimePluginAction::getIntClamp(int x, int low, int high)
+{
+	if (x < low) { return low; }
+	else if (x > high) { return high; }
+	return x;
+}
+
+// ------------------------------------------------
+// map_component
+// ------------------------------------------------
+QRgb DzRuntimePluginAction::getSafePixel(const QImage& img, int x, int y) 
+{
+	int ix = this->getIntClamp(x, 0, img.size().width() - 1);
+	int iy = this->getIntClamp(y, 0, img.size().height() - 1);
+	return img.pixel(ix, iy);
+}
+
+// ------------------------------------------------
+// makeNormalMapFromBumpMap
+// ------------------------------------------------
+QImage DzRuntimePluginAction::makeNormalMapFromBumpMap(const QImage& image, double normalStrength) {
+	QImage result = QImage(image.size().width(), image.size().height(), QImage::Format_ARGB32_Premultiplied);
+	QRect rect = result.rect();
+	int r1 = rect.top();
+	int r2 = rect.bottom();
+	int c1 = rect.left();
+	int c2 = rect.right();
+	DzProgress progress = DzProgress(QString("Generating Normalmap"), 100, false, true);
+	float step = ((float)(r2 - r1)) / 100.0;
+	float current = 0;
+
+	// row loop
+	for (int row = r1; row <= r2; row++) {
+		current++;
+		if (current >= step) {
+			progress.step();
+			current = 0;
+		}
+
+		// col loop
+		for (int col = c1; col <= c2; col++) {
+
+			// Pixel Picker
+			const QRgb topLeft = this->getSafePixel(image, col - 1, row - 1);
+			const QRgb top = this->getSafePixel(image, col, row - 1);
+			const QRgb topRight = this->getSafePixel(image, col + 1, row - 1);
+			const QRgb right = this->getSafePixel(image, col + 1, row);
+			const QRgb bottomRight = this->getSafePixel(image, col + 1, row + 1);
+			const QRgb bottom = this->getSafePixel(image, col, row + 1);
+			const QRgb bottomLeft = this->getSafePixel(image, col - 1, row + 1);
+			const QRgb left = this->getSafePixel(image, col - 1, row);
+
+			// calculating pixel intensities
+			const double tl = this->getPixelIntensity(topLeft);
+			const double t = this->getPixelIntensity(top);
+			const double tr = this->getPixelIntensity(topRight);
+			const double r = this->getPixelIntensity(right);
+			const double br = this->getPixelIntensity(bottomRight);
+			const double b = this->getPixelIntensity(bottom);
+			const double bl = this->getPixelIntensity(bottomLeft);
+			const double l = this->getPixelIntensity(left);
+
+			// Sobel filter
+			const double dX = (tr + 2.0 * r + br) - (tl + 2.0 * l + bl);
+			const double dY = 1.0 / normalStrength;
+			const double dZ = (bl + 2.0 * b + br) - (tl + 2.0 * t + tr);
+			const DzVec3 vec = DzVec3(dX, dY, dZ).normalized();
+
+			// DS uses Y as up, not Z, Normalmaps uses Z
+			const QColor color = QColor(this->getNormalMapComponent(vec.m_x), this->getNormalMapComponent(vec.m_z), this->getNormalMapComponent(vec.m_y));
+			result.setPixel(col, row, color.rgb());
+		}
+	}
+
+	return result;
+}
+
+
 
 #include "moc_DzRuntimePluginAction.cpp"
