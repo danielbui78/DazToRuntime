@@ -439,10 +439,7 @@ void DzRuntimePluginAction::ExportNode(DzNode* Node)
 			  }
 		  }
 
-		  // rename duplicate material names
-		  QList<QString> MaterialNames;
-		  QMap<DzMaterial*, QString> OriginalMaterialNames;
-		  RenameDuplicateMaterials(Parent, MaterialNames, OriginalMaterialNames);
+		  preProcessScene(Parent);
 
 		  QDir dir;
 		  dir.mkpath(DestinationPath);
@@ -472,8 +469,7 @@ void DzRuntimePluginAction::ExportNode(DzNode* Node)
 			  WriteConfiguration();
 		  }
 
-		  // Change back material names
-		  UndoRenameDuplicateMaterials(Parent, MaterialNames, OriginalMaterialNames);
+		  undoPreProcessScene();
 	 }
 }
 
