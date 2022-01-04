@@ -447,6 +447,36 @@ bool DzRuntimePluginAction::undoRenameDuplicateMaterials()
 	}
 	m_undoTable_DuplicateMaterialRename.clear();
 
+	return bResult;
+}
+
+bool DzRuntimePluginAction::renameDuplicateMaterial(DzMaterial *material, QList<QString>* existingMaterialNameList)
+{
+	int nameIndex = 0;
+	QString newMaterialName = material->getName();
+	while (existingMaterialNameList->contains(newMaterialName))
+	{
+		newMaterialName = material->getName() + QString("_%1").arg(++nameIndex);
+	}
+	if (newMaterialName != material->getName())
+	{
+		m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
+		material->setName(newMaterialName);
+	}
+	existingMaterialNameList->append(newMaterialName);
+
+	return true;
+}
+
+bool DzRuntimePluginAction::undoRenameDuplicateMaterials()
+{
+	QMap<DzMaterial*, QString>::iterator iter;
+	for (iter = m_undoTable_DuplicateMaterialRename.begin(); iter != m_undoTable_DuplicateMaterialRename.end(); ++iter)
+	{
+		iter.key()->setName(iter.value());
+	}
+	m_undoTable_DuplicateMaterialRename.clear();
+
 	return true;
 
 }
