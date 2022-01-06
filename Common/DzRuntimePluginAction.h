@@ -144,6 +144,6 @@ private:
 	 bool isNormalMapMissing(DzMaterial* material);
 	 bool isHeightMapPresent(DzMaterial* material);
 	 QString getHeightMapFilename(DzMaterial* material);
-	 double DzRuntimePluginAction::getHeightMapStrength(DzMaterial* material);
+	 double getHeightMapStrength(DzMaterial* material);
 
 };
