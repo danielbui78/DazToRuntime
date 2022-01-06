@@ -206,11 +206,11 @@ bool DzRuntimePluginAction::undoGenerateMissingNormalMaps()
 		if (numericProp)
 		{
 			numericProp->setDoubleValue(numericProp->getDoubleDefaultValue());
-			numericProp->setMap("");
+			numericProp->setMap(nullptr);
 		}
 		else if (imageProp)
 		{
-			imageProp->setValue("");
+			imageProp->setValue(nullptr);
 		}
 	}
 	m_undoTable_GenerateMissingNormalMap.clear();
