@@ -29,6 +29,8 @@
 #include <dzmodifier.h>
 #include <dzmorph.h>
 #include <dzprogress.h>
+#include <dztexture.h>
+#include <dzimagemgr.h>
 
 #include <QtCore/qdir.h>
 #include <QtGui/qlineedit.h>
@@ -48,6 +50,7 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 	 ShowFbxDialog = false;
 	 ControllersToDisconnect.append("facs_bs_MouthClose_div2");
 	 UseRelativePaths = false;
+	 m_bUndoNormalMaps = true;
 }
 
 DzRuntimePluginAction::~DzRuntimePluginAction()
@@ -56,8 +59,7 @@ DzRuntimePluginAction::~DzRuntimePluginAction()
 
 bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 {
-	// placeholder settings, TODO: move to member variable / Q_PROPERTY
-	bool bInjectNormalMaps = true;
+	DzProgress preProcessProgress = DzProgress("Daz Bridge Pre-Processing...", 0, false, true);
 	
 	///////////////////////
 	// Create JobPool
@@ -105,13 +107,85 @@ bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 					renameDuplicateMaterial(material, &existingMaterialNameList);
 
 					/////////////////
-					// Inject Normal Maps
+					// Generate Missing Normal Maps
 					/////////////////
-					if (bInjectNormalMaps)
+					generateMissingNormalMap(material);
+				}
+			}
+		}
+	}
+
+	preProcessProgress.finish();
+
+	return true;
+}
+
+bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
+{
+	// Check if normal map missing
+	if (isNormalMapMissing(material))
+	{
+		// Check if height map present
+		if (isHeightMapPresent(material))
+		{
+			// Generate normal map from height map
+			QString heightMapFilename = getHeightMapFilename(material);
+			if (heightMapFilename != "")
+			{
+				// Retrieve Normap Map property
+				QString propertyName = "normal map";
+				DzProperty* normalMapProp = material->findProperty(propertyName, false);
+				if (normalMapProp)
+				{
+					DzImageProperty* imageProp = qobject_cast<DzImageProperty*>(normalMapProp);
+					DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(normalMapProp);
+
+					// calculate normal map strength based on height map strength
+					double heightStrength = getHeightMapStrength(material);
+					double normalStrength = heightStrength * 0.5;
+					double bakeStrength = normalStrength;
+					// If numeric property, then do not bake normal map strength into
+					//   image. Use normal strength property to transmit strength instead.
+					if (numericProp) bakeStrength = 1.0;
+
+					// create normalMap filename
+					QString tempPath;
+					QFileInfo fileInfo = QFileInfo(heightMapFilename);
+					QString normalMapFilename = fileInfo.completeBaseName() + "_nm." + fileInfo.suffix();
+					QString normalMapSavePath = dzApp->getTempPath() + "/" + normalMapFilename;
+					QFileInfo normalMapInfo = QFileInfo(normalMapSavePath);
+
+					if (!normalMapInfo.exists())
 					{
-						// Check if normal map missing
-						// Check if height map present
-						// Generate normal map from height map
+						// Generate Temp Normal Map if does not exist
+						QImage normalMap = makeNormalMapFromHeightMap(heightMapFilename, bakeStrength);
+						// write QImage to temp folder
+						QString progressString = "Saving Normal Map: " + normalMapSavePath;
+						DzProgress saveProgress = DzProgress(progressString, 2, false, true);
+						saveProgress.step();
+						normalMap.save(normalMapSavePath);
+						saveProgress.step();
+						saveProgress.finish();
+					}
+
+					// Insert generated NormalMap into Daz material
+					if (numericProp)
+					{
+						// Injecting with DzTexture is causing flipped normal artifacts
+//						DzTexture* texture = dzApp->getImageMgr()->getImage(normalMapSavePath);
+//						numericProp->setMap(texture);
+						numericProp->setMap(normalMapSavePath);
+						numericProp->setDoubleValue(normalStrength);
+					}
+					else if (imageProp)
+					{
+						imageProp->setValue(normalMapSavePath);
+					}
+
+					if (m_bUndoNormalMaps)
+					{
+						// Add to Undo Table
+						m_undoTable_GenerateMissingNormalMap.insert(material, normalMapProp);
 					}
 				}
 			}
@@ -121,11 +195,181 @@ bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 	return true;
 }
 
+bool DzRuntimePluginAction::undoGenerateMissingNormalMaps()
+{
+	QMap<DzMaterial*, DzProperty*>::iterator iter;
+	for (iter = m_undoTable_GenerateMissingNormalMap.begin(); iter != m_undoTable_GenerateMissingNormalMap.end(); ++iter)
+	{
+		DzProperty* normalMapProp = iter.value();
+		DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(normalMapProp);
+		DzImageProperty* imageProp = qobject_cast<DzImageProperty*>(normalMapProp);
+		if (numericProp)
+		{
+			numericProp->setDoubleValue(numericProp->getDoubleDefaultValue());
+			numericProp->setMap("");
+		}
+		else if (imageProp)
+		{
+			imageProp->setValue("");
+		}
+	}
+	m_undoTable_GenerateMissingNormalMap.clear();
+
+	return true;
+}
+
+double DzRuntimePluginAction::getHeightMapStrength(DzMaterial* material)
+{
+	QString propertyName = "bump strength";
+	DzProperty* heightMapProp = material->findProperty(propertyName, false);
+
+	if (heightMapProp)
+	{
+		// DEBUG
+		QString propertyName = heightMapProp->getName();
+		QString propertyLabel = heightMapProp->getLabel();
+
+		// normal map property preseet
+		DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(heightMapProp);
+
+		if (numericProp)
+		{
+			double heightStrength = numericProp->getDoubleValue();
+			return heightStrength;
+		}
+
+	}
+
+	return 0.0;
+
+}
+
+QString DzRuntimePluginAction::getHeightMapFilename(DzMaterial* material)
+{
+	QString propertyName = "bump strength";
+	DzProperty* heightMapProp = material->findProperty(propertyName, false);
+
+	if (heightMapProp)
+	{
+		// DEBUG
+		QString propertyName = heightMapProp->getName();
+		QString propertyLabel = heightMapProp->getLabel();
+
+		// normal map property preseet
+		DzImageProperty* imageProp = qobject_cast<DzImageProperty*>(heightMapProp);
+		DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(heightMapProp);
+
+		if (imageProp)
+		{
+			if (imageProp->getValue())
+			{
+				QString heightMapFilename = imageProp->getValue()->getFilename();
+				return heightMapFilename;
+			}
+		}
+		else if (numericProp)
+		{
+			if (numericProp->getMapValue())
+			{
+				QString heightMapFilename = numericProp->getMapValue()->getFilename();
+				return heightMapFilename;
+			}
+		}
+
+		// Bump Map property present, missing mapvalue
+		return "";
+	}
+
+	// DEBUG
+	QString materialName = material->getName();
+	QString materialLabel = material->getLabel();
+
+	return "";
+}
+
+// Only returns true if "Normal Map" property exists, but is not set to a filename
+bool DzRuntimePluginAction::isNormalMapMissing(DzMaterial* material)
+{
+	QString propertyName = "normal map";
+	DzProperty* normalMapProp = material->findProperty(propertyName, false);
+
+	if (normalMapProp)
+	{
+		// DEBUG
+		QString propertyName = normalMapProp->getName();
+		QString propertyLabel = normalMapProp->getLabel();
+
+		// normal map property preseet
+		DzImageProperty* imageProp = qobject_cast<DzImageProperty*>(normalMapProp);
+		DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(normalMapProp);
+
+		if (imageProp)
+		{
+			if (imageProp->getValue())
+			{
+				QString normalMapFilename = imageProp->getValue()->getFilename();
+				if (normalMapFilename == "")
+				{
+					// image-type normal map property present, value is empty string
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				// image property is missing texture
+				return true;
+			}
+		}
+		else if (numericProp)
+		{
+			if (numericProp->getMapValue())
+			{
+				QString normalMapFilename = numericProp->getMapValue()->getFilename();
+				if (normalMapFilename == "")
+				{
+					// numeric-type normal map property present, map value is empty string
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+			else
+			{
+				// numeric-type normal map property present, no map value
+				return true;
+			}
+		}
+
+		// normal map property exists...
+		return false;
+	}
+
+	// normal map property does not exist
+	return false;
+}
+
+bool DzRuntimePluginAction::isHeightMapPresent(DzMaterial* material)
+{
+	QString propertyName = "bump strength";
+	DzProperty* heightMapProp = material->findProperty(propertyName, false);
+
+	if (heightMapProp)
+	{
+		return true;
+	}
+
+	return false;
+}
+
 bool DzRuntimePluginAction::undoPreProcessScene()
 {
 	bool bResult = true;
-	// placeholder for settings
-	bool bUndoInjectNormalMaps = false;
 
 	if (undoRenameDuplicateMaterials() == false)
 	{
@@ -133,9 +377,9 @@ bool DzRuntimePluginAction::undoPreProcessScene()
 	}
 
 	// Undo Inject Normal Maps
-	if (bUndoInjectNormalMaps)
+	if (undoGenerateMissingNormalMaps() == false)
 	{
-		// for each material in undotable for normalmap injection, remove normal map property
+		bResult = false;
 	}
 
 	return bResult;
@@ -151,6 +395,7 @@ bool DzRuntimePluginAction::renameDuplicateMaterial(DzMaterial *material, QList<
 	}
 	if (newMaterialName != material->getName())
 	{
+		// Add to Undo Table
 		m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
 		material->setName(newMaterialName);
 	}
@@ -894,14 +1139,25 @@ QRgb DzRuntimePluginAction::getSafePixel(const QImage& img, int x, int y)
 // ------------------------------------------------
 // makeNormalMapFromBumpMap
 // ------------------------------------------------
-QImage DzRuntimePluginAction::makeNormalMapFromBumpMap(const QImage& image, double normalStrength) {
-	QImage result = QImage(image.size().width(), image.size().height(), QImage::Format_ARGB32_Premultiplied);
+QImage DzRuntimePluginAction::makeNormalMapFromHeightMap(QString heightMapFilename, double normalStrength)
+{
+	// load qimage
+	QImage image;
+	image.load(heightMapFilename);
+	int imageWidth = image.size().width();
+	int imageHeight = image.size().height();
+
+	QImage result = QImage(imageWidth, imageHeight, QImage::Format_ARGB32_Premultiplied);
 	QRect rect = result.rect();
 	int r1 = rect.top();
 	int r2 = rect.bottom();
 	int c1 = rect.left();
 	int c2 = rect.right();
-	DzProgress progress = DzProgress(QString("Generating Normalmap"), 100, false, true);
+
+	QFileInfo fileInfo = QFileInfo(heightMapFilename);
+	QString progressString = QString("Generating Normal Map: %1 (%2 x %3)").arg(fileInfo.fileName()).arg(imageWidth).arg(imageHeight);
+
+	DzProgress progress = DzProgress(progressString, 100, false, true);
 	float step = ((float)(r2 - r1)) / 100.0;
 	float current = 0;
 
@@ -915,6 +1171,16 @@ QImage DzRuntimePluginAction::makeNormalMapFromBumpMap(const QImage& image, doub
 
 		// col loop
 		for (int col = c1; col <= c2; col++) {
+
+			//// skip black pixels to speed conversion
+			//QRgb rgbMask = image.pixel(col, row);
+			//QColor mask = QColor(rgbMask);
+			//if (mask.red() == 0 && mask.green() == 0 && mask.blue() == 0)
+			//{
+			//	const QColor color = QColor(128, 127, 255);
+			//	result.setPixel(col, row, color.rgb());
+			//	continue;
+			//}
 
 			// Pixel Picker
 			const QRgb topLeft = this->getSafePixel(image, col - 1, row - 1);
@@ -935,6 +1201,14 @@ QImage DzRuntimePluginAction::makeNormalMapFromBumpMap(const QImage& image, doub
 			const double b = this->getPixelIntensity(bottom);
 			const double bl = this->getPixelIntensity(bottomLeft);
 			const double l = this->getPixelIntensity(left);
+
+			//// skip edge cases to reduce seam
+			//if (tl == 0 || t == 0 || tr == 0 || r == 0 || br == 0 || b == 0 || bl == 0 || l == 0)
+			//{
+			//	const QColor color = QColor(128, 127, 255);
+			//	result.setPixel(col, row, color.rgb());
+			//	continue;
+			//}
 
 			// Sobel filter
 			const double dX = (tr + 2.0 * r + br) - (tl + 2.0 * l + bl);

@@ -24,6 +24,7 @@ class DzRuntimePluginAction : public DzAction {
 	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
 	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
 	Q_PROPERTY(bool UseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
+	Q_PROPERTY(bool bUndoNormalMaps READ getUndoNormalMaps WRITE setUndoNormalMaps)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -31,14 +32,15 @@ public:
 
 public slots:
 	// Normal Map Handling
-	QImage makeNormalMapFromBumpMap(const QImage& image, double normalStrength);
+	QImage makeNormalMapFromHeightMap(QString heightMapFilename, double normalStrength);
 	// Pre-Process Scene data to workaround FbxExporter issues, called by Export() before FbxExport operation.
 	bool preProcessScene(DzNode* parentNode = nullptr);
 	// Undo changes made by preProcessScene(), called by Export() after FbxExport operation.
 	bool undoPreProcessScene();
 	bool renameDuplicateMaterial(DzMaterial* material, QList<QString>* existingMaterialNameList);
 	bool undoRenameDuplicateMaterials();
-
+	bool generateMissingNormalMap(DzMaterial* material);
+	bool undoGenerateMissingNormalMaps();
 
 protected:
 	 QString CharacterName; // Exported filename without extension
@@ -59,6 +61,7 @@ protected:
 	 QString ProductComponentName; // Friendly name of Component of Daz Store Product, can contain spaces and special characters
 	 QStringList ScriptOnly_MorphList; // overrides Morph Selection Dialog
 	 bool UseRelativePaths;
+	 bool m_bUndoNormalMaps;
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
@@ -125,14 +128,22 @@ protected:
 	 void writeJSON_Property_Texture(DzJsonWriter& Writer, QString sName, double dValue, QString sType, QString sTexture);
 	 QString makeUniqueFilename(QString sFilename);
 
+	 bool getUndoNormalMaps() { return this->m_bUndoNormalMaps; };
+	 void setUndoNormalMaps(bool arg_UndoNormalMaps) { this->m_bUndoNormalMaps = arg_UndoNormalMaps; };
+
 private:
 	 // Undo data structures
 	 QMap<DzMaterial*, QString> m_undoTable_DuplicateMaterialRename;
+	 QMap<DzMaterial*, DzProperty*> m_undoTable_GenerateMissingNormalMap;
 
 	 // NormalMap utility methods
 	 double getPixelIntensity(const  QRgb& pixel);
 	 uint8_t getNormalMapComponent(double pX);
 	 int getIntClamp(int x, int low, int high);
 	 QRgb getSafePixel(const QImage& img, int x, int y);
+	 bool isNormalMapMissing(DzMaterial* material);
+	 bool isHeightMapPresent(DzMaterial* material);
+	 QString getHeightMapFilename(DzMaterial* material);
+	 double DzRuntimePluginAction::getHeightMapStrength(DzMaterial* material);
 
 };
