@@ -460,6 +460,7 @@ bool DzRuntimePluginAction::renameDuplicateMaterial(DzMaterial *material, QList<
 	}
 	if (newMaterialName != material->getName())
 	{
+		// Add to Undo Table
 		m_undoTable_DuplicateMaterialRename.insert(material, material->getName());
 		material->setName(newMaterialName);
 	}
