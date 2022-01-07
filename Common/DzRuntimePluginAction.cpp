@@ -141,6 +141,29 @@ bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
 					DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(normalMapProp);
 
 					// calculate normal map strength based on height map strength
+					double conversionFactor = 0.5;
+					QString shaderName = material->getMaterialName().toLower();
+					if (shaderName.contains("aoa_subsurface"))
+					{
+						conversionFactor = 3.0;
+					}
+					else if (shaderName.contains("omubersurface"))
+					{
+						double bumpMin = -0.1; 
+						double bumpMax = 0.1;
+						DzNumericProperty *bumpMinProp = qobject_cast<DzNumericProperty*>(material->findProperty("bump minimum", false));
+						DzNumericProperty *bumpMaxProp = qobject_cast<DzNumericProperty*>(material->findProperty("bump maximum", false));
+						if (bumpMinProp)
+						{
+							bumpMin = bumpMinProp->getDoubleValue();
+						}
+						if (bumpMaxProp)
+						{
+							bumpMax = bumpMaxProp->getDoubleValue();
+						}
+						double range = bumpMax - bumpMin;
+						conversionFactor = range * 25;
+					}
 					double heightStrength = getHeightMapStrength(material);
 					double normalStrength = heightStrength * conversionFactor;
 					double bakeStrength = 1.0;
