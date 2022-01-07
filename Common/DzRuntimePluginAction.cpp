@@ -178,19 +178,19 @@ bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
 					// create normalMap filename
 					QString tempPath;
 					QFileInfo fileInfo = QFileInfo(heightMapFilename);
-					QString normalMapFilename = fileInfo.completeBaseName() + "_nm." + fileInfo.suffix();
+					//QString normalMapFilename = fileInfo.completeBaseName() + "_nm." + fileInfo.suffix();
+					QString normalMapFilename = fileInfo.completeBaseName() + "_nm." + "png";
 					QString normalMapSavePath = dzApp->getTempPath() + "/" + normalMapFilename;
 					QFileInfo normalMapInfo = QFileInfo(normalMapSavePath);
 
+					// Generate Temp Normal Map if does not exist
 					if (!normalMapInfo.exists())
 					{
-						// Generate Temp Normal Map if does not exist
 						QImage normalMap = makeNormalMapFromHeightMap(heightMapFilename, bakeStrength);
-						// write QImage to temp folder
 						QString progressString = "Saving Normal Map: " + normalMapSavePath;
 						DzProgress saveProgress = DzProgress(progressString, 2, false, true);
 						saveProgress.step();
-						normalMap.save(normalMapSavePath);
+						normalMap.save(normalMapSavePath, 0, 75);
 						saveProgress.step();
 						saveProgress.finish();
 					}
