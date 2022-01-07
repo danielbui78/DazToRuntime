@@ -26,6 +26,7 @@
 #include "DzUnrealDialog.h"
 #include "DzUnrealMorphSelectionDialog.h"
 #include "DzUnrealSubdivisionDialog.h"
+#include "version.h"
 
 /*****************************
 Local definitions
@@ -59,7 +60,8 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	int btnMinWidth = style()->pixelMetric(DZ_PM_ButtonMinWidth);
 
 	// Set the dialog title
-	setWindowTitle(tr("Daz To Unreal"));
+	int revision = PLUGIN_REV % 1000;
+	setWindowTitle(tr("Daz To Unreal v%1.%2 Pre-Release Build %3.%4").arg(PLUGIN_MAJOR).arg(PLUGIN_MINOR).arg(revision).arg(PLUGIN_BUILD));
 	layout()->setSizeConstraint(QLayout::SetFixedSize);
 	QFormLayout* mainLayout = new QFormLayout(this);
 

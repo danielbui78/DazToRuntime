@@ -50,7 +50,11 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 	 ShowFbxDialog = false;
 	 ControllersToDisconnect.append("facs_bs_MouthClose_div2");
 	 UseRelativePaths = false;
+#ifdef _DEBUG
+	 m_bUndoNormalMaps = false;
+#else
 	 m_bUndoNormalMaps = true;
+#endif
 }
 
 DzRuntimePluginAction::~DzRuntimePluginAction()
@@ -198,9 +202,6 @@ bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
 					// Insert generated NormalMap into Daz material
 					if (numericProp)
 					{
-						// Injecting with DzTexture is causing flipped normal artifacts
-//						DzTexture* texture = dzApp->getImageMgr()->getImage(normalMapSavePath);
-//						numericProp->setMap(texture);
 						numericProp->setMap(normalMapSavePath);
 						numericProp->setDoubleValue(normalStrength);
 					}
@@ -376,6 +377,12 @@ bool DzRuntimePluginAction::isNormalMapMissing(DzMaterial* material)
 		// normal map property exists...
 		return false;
 	}
+
+#ifdef _DEBUG
+	QString materialName = material->getName();
+	QString materialLabel = material->getLabel();
+	QString shaderName = material->getMaterialName();
+#endif
 
 	// normal map property does not exist
 	return false;
