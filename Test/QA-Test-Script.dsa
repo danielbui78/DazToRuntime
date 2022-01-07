@@ -112,7 +112,7 @@ function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, s
 
 	return sReturnString;
 }
-function Run_TestCase_11(sTestAsset)
+function Run_TestCase_1001(sTestAsset)
 {
 
 	sExportFilename = "CustomAsset"
@@ -123,7 +123,7 @@ function Run_TestCase_11(sTestAsset)
 	sComponentName = ""
 	arrayMorphList = []
 
-	print("Running Test Case 11:")
+	print("Running Test Case 1001:")
 
 	Scene.clear()
 	var oContentMgr = App.getContentMgr()
@@ -147,6 +147,8 @@ function Run_TestCase_11(sTestAsset)
 	{
 		return false;
 	}
+
+
 
 	return true;
 }
@@ -203,6 +205,60 @@ function Run_TestCase_01(sTestAsset)
 		return false;
 	}
 
+	// check for normal maps
+	var sDTU = "c:/users/dbui/documents/daztounreal/genesis8female/genesis8female.dtu"
+ 	var sExportTexturesFolder = DzFileInfo(sDTU).path() + "/" + "exporttextures"
+ 	print(sExportTexturesFolder)
+	var oFolderInfo = new DzDir( sExportTexturesFolder )
+	if ( !oFolderInfo.exists() )
+	{
+		print("Normal map folder not found [FAILED].")
+		return false;
+	}
+	else
+	{
+		print("Generated Normal map folder found:")
+	}
+	var numFiles = oFolderInfo.count() - 2;
+	if (numFiles < 6)
+	{
+		print("  Incorrect number of normal maps found [FAILED].")
+		return false;
+	}
+	var arrNormalMapList = ["G8FBaseArmsMapB_1004_nm.png", "G8FBaseEyesB_1007_nm.png", "G8FBaseFaceMapB_1001_nm.png",
+							"G8FBaseLegsMapB_1003_nm.png", "G8FBaseMouthMapB_1005_nm.png", "G8FBaseTorsoMapB_1002_nm.png"]
+	for (i=0; i < 6; i++)
+	{
+		sNormalMapPath = sExportTexturesFolder + "/" + arrNormalMapList[i];
+		var oFileInfo = new DzFileInfo(sNormalMapPath);
+		if (oFileInfo.exists())
+		{
+			print("  Generated normal map found: " + arrNormalMapList[i] + ":");
+			var img = new QImage;
+			if (img.load(sNormalMapPath) == true)
+			{
+				print("    - valid image format. [OK]");
+			}
+			else
+			{
+				print("    - invalid format. [FAILED]")
+				return false;
+			}
+		}
+		else
+		{
+			print("  Normal map not found: " + arrNormalMapList[i] + " [FAILED]");
+			return false;
+		}
+	}
+
+  /////////////////////////////////////////////
+	// TODO: undoGenerateMissingNormalMaps()
+	// Check All Surfaces to Verify that
+	// added Normal Maps were properly
+	// removed.
+	/////////////////////////////////////////////
+
 	return true;
 }
 
@@ -224,12 +280,12 @@ else
 //Run_TestCase_01("/people/genesis 8 female/genesis 8.1 basic female.duf")
 //Run_TestCase_01("/people/genesis 8 female/characters/victoria 8.1.duf")
 
-var sTestAsset11 = "/people/genesis 8 female/genesis 8.1 basic female.duf"
-if (Run_TestCase_11(sTestAsset11) == true)
+var sTestAsset1001 = "/people/genesis 8 female/genesis 8.1 basic female.duf"
+if (Run_TestCase_1001(sTestAsset1001) == true)
 {
-	print("Test Case 11: PASSED");
+	print("Test Case 1001: PASSED");
 }
 else
 {
-	print("Test Case 11: FAILED");
+	print("Test Case 1001: FAILED");
 }

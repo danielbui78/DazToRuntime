@@ -11,15 +11,27 @@
 8. Click "Accept".
 9. Confirm Unreal Engine has successfully generated a new "Genesis8Female" asset in the Content Browser Pane.
 10. Confirm that a "Genesis8Female" subfolder was generated in the Intermediate Folder, with "Genesis8Female.dtu" and "Genesis8Female.fbx" files.
+11. Confirm that "ExportTextures" subfolder is present in the "Genesis8Female" folder, with 6 normal map files for: arms, eyes, face, legs, mouth, torso.
+12. Confirm normal maps are valid images by opening each one in an image viewer.
+13. In Daz Studio, go to the Surfaces pane and click the "Editor" tab.
+14. Select "Genesis 8 Female", type "normal" in the search/filter bar text box which is found next to the magnifying glass icon.
+15. Confirm that pane shows "(16): Normal Map" property with "Choose Map" text displayed.
 
 ## TC2. Load and Export Additional Genesis 8.1 Basic Female to Unreal
 1. Continue from previous Daz Studio and Unreal Engine session (test case 1).
-2. Load Genesis 8.1 Basic Female.
-3. Select File->Send To->Daz To Unreal.
-4. Confirm Asset Name is "Genesis81Female" in the Daz To Unreal dialog window.
-5. Click "Accept".
-6. Confirm UnrealEngine has successfully generated a new "Genesis81Female" asset in the Content Browser Pane.
-7. Confirm that a "Genesis81Female" subfolder was generated in the Intermediate Folder, with "Genesis81Female.dtu" and "Genesis81Female.fbx" files.
+2. Deselect "Genesis 8 Female" from Scene.
+3. Load Genesis 8.1 Basic Female.
+4. Confirm new Scene node is created named "Genesis 8.1 Female".
+5. Select File->Send To->Daz To Unreal.
+6. Confirm Asset Name is "Genesis81Female" in the Daz To Unreal dialog window.
+7. Click "Accept".
+8. Confirm UnrealEngine has successfully generated a new "Genesis81Female" asset in the Content Browser Pane.
+9. Confirm that a "Genesis81Female" subfolder was generated in the Intermediate Folder, with "Genesis81Female.dtu" and "Genesis81Female.fbx" files.
+10. Confirm that "ExportTextures" subfolder is present in the "Genesis8Female" folder, with 5 normal map files for: body, face, head, arms, legs.
+11. Confirm normal maps are valid images by opening each one in an image viewer.
+12. In Daz Studio, go to the Surfaces pane and click the "Editor" tab.
+13. Open the "Genesis 8.1 Female" tree and select "Skin-Lips-Nails", type "normal" in the search/filter bar text box which is found next to the magnifying glass icon.
+14. Confirm that pane shows "(10): Normal Map" property with "Choose Map" text displayed.
 
 ## TC3. Load and Export Genesis 8.1 Basic Female with Custom Scene Node Label.
 1. Start Daz Studio.
@@ -117,6 +129,7 @@
 8. Click "Accept".
 9. Confirm Unreal Engine has successfully generated a new "Victoria81" asset in the Content Browser Pane.
 10. Confirm that a "Victoria81" subfolder was generated in the Intermediate Folder, with "Victoria81.dtu" and "Victoria81.fbx" files.
+11. Confirm that "ExportTextures" subfolder is NOT present in the "Victoria81" folder.
 
 ## TC10. Load and Export Victoria 8.1 with "Victoria 8.1 Tattoo All - Add" to Unreal
 1. Start Daz Studio.
