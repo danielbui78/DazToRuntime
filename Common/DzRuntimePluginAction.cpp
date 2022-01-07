@@ -1199,15 +1199,15 @@ QImage DzRuntimePluginAction::makeNormalMapFromHeightMap(QString heightMapFilena
 		// col loop
 		for (int col = c1; col <= c2; col++) {
 
-			//// skip black pixels to speed conversion
-			//QRgb rgbMask = image.pixel(col, row);
-			//QColor mask = QColor(rgbMask);
-			//if (mask.red() == 0 && mask.green() == 0 && mask.blue() == 0)
-			//{
-			//	const QColor color = QColor(128, 127, 255);
-			//	result.setPixel(col, row, color.rgb());
-			//	continue;
-			//}
+			// skip blank pixels to speed conversion
+			QRgb rgbMask = image.pixel(col, row);
+			int mask = QColor(rgbMask).value();
+			if (mask == 0 || mask == 255)
+			{
+				const QColor color = QColor(128, 127, 255);
+				result.setPixel(col, row, color.rgb());
+				continue;
+			}
 
 			// Pixel Picker
 			const QRgb topLeft = this->getSafePixel(image, col - 1, row - 1);
