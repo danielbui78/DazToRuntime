@@ -142,11 +142,15 @@ bool DzRuntimePluginAction::generateMissingNormalMap(DzMaterial* material)
 
 					// calculate normal map strength based on height map strength
 					double heightStrength = getHeightMapStrength(material);
-					double normalStrength = heightStrength * 0.5;
-					double bakeStrength = normalStrength;
-					// If numeric property, then do not bake normal map strength into
-					//   image. Use normal strength property to transmit strength instead.
-					if (numericProp) bakeStrength = 1.0;
+					double normalStrength = heightStrength * conversionFactor;
+					double bakeStrength = 1.0;
+					// If not numeric property, then save normal map strength to external
+					//   value so it can be added into the DTU file on export.
+					if (!numericProp && imageProp)
+					{
+						// normalStrengthTable <material, normalstrength>
+						m_imgPropertyTable_NormalMapStrength.insert(imageProp, normalStrength);
+					}
 
 					// create normalMap filename
 					QString tempPath;

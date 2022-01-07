@@ -394,6 +394,14 @@ void DzUnrealAction::WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStr
 								}
 								dtuPropValue = Material->getDiffuseColor().name();
 								dtuPropType = QString("Texture");
+								
+								// Check if this is a Normal Map with Strength stored in lookup table
+								if (m_imgPropertyTable_NormalMapStrength.contains(ImageProperty))
+								{
+									dtuPropType = QString("Double");
+									dtuPropNumericValue = m_imgPropertyTable_NormalMapStrength[ImageProperty];
+									bUseNumeric = true;
+								}
 						  }
 						  // DzColorProperty is subclass of DzNumericProperty
 						  else if (ColorProperty)

@@ -3,6 +3,7 @@
 #include <dznode.h>
 #include <DzFileIOSettings.h>
 #include <dzjsonwriter.h>
+#include <dzimageproperty.h>
 
 #include "QtCore/qfile.h"
 #include "QtCore/qtextstream.h"
@@ -54,6 +55,7 @@ protected:
 	 QString FBXVersion;
 	 QMap<QString,QString> MorphMapping;
 	 QList<QString> PoseList;
+	 QMap<DzImageProperty*, double> m_imgPropertyTable_NormalMapStrength;
 
 	 // Used only by script system
 	 QString ExportFolder; // over-rides bridge use of <CharacterName> for the destination folder
