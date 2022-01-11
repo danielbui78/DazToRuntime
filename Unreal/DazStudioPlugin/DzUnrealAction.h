@@ -12,13 +12,11 @@
 
 class DzUnrealAction : public DzRuntimePluginAction {
 	Q_OBJECT
-    Q_PROPERTY(int NonInteractiveMode READ getNonInteractiveMode WRITE setNonInteractiveMode)
 public:
 	 DzUnrealAction();
 
 protected:
 	 int Port;
-     int NonInteractiveMode;
 	 DzUnrealSubdivisionDialog* SubdivisionDialog;
 
 	 void executeAction();
@@ -27,7 +25,5 @@ protected:
 	 QUuid WriteInstance(DzNode* Node, DzJsonWriter& Writer, QUuid ParentID);
 	 void WriteConfiguration();
 	 void SetExportOptions(DzFileIOSettings& ExportOptions);
-     int getNonInteractiveMode();
-     void setNonInteractiveMode(int);
 
 };

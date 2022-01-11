@@ -530,12 +530,6 @@ QUuid DzUnrealAction::WriteInstance(DzNode* Node, DzJsonWriter& Writer, QUuid Pa
 
 	return Uid;
 }
-void DzUnrealAction::setNonInteractiveMode(int mode) {
-    this->NonInteractiveMode = mode;
-}
-int DzUnrealAction::getNonInteractiveMode() {
-    return this->NonInteractiveMode;
-}
 
 
 #include "moc_DzUnrealAction.cpp"

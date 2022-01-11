@@ -17,14 +17,15 @@ struct AttachmentInfo
 
 class DzRuntimePluginAction : public DzAction {
 	Q_OBJECT
-	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
-	Q_PROPERTY(QString ExportFilename READ getExportFilename WRITE setExportFilename)
-	Q_PROPERTY(QString ExportFolder READ getExportFolder WRITE setExportFolder)
-	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
-	Q_PROPERTY(QString ProductName READ getProductName WRITE setProductName)
-	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
-	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
-	Q_PROPERTY(bool UseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
+	Q_PROPERTY(int nNonInteractiveMode READ getNonInteractiveMode WRITE setNonInteractiveMode)
+	Q_PROPERTY(QString sAssetType READ getAssetType WRITE setAssetType)
+	Q_PROPERTY(QString sExportFilename READ getExportFilename WRITE setExportFilename)
+	Q_PROPERTY(QString sExportFolder READ getExportFolder WRITE setExportFolder)
+	Q_PROPERTY(QString sRootFolder READ getRootFolder WRITE setRootFolder)
+	Q_PROPERTY(QString sProductName READ getProductName WRITE setProductName)
+	Q_PROPERTY(QString sProductComponentName READ getProductComponentName WRITE setProductComponentName)
+	Q_PROPERTY(QStringList aMorphList READ getMorphList WRITE setMorphList)
+	Q_PROPERTY(bool bUseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
 	Q_PROPERTY(bool bUndoNormalMaps READ getUndoNormalMaps WRITE setUndoNormalMaps)
 public:
 
@@ -47,6 +48,7 @@ public slots:
 	bool undoGenerateMissingNormalMaps();
 
 protected:
+	int NonInteractiveMode;
 	 QString CharacterName; // Exported filename without extension
 	 QString RootFolder; // The destination Root Folder
 	 QString DestinationPath; // Path to destination files: <RootFolder> + "/" + <CharacterName (folder)> + "/"
@@ -135,6 +137,9 @@ protected:
 
 	 bool getUndoNormalMaps() { return this->m_bUndoNormalMaps; };
 	 void setUndoNormalMaps(bool arg_UndoNormalMaps) { this->m_bUndoNormalMaps = arg_UndoNormalMaps; };
+
+	 int getNonInteractiveMode() { return this->NonInteractiveMode; };
+	 void setNonInteractiveMode(int arg_Mode) { this->NonInteractiveMode = arg_Mode; };
 
 private:
 	 // Undo data structures
