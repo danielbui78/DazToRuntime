@@ -482,6 +482,29 @@ bool DzRuntimePluginAction::undoRenameDuplicateMaterials()
 
 }
 
+void DzRuntimePluginAction::resetToDefaults()
+{
+	// reset all dialog settings and script-exposed properties to defaults
+	DzNode *selection = dzScene->getPrimarySelection();
+	if (selection)
+	{
+		CharacterName = this->cleanString(selection->getLabel());
+	}
+	// TODO: 
+	/*
+	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
+	Q_PROPERTY(QString ExportFilename READ getExportFilename WRITE setExportFilename)
+	Q_PROPERTY(QString ExportFolder READ getExportFolder WRITE setExportFolder)
+	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
+	Q_PROPERTY(QString ProductName READ getProductName WRITE setProductName)
+	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
+	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
+	Q_PROPERTY(bool UseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
+	Q_PROPERTY(bool bUndoNormalMaps READ getUndoNormalMaps WRITE setUndoNormalMaps)
+	*/
+
+}
+
 void DzRuntimePluginAction::Export()
 {
 	// FBX Export

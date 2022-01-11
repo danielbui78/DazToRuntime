@@ -31,6 +31,9 @@ public:
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
 	 virtual ~DzRuntimePluginAction();
 
+	 Q_INVOKABLE void resetToDefaults();
+	 Q_INVOKABLE QString cleanString(QString argString) { return argString.remove(QRegExp("[^A-Za-z0-9_]")); };
+
 public slots:
 	// Normal Map Handling
 	QImage makeNormalMapFromHeightMap(QString heightMapFilename, double normalStrength);
