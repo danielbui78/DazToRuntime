@@ -34,6 +34,8 @@ public:
 
 	 Q_INVOKABLE void resetToDefaults();
 	 Q_INVOKABLE QString cleanString(QString argString) { return argString.remove(QRegExp("[^A-Za-z0-9_]")); };
+	 Q_INVOKABLE QStringList getAvailableMorphs(DzNode* Node);
+	 Q_INVOKABLE QStringList getActiveMorphs(DzNode* Node);
 
 public slots:
 	// Normal Map Handling

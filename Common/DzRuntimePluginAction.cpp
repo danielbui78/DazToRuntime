@@ -1341,6 +1341,106 @@ QImage DzRuntimePluginAction::makeNormalMapFromHeightMap(QString heightMapFilena
 	return result;
 }
 
+QStringList DzRuntimePluginAction::getAvailableMorphs(DzNode* Node)
+{
+	QStringList newMorphList;
 
+	DzObject* Object = Node->getObject();
+	DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
+
+	for (int index = 0; index < Node->getNumProperties(); index++)
+	{
+		DzProperty* property = Node->getProperty(index);
+		QString propName = property->getName();
+		QString propLabel = property->getLabel();
+		DzPresentation* presentation = property->getPresentation();
+		if (presentation && presentation->getType() == "Modifier/Shape")
+		{
+			newMorphList.append(propName);
+		}
+	}
+
+	if (Object)
+	{
+		for (int index = 0; index < Object->getNumModifiers(); index++)
+		{
+			DzModifier* modifier = Object->getModifier(index);
+			QString modName = modifier->getName();
+			QString modLabel = modifier->getLabel();
+			DzMorph* mod = qobject_cast<DzMorph*>(modifier);
+			if (mod)
+			{
+				for (int propindex = 0; propindex < modifier->getNumProperties(); propindex++)
+				{
+					DzProperty* property = modifier->getProperty(propindex);
+					QString propName = property->getName();
+					QString propLabel = property->getLabel();
+					DzPresentation* presentation = property->getPresentation();
+					if (presentation)
+					{
+						newMorphList.append(modName);
+					}
+				}
+			}
+		}
+	}
+
+	return newMorphList;
+}
+
+QStringList DzRuntimePluginAction::getActiveMorphs(DzNode* Node)
+{
+	QStringList newMorphList;
+
+	DzObject* Object = Node->getObject();
+	DzShape* Shape = Object ? Object->getCurrentShape() : NULL;
+
+	for (int index = 0; index < Node->getNumProperties(); index++)
+	{
+		DzProperty* property = Node->getProperty(index);
+		QString propName = property->getName();
+		QString propLabel = property->getLabel();
+		DzPresentation* presentation = property->getPresentation();
+		if (presentation && presentation->getType() == "Modifier/Shape")
+		{
+			DzNumericProperty *numericProp = qobject_cast<DzNumericProperty*>(property);
+			if (numericProp->getDoubleValue() > 0)
+			{
+				newMorphList.append(propName);
+			}
+		}
+	}
+
+	if (Object)
+	{
+		for (int index = 0; index < Object->getNumModifiers(); index++)
+		{
+			DzModifier* modifier = Object->getModifier(index);
+			QString modName = modifier->getName();
+			QString modLabel = modifier->getLabel();
+			DzMorph* mod = qobject_cast<DzMorph*>(modifier);
+			if (mod)
+			{
+				for (int propindex = 0; propindex < modifier->getNumProperties(); propindex++)
+				{
+					DzProperty* property = modifier->getProperty(propindex);
+					QString propName = property->getName();
+					QString propLabel = property->getLabel();
+					DzPresentation* presentation = property->getPresentation();
+					if (presentation)
+					{
+						DzNumericProperty* numericProp = qobject_cast<DzNumericProperty*>(property);
+						if (numericProp->getDoubleValue() > 0)
+						{
+							newMorphList.append(modName);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return newMorphList;
+}
 
 #include "moc_DzRuntimePluginAction.cpp"
