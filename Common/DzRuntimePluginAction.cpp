@@ -61,6 +61,57 @@ DzRuntimePluginAction::~DzRuntimePluginAction()
 {
 }
 
+void DzRuntimePluginAction::resetToDefaults()
+{
+	ExportMorphs = false;
+	ExportSubdivisions = false;
+	ShowFbxDialog = false;
+	ControllersToDisconnect.clear();
+	ControllersToDisconnect.append("facs_bs_MouthClose_div2");
+
+	// Reset all dialog settings and script-exposed properties to Hardcoded Defaults
+	// Exception: scene filename to exportfilename behavior is ignored
+	// Ignore saved settings, QSettings, etc.
+	DzNode* selection = dzScene->getPrimarySelection();
+	if (selection)
+	{
+		CharacterName = this->cleanString(selection->getLabel());
+		DzFigure* figure = qobject_cast<DzFigure*>(selection);
+		if (figure)
+		{
+			AssetType = "SkeletalMesh";
+		}
+		else
+		{
+			AssetType = "StaticMesh";
+		}
+	}
+	else
+	{
+		CharacterName = "";
+		AssetType = "SkeletalMesh";
+	}
+	ProductName = "";
+	ProductComponentName = "";
+	ScriptOnly_MorphList.clear();
+	UseRelativePaths = false;
+	m_bUndoNormalMaps = true;
+	NonInteractiveMode = 0;
+	m_undoTable_DuplicateMaterialRename.clear();
+	m_undoTable_GenerateMissingNormalMap.clear();
+	m_sExportFbx = "";
+
+	// TODO: 
+	// - clear MorphDialog (if exists)
+	// - clear Subdivision Dialog (if exists)
+	// - implement target-software specific settings in subclasses
+	/*
+	Q_PROPERTY(QString ExportFolder READ getExportFolder WRITE setExportFolder)
+	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
+	*/
+
+}
+
 bool DzRuntimePluginAction::preProcessScene(DzNode* parentNode)
 {
 	DzProgress preProcessProgress = DzProgress("Daz Bridge Pre-Processing...", 0, false, true);
@@ -479,29 +530,6 @@ bool DzRuntimePluginAction::undoRenameDuplicateMaterials()
 	m_undoTable_DuplicateMaterialRename.clear();
 
 	return true;
-
-}
-
-void DzRuntimePluginAction::resetToDefaults()
-{
-	// reset all dialog settings and script-exposed properties to defaults
-	DzNode *selection = dzScene->getPrimarySelection();
-	if (selection)
-	{
-		CharacterName = this->cleanString(selection->getLabel());
-	}
-	// TODO: 
-	/*
-	Q_PROPERTY(QString AssetType READ getAssetType WRITE setAssetType)
-	Q_PROPERTY(QString ExportFilename READ getExportFilename WRITE setExportFilename)
-	Q_PROPERTY(QString ExportFolder READ getExportFolder WRITE setExportFolder)
-	Q_PROPERTY(QString RootFolder READ getRootFolder WRITE setRootFolder)
-	Q_PROPERTY(QString ProductName READ getProductName WRITE setProductName)
-	Q_PROPERTY(QString ProductComponentName READ getProductComponentName WRITE setProductComponentName)
-	Q_PROPERTY(QStringList MorphList READ getMorphList WRITE setMorphList)
-	Q_PROPERTY(bool UseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
-	Q_PROPERTY(bool bUndoNormalMaps READ getUndoNormalMaps WRITE setUndoNormalMaps)
-	*/
 
 }
 
