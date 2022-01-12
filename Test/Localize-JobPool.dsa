@@ -126,9 +126,9 @@ function ProcessJobFile ( sJobFile ) {
 }
 
 function main() {
-	var aArgList = ["C:/CustomRoot/autoexec-jobpool.txt"]
-	//var aArgList = App.scriptArgs;
-	//var aArgList = getArguments()
+//	var aArgList = ["C:/CustomRoot/autoexec-jobpool.txt"]
+	var aArgList = App.scriptArgs;
+//	var aArgList = getArguments()
 	var nArgCount = aArgList.length;
 
 	if (nArgCount == 0) {

@@ -1,0 +1,19 @@
+// DAZ Studio version 4.16.0.3 filetype DAZ Script
+
+obj = new DzUnrealAction()
+sel = Scene.getPrimarySelection()
+
+print("Available Morphs:")
+list = obj.getAvailableMorphs(sel)
+for (i=0; i < list.length; i++)
+{
+	print(list[i])
+}
+print("\n")
+
+print("Active Morphs:")
+list = obj.getActiveMorphs(sel)
+for (i=0; i < list.length; i++)
+{
+	print(list[i])
+}
