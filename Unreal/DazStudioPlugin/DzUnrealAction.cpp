@@ -143,14 +143,15 @@ void DzUnrealAction::executeAction()
 		if (RootFolder == "" || NonInteractiveMode == 0) RootFolder = BridgeDialog->intermediateFolderEdit->text().replace("\\","/");
 		if (ExportFolder == "" || NonInteractiveMode == 0) ExportFolder = CharacterName;
 		DestinationPath = RootFolder + "/" + ExportFolder + "/";
-        CharacterFBX = DestinationPath + CharacterName + ".fbx";
-        CharacterBaseFBX = DestinationPath + CharacterName + "_base.fbx";
-        CharacterHDFBX = DestinationPath + CharacterName + "_HD.fbx";
+		if (m_sExportFbx == "") m_sExportFbx = CharacterName;
+        CharacterFBX = DestinationPath + m_sExportFbx + ".fbx";
+//        CharacterBaseFBX = DestinationPath + m_sExportFbx + "_base.fbx";
+//        CharacterHDFBX = DestinationPath + m_sExportFbx + "_HD.fbx";
 
 		if (NonInteractiveMode == 0 )
 		{
 			// TODO: consider removing once findData( ) method above is completely implemented
-			AssetType = BridgeDialog->assetTypeCombo->currentText().replace(" ", "");
+			AssetType = cleanString(BridgeDialog->assetTypeCombo->currentText());
 
 			MorphString = BridgeDialog->GetMorphString();
 			MorphMapping = BridgeDialog->GetMorphMapping();
@@ -189,7 +190,11 @@ void DzUnrealAction::WriteConfiguration()
 	 writer.addMember("Asset Name", CharacterName);
 	 writer.addMember("Asset Type", AssetType);
 	 writer.addMember("FBX File", CharacterFBX);
+	 QString CharacterBaseFBX = CharacterFBX;
+	 CharacterBaseFBX.replace(".fbx", "_base.fbx");
 	 writer.addMember("Base FBX File", CharacterBaseFBX);
+	 QString CharacterHDFBX = CharacterFBX;
+	 CharacterHDFBX.replace(".fbx", "_HD.fbx");
 	 writer.addMember("HD FBX File", CharacterHDFBX);
 	 writer.addMember("Import Folder", DestinationPath);
 	 // DB Dec-21-2021: additional metadata

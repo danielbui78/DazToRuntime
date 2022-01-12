@@ -55,6 +55,7 @@ DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString&
 #else
 	 m_bUndoNormalMaps = true;
 #endif
+	 m_sExportFbx = "";
 }
 
 DzRuntimePluginAction::~DzRuntimePluginAction()
@@ -600,7 +601,9 @@ void DzRuntimePluginAction::Export()
 		// After the props have been exported, export the environment
 		CharacterName = OriginalCharacterName;
 		DestinationPath = RootFolder + "/" + ExportFolder + "/";
-		CharacterFBX = DestinationPath + CharacterName + ".fbx";
+		// use original export fbx filestem, if exists
+		if (m_sExportFbx == "") m_sExportFbx = CharacterName;
+		CharacterFBX = DestinationPath + m_sExportFbx + ".fbx";
 		Selection = OriginalSelection;
 		AssetType = "Environment";
 		ExportNode(Selection);
@@ -828,13 +831,13 @@ void DzRuntimePluginAction::ExportNode(DzNode* Node)
 		  {
 			  if (ExportBaseMesh)
 			  {
-				  QString CharacterBaseFBX = CharacterFBX;
+				  QString CharacterBaseFBX = this->CharacterFBX;
 				  CharacterBaseFBX.replace(".fbx", "_base.fbx");
 				  Exporter->writeFile(CharacterBaseFBX, &ExportOptions);
 			  }
 			  else
 			  {
-				  QString CharacterHDFBX = CharacterFBX;
+				  QString CharacterHDFBX = this->CharacterFBX;
 				  CharacterHDFBX.replace(".fbx", "_HD.fbx");
 				  Exporter->writeFile(CharacterHDFBX, &ExportOptions);
 

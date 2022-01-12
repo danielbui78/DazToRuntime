@@ -27,6 +27,7 @@ class DzRuntimePluginAction : public DzAction {
 	Q_PROPERTY(QStringList aMorphList READ getMorphList WRITE setMorphList)
 	Q_PROPERTY(bool bUseRelativePaths READ getUseRelativePaths WRITE setUseRelativePaths)
 	Q_PROPERTY(bool bUndoNormalMaps READ getUndoNormalMaps WRITE setUndoNormalMaps)
+	Q_PROPERTY(QString sExportFbx READ getExportFbx WRITE setExportFbx)
 public:
 
 	 DzRuntimePluginAction(const QString& text = QString::null, const QString& desc = QString::null);
@@ -55,8 +56,8 @@ protected:
 	 QString RootFolder; // The destination Root Folder
 	 QString DestinationPath; // Path to destination files: <RootFolder> + "/" + <CharacterName (folder)> + "/"
 	 QString CharacterFBX;
-	 QString CharacterBaseFBX;
-	 QString CharacterHDFBX;
+//	 QString CharacterBaseFBX;
+//	 QString CharacterHDFBX;
 	 QString AssetType;
 	 QString MorphString;
 	 QString FBXVersion;
@@ -71,6 +72,7 @@ protected:
 	 QStringList ScriptOnly_MorphList; // overrides Morph Selection Dialog
 	 bool UseRelativePaths;
 	 bool m_bUndoNormalMaps;
+	 QString m_sExportFbx;
 
 	 bool ExportMorphs;
 	 bool ExportSubdivisions;
@@ -142,6 +144,9 @@ protected:
 
 	 int getNonInteractiveMode() { return this->NonInteractiveMode; };
 	 void setNonInteractiveMode(int arg_Mode) { this->NonInteractiveMode = arg_Mode; };
+
+	 QString getExportFbx() { return this->m_sExportFbx; };
+	 void setExportFbx(QString arg_FbxName) { this->m_sExportFbx = arg_FbxName; };
 
 private:
 	 // Undo data structures
