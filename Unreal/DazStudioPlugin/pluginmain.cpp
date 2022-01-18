@@ -12,7 +12,7 @@ DZ_PLUGIN_AUTHOR("Daz 3D, Inc");
 DZ_PLUGIN_VERSION(PLUGIN_MAJOR, PLUGIN_MINOR, PLUGIN_REV, PLUGIN_BUILD);
 
 DZ_PLUGIN_DESCRIPTION(QString(
-"<b>Pre-Release DazToUnreal Bridge v%1.%2.%3.%4 </b><br>\
+"<b>Pre-Release DazToUnreal Bridge v%1.%2.%3.%4 (script/automation updates) </b><br>\
 Bridge Collaboration Project<br><br>\
 <a href = \"https://github.com/danielbui78-bridge-collab/DazToRuntime/tree/unreal-main\">Github</a><br><br>"
 ).arg(PLUGIN_MAJOR).arg(PLUGIN_MINOR).arg(PLUGIN_REV).arg(PLUGIN_BUILD));
