@@ -171,45 +171,45 @@ function Validate_LIE_Textures(nNumLIETextures, sNameFilters, sDTUpath)
 function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
 {
 	obj = new DzUnrealAction()
-	obj.NonInteractiveMode = 1
+	obj.nNonInteractiveMode = 1
 
 	// obj.UseRelativePaths: set true for relative Daz Library runtime paths
 	//                       set false for absolute filepath
 	// Default to true to work with interactive mode
-	obj.UseRelativePaths = false;
+	obj.bUseRelativePaths = false;
 	// obj.UseRelativePaths = true;
 
 	// obj.ExportFilename: filename stem for DTU and FBX file
 	// Can not have spaces or hyphen.  Underscore is OK
 	// Leave blank to default to sanitized Scene Node Label
-	obj.ExportFilename = sExportFilename
+	obj.sExportFilename = sExportFilename
 
 	// obj.AssetType: "SkeletalMesh" [DEFAULT], "StaticMesh", "Animation", "Environment", "Pose"
-	obj.AssetType = sAssetType
+	obj.sAssetType = sAssetType
 
 	// obj.RootFolder: path to destination root
 	// If folder or path doesn't exist, it will be created
-	obj.RootFolder = sRootFolder
+	obj.sRootFolder = sRootFolder
 
 	// obj.ExportFolder: name folder containing DTU/FBX
 	// Leave blank to default to sanitized Scene Node Label like ExportFilename
-	obj.ExportFolder = sExportFolder
+	obj.sExportFolder = sExportFolder
 
 	// obj.ProductName: Daz Store Product Name (or anything you want), can have spaces & special characters
-	obj.ProductName = sProductName
+	obj.sProductName = sProductName
 
 	// obj.ProductComponentName: Friendly Name for component within Product
 	// Put frienldy pose name or material name here
-	obj.ProductComponentName = sComponentName
+	obj.sProductComponentName = sComponentName
 
 	// obj.MorphList: String array of morphs to convert into blendshapes within FBX.
 	// Leave empty if you do not want to export any blendshapes.
 	//obj.MorphList = ["CTRLVictoria8_1", "FHMVictoria8_1", "FBMVictoria8_1"]
-	obj.MorphList = arrayMorphList
+	obj.aMorphList = arrayMorphList
 
 	obj.executeAction()
 
-	var sReturnString = obj.RootFolder + "/" + obj.ExportFolder + "/" + obj.ExportFilename + ".dtu"
+	var sReturnString = obj.sRootFolder + "/" + obj.sExportFolder + "/" + obj.sExportFilename + ".dtu"
 
 	return sReturnString;
 }
