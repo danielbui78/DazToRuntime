@@ -88,14 +88,14 @@ void DzUnrealAction::executeAction()
 		// 2) dialog AssetName to get/setExportFilename
 		//connect(BridgeDialog->assetNameEdit, SIGNAL(QLineEdit::textChanged()), this, SLOT(setExportFilename()));
 		// TODO: assess whether ValidateText is needed below
-		if (CharacterName != "")
-		{
-			BridgeDialog->assetNameEdit->setText(CharacterName);
-		}
-		else
-		{
-			BridgeDialog->assetNameEdit->setText(dzScene->getPrimarySelection()->getLabel().remove(QRegExp("[^A-Za-z0-9_]")));
-		}
+		//if (CharacterName != "")
+		//{
+		//	BridgeDialog->assetNameEdit->setText(CharacterName);
+		//}
+		//else
+		//{
+		//	BridgeDialog->assetNameEdit->setText(dzScene->getPrimarySelection()->getLabel().remove(QRegExp("[^A-Za-z0-9_]")));
+		//}
 
 		// 3) ?? to get/setExportFolder
 		// n/a: Not accessible by Bridge UI, ExportFolder is script-only for now

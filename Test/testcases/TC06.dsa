@@ -21,7 +21,7 @@ function Run_TestCase_06(sTestAsset)
     oContentMgr.openFile(sFullPath);
 
     // Select "Bodybuilder" Morph (TC6.8)
-    // *****TODO****
+    arrayMorphList = ["CTRLBodybuilder"];
 
     // Send to Unreal (TC6.10)
     var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList);
@@ -58,6 +58,5 @@ function Run_TestCase_06(sTestAsset)
 		return false;
 	}
 
-    // ***TODO*** remove hardcode to false after fully implementing
-    return false;
+    return true;
 }
