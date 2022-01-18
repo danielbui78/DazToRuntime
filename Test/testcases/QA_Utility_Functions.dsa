@@ -1,0 +1,215 @@
+// DAZ Studio version 4.16.0.3 filetype DAZ Script
+
+/////////////////////////////////////
+// Validation functions
+/////////////////////////////////////
+function Validate_DTU_file( sDtuFilename )
+{
+	var oFile = new DzFile( sDtuFilename );
+	if ( !oFile.exists() )
+	{
+		print("DTU File not found [FAILED].");
+		return false;
+	}
+
+	oFile.open( DzFile.ReadOnly );
+	if (!oFile)
+	{
+		print("Unable to open DTU file [FAILED].");
+		return false;
+	}
+
+	var sDTU_contents = oFile.read();
+	if (!sDTU_contents)
+	{
+		print("Unable to read file [FAILED].");
+		return false;
+	}
+
+	var oDTU = {};
+	try
+	{
+		oDTU = JSON.parse(sDTU_contents);
+	}
+	catch (e)
+	{
+		oDTU = false;
+	}
+
+	if (!oDTU)
+	{
+		print("DTU: Invalid JSON format [FAILED].");
+		return false;
+	}
+	else
+	{
+		print("DTU: Valid JSON format [OK].");
+		return true;
+	}
+	return false;
+}
+
+function Validate_FBX_file (sFbxFilename)
+{
+	var oFBXi = new OpenFBXInterface();
+	var result = oFBXi.LoadScene(sFbxFilename);
+	if (result)
+	{
+		print("FBX fileformat check passed: valid FBX file");
+		return true;
+	}
+	else
+	{
+		print("FBX fileformat check failed: invalid FBX file");
+		return false;
+	}
+	return false;
+}
+
+function Validate_NormalMaps (arrNormalMapList, sDTUpath)
+{
+ 	var sExportTexturesFolder = sDTUpath + "/" + "exporttextures";
+ 	//print(sExportTexturesFolder)
+	var oFolderInfo = new DzDir( sExportTexturesFolder );
+	if ( !oFolderInfo.exists() )
+	{
+		print("Normal map folder not found [FAILED].");
+		return false;
+	}
+	else
+	{
+		print("Generated Normal map folder found:");
+	}
+	oFolderInfo.setNameFilters(["*_nm.png"]);
+	var numFiles = oFolderInfo.count();
+	if (numFiles != arrNormalMapList.length)
+	{
+		print("Incorrect number of normal maps found [FAILED].");
+		return false;
+	}
+	for (i=0; i < arrNormalMapList.length ; i++)
+	{
+		sNormalMapPath = sExportTexturesFolder + "/" + arrNormalMapList[i];
+		var oFileInfo = new DzFileInfo(sNormalMapPath);
+		if (oFileInfo.exists())
+		{
+			print("Generated normal map found: " + arrNormalMapList[i] + ":");
+			if (Validate_Image_Format(sNormalMapPath) == false)
+			{
+				return false;
+			}
+		}
+		else
+		{
+			print("Normal map not found: " + arrNormalMapList[i] + " [FAILED]");
+			return false;
+		}
+	}
+
+    /////////////////////////////////////////////
+	// TODO: Check undoGenerateMissingNormalMaps()
+	// Check All Surfaces to Verify that
+	// added Normal Maps were properly
+	// removed.
+	/////////////////////////////////////////////
+
+	return true;
+}
+
+function Validate_Image_Format(sImagePath)
+{
+	var img = new QImage;
+	if (img.load(sImagePath) == true)
+	{
+		print("  - valid image format. [OK]");
+		return true;
+	}
+	else
+	{
+		print("  - invalid format. [FAILED]")
+		return false;
+	}
+
+	print ("UNKNOWN ERROR: Validate_Image_Format( \"" + sImagePath + "\" )");
+	return false;
+}
+
+function Validate_LIE_Textures(nNumLIETextures, sNameFilters, sDTUpath)
+{
+ 	var sExportTexturesFolder = sDTUpath + "/" + "exporttextures";
+	var oTextureFolder = DzDir(sExportTexturesFolder);
+	if (oTextureFolder.exists() == false)
+	{
+		print("ExportTextures subfolder was NOT generated [FAILED].");
+		return false;
+	}
+
+	oTextureFolder.setNameFilters(sNameFilters);
+	var oFileList = oTextureFolder.entryList();
+
+	if (oFileList.length != nNumLIETextures)
+	{
+		print("Incorrect number of LIE textures found [FAILED].");
+		return false;
+	}
+	for (var i=0; i < oFileList.length; i++)
+	{
+		var sTexturePath = sExportTexturesFolder + "/" + oFileList[i];
+		print("LIE texture found: " + oFileList[i] + ":");
+		if (Validate_Image_Format(sTexturePath) == false)
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/////////////////////////////////////
+// Run Test Case function
+/////////////////////////////////////
+function Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList)
+{
+	obj = new DzUnrealAction()
+	obj.NonInteractiveMode = 1
+
+	// obj.UseRelativePaths: set true for relative Daz Library runtime paths
+	//                       set false for absolute filepath
+	// Default to true to work with interactive mode
+	obj.UseRelativePaths = false;
+	// obj.UseRelativePaths = true;
+
+	// obj.ExportFilename: filename stem for DTU and FBX file
+	// Can not have spaces or hyphen.  Underscore is OK
+	// Leave blank to default to sanitized Scene Node Label
+	obj.ExportFilename = sExportFilename
+
+	// obj.AssetType: "SkeletalMesh" [DEFAULT], "StaticMesh", "Animation", "Environment", "Pose"
+	obj.AssetType = sAssetType
+
+	// obj.RootFolder: path to destination root
+	// If folder or path doesn't exist, it will be created
+	obj.RootFolder = sRootFolder
+
+	// obj.ExportFolder: name folder containing DTU/FBX
+	// Leave blank to default to sanitized Scene Node Label like ExportFilename
+	obj.ExportFolder = sExportFolder
+
+	// obj.ProductName: Daz Store Product Name (or anything you want), can have spaces & special characters
+	obj.ProductName = sProductName
+
+	// obj.ProductComponentName: Friendly Name for component within Product
+	// Put frienldy pose name or material name here
+	obj.ProductComponentName = sComponentName
+
+	// obj.MorphList: String array of morphs to convert into blendshapes within FBX.
+	// Leave empty if you do not want to export any blendshapes.
+	//obj.MorphList = ["CTRLVictoria8_1", "FHMVictoria8_1", "FBMVictoria8_1"]
+	obj.MorphList = arrayMorphList
+
+	obj.executeAction()
+
+	var sReturnString = obj.RootFolder + "/" + obj.ExportFolder + "/" + obj.ExportFilename + ".dtu"
+
+	return sReturnString;
+}
