@@ -200,6 +200,9 @@ void DzUnrealAction::WriteConfiguration()
 	 // DB Dec-21-2021: additional metadata
 	 writer.addMember("Product Name", ProductName);
 	 writer.addMember("Product Component Name", ProductComponentName);
+	 QString AssetID = Selection->getAssetUri().getId();
+	 AssetID = AssetID.remove(QRegExp("[^A-Za-z0-9_]"));
+	 writer.addMember("AssetID", AssetID);
 
 	 if (AssetType != "Environment")
 	 {

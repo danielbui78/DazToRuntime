@@ -513,67 +513,69 @@ void DzRuntimePluginAction::Export()
 	QMap<QString, DzNode*> PropToInstance;
 	if (AssetType == "Environment")
 	{
-		// Store off the original export information
-		QString OriginalCharacterName = CharacterName;
-		DzNode* OriginalSelection = Selection;
-
-		// Find all the different types of props in the scene
-		GetScenePropList(Selection, PropToInstance);
-		QMap<QString, DzNode*>::iterator iter;
-		for (iter = PropToInstance.begin(); iter != PropToInstance.end(); ++iter)
+		// If NonInteractive == 1, then skip export of meshes and just export Environment DTU
+		if (NonInteractiveMode == 0)
 		{
-			// Override the export info for exporting this prop
-			AssetType = "StaticMesh";
-			CharacterName = iter.key();
-			CharacterName = CharacterName.remove(QRegExp("[^A-Za-z0-9_]"));
-			DestinationPath = RootFolder + "/" + CharacterName + "/";
-			CharacterFBX = DestinationPath + CharacterName + ".fbx";
-			DzNode* Node = iter.value();
+			// Store off the original export information
+			QString OriginalCharacterName = CharacterName;
+			DzNode* OriginalSelection = Selection;
 
-			// If this is a figure, send it as a skeletal mesh
-			if (DzSkeleton* Skeleton = Node->getSkeleton())
+			// Find all the different types of props in the scene
+			GetScenePropList(Selection, PropToInstance);
+			QMap<QString, DzNode*>::iterator iter;
+			for (iter = PropToInstance.begin(); iter != PropToInstance.end(); ++iter)
 			{
-				if (DzFigure* Figure = qobject_cast<DzFigure*>(Skeleton))
+				// Override the export info for exporting this prop
+				AssetType = "StaticMesh";
+				CharacterName = iter.key();
+				CharacterName = CharacterName.remove(QRegExp("[^A-Za-z0-9_]"));
+				// Do Not Change DestinationPath: Use the Environment folder as parent folder for all child objects
+				CharacterFBX = DestinationPath + CharacterName + ".fbx";
+				DzNode* Node = iter.value();
+
+				// If this is a figure, send it as a skeletal mesh
+				if (DzSkeleton* Skeleton = Node->getSkeleton())
 				{
-					AssetType = "SkeletalMesh";
+					if (DzFigure* Figure = qobject_cast<DzFigure*>(Skeleton))
+					{
+						AssetType = "SkeletalMesh";
+					}
 				}
+
+				//Unlock the transform controls so the node can be moved to root
+				UnlockTranform(Node);
+
+				// Disconnect the asset being sent from everything else
+				QList<AttachmentInfo> AttachmentList;
+				DisconnectNode(Node, AttachmentList);
+
+				// Set the selection so this will be the exported asset
+				Selection = Node;
+
+				// Store the current transform and zero it out.
+				DzVec3 Location;
+				DzQuat Rotation;
+				DzMatrix3 Scale;
+
+				Node->getWSTransform(Location, Rotation, Scale);
+				Node->setWSTransform(DzVec3(0.0f, 0.0f, 0.0f), DzQuat(), DzMatrix3(true));
+
+				// Export
+				ExportNode(Node);
+
+				// Put the item back where it was
+				Node->setWSTransform(Location, Rotation, Scale);
+
+				// Reconnect all the nodes
+				ReconnectNodes(AttachmentList);
 			}
 
-			//Unlock the transform controls so the node can be moved to root
-			UnlockTranform(Node);
-
-			// Disconnect the asset being sent from everything else
-			QList<AttachmentInfo> AttachmentList;
-			DisconnectNode(Node, AttachmentList);
-
-			// Set the selection so this will be the exported asset
-			Selection = Node;
-
-			// Store the current transform and zero it out.
-			DzVec3 Location;
-			DzQuat Rotation;
-			DzMatrix3 Scale;
-
-			Node->getWSTransform(Location, Rotation, Scale);
-			Node->setWSTransform(DzVec3(0.0f, 0.0f, 0.0f), DzQuat(), DzMatrix3(true));
-
-			// Export
-			ExportNode(Node);
-
-			// Put the item back where it was
-			Node->setWSTransform(Location, Rotation, Scale);
-
-			// Reconnect all the nodes
-			ReconnectNodes(AttachmentList);
+			// Restore Original Environment Node info after child nodes are exported
+			CharacterName = OriginalCharacterName;
+			Selection = OriginalSelection;
 		}
 
-		// After the props have been exported, export the environment
-		CharacterName = OriginalCharacterName;
-		DestinationPath = RootFolder + "/" + ExportFolder + "/";
-		// use original export fbx filestem, if exists
-		if (m_sExportFbx == "") m_sExportFbx = CharacterName;
-		CharacterFBX = DestinationPath + m_sExportFbx + ".fbx";
-		Selection = OriginalSelection;
+		// only outputs DTU, all Meshes are recursively handled above
 		AssetType = "Environment";
 		ExportNode(Selection);
 	}
