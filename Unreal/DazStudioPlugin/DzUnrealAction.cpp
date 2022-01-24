@@ -61,7 +61,7 @@ void DzUnrealAction::executeAction()
 	 // Create and show the dialog. If the user cancels, exit early,
 	 // otherwise continue on and do the thing that required modal
 	 // input from the user.
-    if (dzScene->getNumSelectedNodes() != 1)
+    if (dzScene->getNumSelectedNodes() < 1)
     {
         if (NonInteractiveMode == 0) 
 		{
