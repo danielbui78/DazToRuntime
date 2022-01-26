@@ -14,7 +14,7 @@ class DzUnrealDialog : public DzBasicDialog {
 public:
 
 	/** Constructor **/
-	 DzUnrealDialog(QWidget *parent);
+	 DzUnrealDialog(QWidget *parent=nullptr);
 
 	/** Destructor **/
 	virtual ~DzUnrealDialog() {}

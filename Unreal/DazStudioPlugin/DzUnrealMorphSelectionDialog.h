@@ -2,6 +2,7 @@
 #include "dzbasicdialog.h"
 #include <QtGui/qlineedit.h>
 #include <QtGui/qcombobox.h>
+#include <QtGui/qcheckbox.h>
 #include <QtCore/qsettings.h>
 #include "dznode.h"
 
@@ -57,7 +58,7 @@ class DzUnrealMorphSelectionDialog : public DzBasicDialog {
 	 Q_OBJECT
 public:
 
-	 DzUnrealMorphSelectionDialog(QWidget* parent);
+	 DzUnrealMorphSelectionDialog(QWidget* parent=nullptr);
 	 virtual ~DzUnrealMorphSelectionDialog() {}
 
 	 // Setup the dialog

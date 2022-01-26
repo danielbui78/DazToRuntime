@@ -20,7 +20,7 @@ class DzUnrealSubdivisionDialog : public DzBasicDialog {
 public:
 
 	/** Constructor **/
-	 DzUnrealSubdivisionDialog(QWidget *parent);
+	DzUnrealSubdivisionDialog(QWidget *parent=nullptr);
 
 	void PrepareDialog();
 
