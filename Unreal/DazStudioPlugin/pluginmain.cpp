@@ -21,8 +21,8 @@ Bridge Collaboration Project<br><br>\
 
 DZ_PLUGIN_CLASS_GUID(DzUnrealAction, 99F42CAE-CD02-49BC-A7CE-C0CF4EDD7609);
 DZ_PLUGIN_CUSTOM_CLASS_GUID(DzUnrealDialog, b7c0b573-bd61-452c-92c1-9560459b4e89);
-DZ_PLUGIN_CUSTOM_CLASS_GUID(DzUnrealMorphSelectionDialog, a438f76c-e9a4-4989-8bc5-cbc7203c7d6b);
-DZ_PLUGIN_CUSTOM_CLASS_GUID(DzUnrealSubdivisionDialog, 04056c67-fbb3-4ae5-b768-06796cff4894);
+DZ_PLUGIN_CUSTOM_CLASS_GUID(DzUnrealMorphSelectionDialog, 321916ba-0bcc-45d9-8c7e-ebbe80dea51c);
+DZ_PLUGIN_CUSTOM_CLASS_GUID(DzUnrealSubdivisionDialog, a2342e17-db3b-4032-a576-75b5843fa893);
 
 static QWidget* GetParentArg0(const QVariantList& args)
 {
