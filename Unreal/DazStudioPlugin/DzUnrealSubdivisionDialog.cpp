@@ -209,6 +209,27 @@ DzNode* DzUnrealSubdivisionDialog::FindObject(DzNode* Node, QString Name)
 	return NULL;
 }
 
+bool DzUnrealSubdivisionDialog::setSubdivisionLevelByNode(DzNode* Node, int level)
+{
+	DzNode* selection = dzScene->getPrimarySelection();
+	QString searchName = Node->getName();
+	foreach(QComboBox * combo, SubdivisionCombos)
+	{
+		QString name = combo->property("Object").toString();
+		if (name == searchName)
+		{
+			int maxLevel = combo->count() - 1;
+			if (level > maxLevel)
+				return false;
+
+			combo->setCurrentIndex(level);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void DzUnrealSubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled)
 {
 	DzNode* Selection = dzScene->getPrimarySelection();

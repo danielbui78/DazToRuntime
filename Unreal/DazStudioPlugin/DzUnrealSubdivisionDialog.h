@@ -43,6 +43,8 @@ public:
 	Q_INVOKABLE void WriteSubdivisions(DzJsonWriter& Writer);
 	Q_INVOKABLE DzNode* FindObject(DzNode* Node, QString Name);
 
+	Q_INVOKABLE bool setSubdivisionLevelByNode(DzNode* Node, int level);
+
 public slots:
 	void HandleSubdivisionLevelChanged(const QString& text);
 
