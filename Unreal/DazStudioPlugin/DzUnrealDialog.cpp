@@ -38,8 +38,8 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	DzBasicDialog(parent, DAZ_TO_UNREAL_PLUGIN_NAME)
 {
 	 assetNameEdit = NULL;
-	 projectEdit = NULL;
-	 projectButton = NULL;
+//	 projectEdit = NULL;
+//	 projectButton = NULL;
 	 assetTypeCombo = NULL;
 	 portEdit = NULL;
 	 intermediateFolderEdit = NULL;
