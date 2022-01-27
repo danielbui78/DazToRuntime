@@ -39,8 +39,8 @@
 #include <QtGui/qcheckbox.h>
 #include <QtGui/QMessageBox>
 
-
 #include "DzRuntimePluginAction.h"
+
 
 DzRuntimePluginAction::DzRuntimePluginAction(const QString& text, const QString& desc) :
 	 DzAction(text, desc)
@@ -71,27 +71,34 @@ void DzRuntimePluginAction::resetToDefaults()
 	ControllersToDisconnect.append("facs_bs_MouthClose_div2");
 
 	// Reset all dialog settings and script-exposed properties to Hardcoded Defaults
-	// Exception: scene filename to exportfilename behavior is ignored
 	// Ignore saved settings, QSettings, etc.
 	DzNode* selection = dzScene->getPrimarySelection();
+	DzFigure* figure = qobject_cast<DzFigure*>(selection);
 	if (selection)
 	{
-		CharacterName = this->cleanString(selection->getLabel());
-		DzFigure* figure = qobject_cast<DzFigure*>(selection);
-		if (figure)
+		if (dzScene->getFilename().length() > 0)
 		{
-			AssetType = "SkeletalMesh";
+			QFileInfo fileInfo = QFileInfo(dzScene->getFilename());
+			CharacterName = fileInfo.baseName().remove(QRegExp("[^A-Za-z0-9_]"));
 		}
 		else
 		{
-			AssetType = "StaticMesh";
+			CharacterName = this->cleanString(selection->getLabel());
 		}
 	}
 	else
 	{
 		CharacterName = "";
+	}
+	if (figure)
+	{
 		AssetType = "SkeletalMesh";
 	}
+	else
+	{
+		AssetType = "StaticMesh";
+	}
+
 	ProductName = "";
 	ProductComponentName = "";
 	ScriptOnly_MorphList.clear();
