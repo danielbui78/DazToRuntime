@@ -20,11 +20,21 @@ function Run_TestCase_07(sTestAsset)
     var sFullPath = oContentMgr.findFile(sTestAsset);
     oContentMgr.openFile(sFullPath);
 
+    // Create DzUnrealAction and DzUnrealDialog
+    var wBridgeDialog = new DzUnrealDialog();
+    wBridgeDialog.wSubdivisionEnabledCheckBox.setChecked(true);
+//    var oBridge = new DzUnrealAction();
+
     // Set Subdivision Level 2 (TC7.8)
-    // ****TODO*****
+    var nodeSelection = Scene.getPrimarySelection();
+    var wSubdivDialog = DzUnrealSubdivisionDialog().Get(wBridgeDialog);
+    if (wSubdivDialog != undefined)
+    {
+	    var result = wSubdivDialog.setSubdivisionLevelByNode(nodeSelection,2);
+	}
 
     // Send to Unreal (TC7.10)
-    var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList);
+    var sReturnString = Run_Exporter2(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList);
     var sDtuFilename = sReturnString;
 
     // check for expected root folder, export folder and export filename
@@ -42,9 +52,19 @@ function Run_TestCase_07(sTestAsset)
 
     var sFbxFilename = sDtuFilename;
     sFbxFilename = sFbxFilename.replace(".dtu",".fbx");
-    print("Exported DTU = " + sFbxFilename);
-
-    if (Validate_FBX_file(sFbxFilename) == false)
+    // Check for Fbx_base
+    var sFbxFilenameHD = sFbxFilename;
+    sFbxFilenameHD = sFbxFilenameHD.replace(".fbx","_base.fbx");
+    print("Exported FBX base = " + sFbxFilenameHD);
+    if (Validate_FBX_file(sFbxFilenameHD) == false)
+    {
+        return false;
+    }
+    // Check for Fbx_HD
+    var sFbxFilenameHD = sFbxFilename;
+    sFbxFilenameHD = sFbxFilenameHD.replace(".fbx","_HD.fbx");
+    print("Exported FBX HD = " + sFbxFilenameHD);
+    if (Validate_FBX_file(sFbxFilenameHD) == false)
     {
         return false;
     }
@@ -58,6 +78,5 @@ function Run_TestCase_07(sTestAsset)
 		return false;
 	}
 
-    // ***TODO*** remove hardcode to false after fully implementing
-    return false;
+    return true;
 }

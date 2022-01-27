@@ -21,10 +21,10 @@ function Run_TestCase_08(sTestAsset)
     Scene.loadScene(sTestAsset, DzScene.OpenNew);
 
     // Send to Unreal (TC8.9)
-    var sReturnString = Run_Exporter2(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList);
+    var sReturnString = Run_Exporter(sExportFilename, sAssetType, sRootFolder, sExportFolder, sProductName, sComponentName, arrayMorphList);
     var sDtuFilename = sReturnString;
 
-    // check for expected root folder, export folder and export filename 
+    // check for expected root folder, export folder and export filename
     if (sDtuFilename.lower().find("/documents/daztounreal/tc08/qatestscene01.dtu") == -1)
     {
         print ("Test Case 8 FAILED: Incorrect output DTU filename");
