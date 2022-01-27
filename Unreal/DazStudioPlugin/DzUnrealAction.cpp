@@ -553,8 +553,6 @@ void DzUnrealAction::resetToDefaults()
 		DzMainWindow* mw = dzApp->getInterface();
 		BridgeDialog = new DzUnrealDialog(mw);
 	}
-//	BridgeDialog->getSubdivisionEnabledCheckBox()->setChecked(false);
-//	BridgeDialog->getMorphsEnabledCheckBox()->setChecked(false);
 	BridgeDialog->resetToDefaults();
 
 	if (SubdivisionDialog != nullptr)
@@ -567,7 +565,7 @@ void DzUnrealAction::resetToDefaults()
 		}
 	}
 	// reset morph selection
-	DzUnrealMorphSelectionDialog::Get(nullptr)->PrepareDialog();
+	//DzUnrealMorphSelectionDialog::Get(nullptr)->PrepareDialog();
 
 }
 
