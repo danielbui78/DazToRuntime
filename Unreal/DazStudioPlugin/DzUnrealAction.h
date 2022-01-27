@@ -10,14 +10,22 @@
 #include <DzRuntimePluginAction.h>
 #include "DzUnrealSubdivisionDialog.h"
 
+class DzUnrealDialog;
+
 class DzUnrealAction : public DzRuntimePluginAction {
 	Q_OBJECT
+	Q_PROPERTY(QWidget* wBridgeDialog READ getBridgeDialog WRITE setBridgeDialog)
 public:
 	 DzUnrealAction();
+
+	 DzUnrealDialog* getBridgeDialog() { return BridgeDialog; }
+	 void setBridgeDialog(QWidget* arg_dlg) { BridgeDialog = qobject_cast<DzUnrealDialog*>(arg_dlg); }
+	 Q_INVOKABLE void resetToDefaults();
 
 protected:
 	 int Port;
 	 DzUnrealSubdivisionDialog* SubdivisionDialog;
+	 DzUnrealDialog *BridgeDialog;
 
 	 void executeAction();
 	 void WriteMaterials(DzNode* Node, DzJsonWriter& Writer, QTextStream& Stream);

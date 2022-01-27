@@ -31,6 +31,7 @@ DzUnrealAction::DzUnrealAction() :
 	 DzRuntimePluginAction(tr("&Daz to Unreal"), tr("Send the selected node to Unreal."))
 {
 	 Port = 0;
+	 BridgeDialog = nullptr;
 	 SubdivisionDialog = nullptr;
      NonInteractiveMode = 0;
 	 AssetType = QString("SkeletalMesh");
@@ -72,7 +73,10 @@ void DzUnrealAction::executeAction()
     }
 
     // Create the dialog
-    DzUnrealDialog* BridgeDialog = new DzUnrealDialog(mw);
+	if (BridgeDialog == nullptr)
+	{
+		BridgeDialog = new DzUnrealDialog(mw);
+	}
 
 	//////////////////////////////////////
 	// Connect bridge dialog to exposed properties for scripting
@@ -537,5 +541,34 @@ QUuid DzUnrealAction::WriteInstance(DzNode* Node, DzJsonWriter& Writer, QUuid Pa
 	return Uid;
 }
 
+// Overrides baseclass implementation with Unreal specific resets
+// Resets Default Values but Ignores any saved settings
+void DzUnrealAction::resetToDefaults()
+{
+	DzRuntimePluginAction::resetToDefaults();
+
+	// Must Instantiate BridgeDialog so that we can override any saved states
+	if (BridgeDialog == nullptr)
+	{
+		DzMainWindow* mw = dzApp->getInterface();
+		BridgeDialog = new DzUnrealDialog(mw);
+	}
+//	BridgeDialog->getSubdivisionEnabledCheckBox()->setChecked(false);
+//	BridgeDialog->getMorphsEnabledCheckBox()->setChecked(false);
+	BridgeDialog->resetToDefaults();
+
+	if (SubdivisionDialog != nullptr)
+	{
+		foreach(QObject * obj, SubdivisionDialog->getSubdivisionCombos())
+		{
+			QComboBox* combo = qobject_cast<QComboBox*>(obj);
+			if (combo)
+				combo->setCurrentIndex(0);
+		}
+	}
+	// reset morph selection
+	DzUnrealMorphSelectionDialog::Get(nullptr)->PrepareDialog();
+
+}
 
 #include "moc_DzUnrealAction.cpp"

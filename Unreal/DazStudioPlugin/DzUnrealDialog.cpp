@@ -23,6 +23,7 @@
 #include "dzaction.h"
 #include "dzskeleton.h"
 
+#include "DzRuntimePluginAction.h"
 #include "DzUnrealDialog.h"
 #include "DzUnrealMorphSelectionDialog.h"
 #include "DzUnrealSubdivisionDialog.h"
@@ -173,6 +174,9 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	showFbxDialogCheckBox->setWhatsThis("Checking this will show the FBX Dialog for adjustments before export.");
 	exportMaterialPropertyCSVCheckBox->setWhatsThis("Checking this will write out a CSV of all the material properties.  Useful for reference when changing materials.");
 
+	// Set Defaults
+	resetToDefaults();
+
 	// Load Settings
 	if (!settings->value("IntermediatePath").isNull())
 	{
@@ -217,6 +221,10 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 		}
 	}
 
+}
+
+void DzUnrealDialog::resetToDefaults()
+{
 	// Set Defaults
 	DzNode* Selection = dzScene->getPrimarySelection();
 	if (dzScene->getFilename().length() > 0)
@@ -224,7 +232,7 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 		QFileInfo fileInfo = QFileInfo(dzScene->getFilename());
 		assetNameEdit->setText(fileInfo.baseName().remove(QRegExp("[^A-Za-z0-9_]")));
 	}
-	else if(dzScene->getPrimarySelection())
+	else if (dzScene->getPrimarySelection())
 	{
 		assetNameEdit->setText(Selection->getLabel().remove(QRegExp("[^A-Za-z0-9_]")));
 	}
@@ -237,6 +245,15 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	{
 		assetTypeCombo->setCurrentIndex(1);
 	}
+
+	QString DefaultPath = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DazToUnreal";
+	intermediateFolderEdit->setText(DefaultPath);
+
+	subdivisionEnabledCheckBox->setChecked(false);
+	morphsEnabledCheckBox->setChecked(false);
+	showFbxDialogCheckBox->setChecked(false);
+	exportMaterialPropertyCSVCheckBox->setChecked(false);
+
 }
 
 void DzUnrealDialog::HandleSelectIntermediateFolderButton()

@@ -60,6 +60,8 @@ public:
 	// Pass so the DazTRoUnrealAction can access it from the morph dialog
 	Q_INVOKABLE QMap<QString,QString> GetMorphMapping() { return morphMapping; }
 
+	Q_INVOKABLE void resetToDefaults();
+
 	void Accepted();
 private slots:
 	void HandleSelectIntermediateFolderButton();
