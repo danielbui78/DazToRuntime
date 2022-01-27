@@ -83,7 +83,7 @@ DzUnrealSubdivisionDialog::DzUnrealSubdivisionDialog(QWidget *parent) :
 	setFixedWidth(width());
 	setFixedHeight(height());
 
-
+	SubdivisionCombos.clear();
 }
 
 QSize DzUnrealSubdivisionDialog::minimumSizeHint() const
@@ -291,6 +291,16 @@ void DzUnrealSubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 		Writer.finishObject();
 		//stream << "1, " << Name << ", " << targetValue << endl;
 	}
+}
+
+QObjectList DzUnrealSubdivisionDialog::getSubdivisionCombos()
+{
+	QObjectList *returnList = new QObjectList();
+	foreach(QComboBox * combo, SubdivisionCombos)
+	{
+		returnList->append(qobject_cast<QWidget*>(combo));
+	}
+	return *returnList;
 }
 
 #include "moc_DzUnrealSubdivisionDialog.cpp"

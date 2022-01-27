@@ -17,7 +17,9 @@ class QGridLayout;
 
 class DzUnrealSubdivisionDialog : public DzBasicDialog {
 	Q_OBJECT
+	Q_PROPERTY(QObjectList aSubdivisionCombos READ getSubdivisionCombos)
 public:
+	QObjectList getSubdivisionCombos();
 
 	/** Constructor **/
 	DzUnrealSubdivisionDialog(QWidget *parent=nullptr);
