@@ -64,13 +64,13 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	int revision = PLUGIN_REV % 1000;
 	setWindowTitle(tr("Daz To Unreal v%1.%2 Pre-Release Build %3.%4").arg(PLUGIN_MAJOR).arg(PLUGIN_MINOR).arg(revision).arg(PLUGIN_BUILD));
 	layout()->setSizeConstraint(QLayout::SetFixedSize);
-	QFormLayout* mainLayout = new QFormLayout(this);
+	QFormLayout* mainLayout = new QFormLayout();
 
 
 	advancedWidget = new QWidget();
-	QHBoxLayout* advancedLayoutOuter = new QHBoxLayout(this);
+	QHBoxLayout* advancedLayoutOuter = new QHBoxLayout();
 	advancedLayoutOuter->addWidget(advancedWidget);
-	QFormLayout* advancedLayout = new QFormLayout(this);
+	QFormLayout* advancedLayout = new QFormLayout();
 	advancedWidget->setLayout(advancedLayout);
 
 	// Asset Name
@@ -78,7 +78,7 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	assetNameEdit->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_]*"), this));
 
 	// Intermediate Folder
-	QHBoxLayout* intermediateFolderLayout = new QHBoxLayout(this);
+	QHBoxLayout* intermediateFolderLayout = new QHBoxLayout();
 	intermediateFolderEdit = new QLineEdit(this);
 	intermediateFolderButton = new QPushButton("...", this);
 	connect(intermediateFolderButton, SIGNAL(released()), this, SLOT( HandleSelectIntermediateFolderButton() ));
@@ -95,7 +95,7 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	assetTypeCombo->addItem("Pose");
 
 	// Morphs
-	QHBoxLayout* morphsLayout = new QHBoxLayout(this);
+	QHBoxLayout* morphsLayout = new QHBoxLayout();
 	morphsButton = new QPushButton("Choose Morphs", this);
 	connect(morphsButton, SIGNAL(released()), this, SLOT(HandleChooseMorphsButton()));
 	morphsEnabledCheckBox = new QCheckBox("", this);
@@ -105,7 +105,7 @@ DzUnrealDialog::DzUnrealDialog(QWidget *parent) :
 	connect(morphsEnabledCheckBox, SIGNAL(stateChanged(int)), this, SLOT(HandleMorphsCheckBoxChange(int)));
 
 	// Subdivision
-	QHBoxLayout* subdivisionLayout = new QHBoxLayout(this);
+	QHBoxLayout* subdivisionLayout = new QHBoxLayout();
 	subdivisionButton = new QPushButton("Choose Subdivisions", this);
 	connect(subdivisionButton, SIGNAL(released()), this, SLOT(HandleChooseSubdivisionsButton()));
 	subdivisionEnabledCheckBox = new QCheckBox("", this);

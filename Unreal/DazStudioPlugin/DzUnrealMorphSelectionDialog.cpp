@@ -86,7 +86,7 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 	presetsFolder = QDesktopServices::storageLocation(QDesktopServices::DocumentsLocation) + QDir::separator() + "DAZ 3D"+ QDir::separator() + "Bridges" + QDir::separator() + "Daz To Unreal" + QDir::separator() + "Presets";
 
 
-	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	QVBoxLayout* mainLayout = new QVBoxLayout();
 
 	// Left tree with morph structure
 	morphTreeWidget = new QTreeWidget(this);
@@ -101,14 +101,14 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 	morphExportListWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
 	// Quick filter box
-	QHBoxLayout* filterLayout = new QHBoxLayout(this);
+	QHBoxLayout* filterLayout = new QHBoxLayout();
 	filterLayout->addWidget(new QLabel("filter"));
 	filterEdit = new QLineEdit();
 	connect(filterEdit, SIGNAL(textChanged(const QString &)), this, SLOT(FilterChanged(const QString &)));
 	filterLayout->addWidget(filterEdit);
 
 	// Presets
-	QHBoxLayout* settingsLayout = new QHBoxLayout(this);
+	QHBoxLayout* settingsLayout = new QHBoxLayout();
 	presetCombo = new QComboBox(this);
 	QPushButton* savePresetButton = new QPushButton("Save Preset", this);
 	connect(savePresetButton, SIGNAL(released()), this, SLOT(HandleSavePreset()));
@@ -118,21 +118,21 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 	settingsLayout->addStretch();
 
 	// All Morphs
-	QHBoxLayout* morphsLayout = new QHBoxLayout(this);
+	QHBoxLayout* morphsLayout = new QHBoxLayout();
 
 	// Left Tree
-	QVBoxLayout* treeLayout = new QVBoxLayout(this);
+	QVBoxLayout* treeLayout = new QVBoxLayout();
 	treeLayout->addWidget(new QLabel("Morph Groups"));
 	treeLayout->addWidget(new QLabel("Select to see available morphs"));
 	treeLayout->addWidget(morphTreeWidget);
 
 	// Buttons for quickly adding certain JCMs
 	QGroupBox* MorphGroupBox = new QGroupBox("Morph Utilities", this);
-	MorphGroupBox->setLayout(new QVBoxLayout(this));
+	MorphGroupBox->setLayout(new QVBoxLayout());
 	QGroupBox* JCMGroupBox = new QGroupBox("Add JCMs", this);
-	JCMGroupBox->setLayout(new QGridLayout(this));
+	JCMGroupBox->setLayout(new QGridLayout());
 	QGroupBox* FaceGroupBox = new QGroupBox("Add Expressions", this);
-	FaceGroupBox->setLayout(new QGridLayout(this));
+	FaceGroupBox->setLayout(new QGridLayout());
 	QPushButton* ArmsJCMButton = new QPushButton("Arms");
 	QPushButton* LegsJCMButton = new QPushButton("Legs");
 	QPushButton* TorsoJCMButton = new QPushButton("Torso");
@@ -165,7 +165,7 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 
 
 	// Center List of morphs based on tree selection
-	QVBoxLayout* morphListLayout = new QVBoxLayout(this);
+	QVBoxLayout* morphListLayout = new QVBoxLayout();
 	morphListLayout->addWidget(new QLabel("Morphs in Group"));
 	morphListLayout->addWidget(new QLabel("Select and click Add for Export"));
 	morphListLayout->addLayout(filterLayout);
@@ -178,7 +178,7 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 	morphsLayout->addLayout(morphListLayout);
 
 	// Right List of morphs that will export
-	QVBoxLayout* selectedListLayout = new QVBoxLayout(this);
+	QVBoxLayout* selectedListLayout = new QVBoxLayout();
 	selectedListLayout->addWidget(new QLabel("Morphs to Export"));
 	selectedListLayout->addWidget(morphExportListWidget);
 
