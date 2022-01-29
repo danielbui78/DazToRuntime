@@ -66,15 +66,16 @@ To Test Subdivision support:
 To Test dForce Clothing to Unity Cloth Physics support:
 =======================================================
 *Make sure you save your DazStudio project before taking these steps, some will Not revert with Undo command.*
+
 *Preparation:*
-0. In the Unity Editor, open the Unofficial DTU Bridge window.  Go to the Options tab.  Make sure the "Enable dForce Support" option is checked on.  Close the Unofficial DTU Bridge window.  Switch to Daz Studio.
-1. Load dForce compliant clothing onto your figure.
-2. Clear any dForce simulation calculations in the scene by selecting the Simulations Settings Pane and clicking "Clear".  Warning: you will NOT be able to undo this procedure.
-3. Select the Surfaces Pane and select the clothing surface materials.  For each material, double-check the Simulation Properties Tab to make sure that Dynamics Strength is set correctly: a value of 1.00 will often cause clothing to fall off or explode in Unity.  Try setting this to 0.5 if this happens.
-4. Recommend setting one Material's Dynamics Strength to 0.2 or less, to act as an anchor for the rest of the clothing -- example: waist-line of pants and skirts, neck-line of shirts and jackets.
-5. With dForce Clothing still selected, add a Push Modifier via the "Edit->Object->Geometry->Add Push Modifier..." menu command.  This will add a new property in the Parameters Pane called "PushModifier" in the "Mesh Offset" Property Group.  Try 0.1 as an initial value.  It can be increased if you are having cloth collision issues such as clothes exploding.
-6. Select "File->Send To->Unofficial Daz to Unity Bridge".
-7. Open Unity Editor window and wait for DTU import to complete and Prefab to be created in the Scene.
+1. In the Unity Editor, open the Unofficial DTU Bridge window.  Go to the Options tab.  Make sure the "Enable dForce Support" option is checked on.  Close the Unofficial DTU Bridge window.  Switch to Daz Studio.
+2. Load dForce compliant clothing onto your figure.
+3. Clear any dForce simulation calculations in the scene by selecting the Simulations Settings Pane and clicking "Clear".  Warning: you will NOT be able to undo this procedure.
+4. Select the Surfaces Pane and select the clothing surface materials.  For each material, double-check the Simulation Properties Tab to make sure that Dynamics Strength is set correctly: a value of 1.00 will often cause clothing to fall off or explode in Unity.  Try setting this to 0.5 if this happens.
+5. Recommend setting one Material's Dynamics Strength to 0.2 or less, to act as an anchor for the rest of the clothing -- example: waist-line of pants and skirts, neck-line of shirts and jackets.
+6. With dForce Clothing still selected, add a Push Modifier via the "Edit->Object->Geometry->Add Push Modifier..." menu command.  This will add a new property in the Parameters Pane called "PushModifier" in the "Mesh Offset" Property Group.  Try 0.1 as an initial value.  It can be increased if you are having cloth collision issues such as clothes exploding.
+7. Select "File->Send To->Unofficial Daz to Unity Bridge".
+8. Open Unity Editor window and wait for DTU import to complete and Prefab to be created in the Scene.
 
 *Cloth Colliders:*
 1. In the Scene Pane, open the imported prefab and select the "Cloth Collision Rig".  In the Inspector Pane, you will see the "Cloth Collision Assigner" Script Component.
