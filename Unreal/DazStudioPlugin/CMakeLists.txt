@@ -35,11 +35,7 @@ add_library( ${DZ_PLUGIN_TGT_NAME} SHARED
 	DzUnrealAction.h
 	DzUnrealDialog.cpp
 	DzUnrealDialog.h
-	DzUnrealMorphSelectionDialog.cpp
-	DzUnrealMorphSelectionDialog.h
 	pluginmain.cpp
-	DzUnrealSubdivisionDialog.cpp
-	DzUnrealSubdivisionDialog.h
 	version.h
 	${DPC_IMAGES_CPP}
 	${OS_SOURCES}

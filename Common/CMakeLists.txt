@@ -6,8 +6,15 @@ set(COMMON_LIB_INCLUDE_DIR ${COMMON_LIB_INCLUDE_DIR} PARENT_SCOPE)
 
 include_directories(${COMMON_LIB_INCLUDE_DIR})
 set(LIB_SRCS 
-	"DzRuntimePluginAction.cpp"
-	"DzRuntimePluginAction.h"
+	DzRuntimePluginAction.cpp
+	DzRuntimePluginAction.h
+	DzBridgeMorphSelectionDialog.cpp
+	DzBridgeMorphSelectionDialog.h
+	DzBridgeSubdivisionDialog.cpp
+	DzBridgeSubdivisionDialog.h
+	DzBridgeDialog.cpp
+	DzBridgeDialog.h
+	common_version.h
 )
 
 add_library(common STATIC ${LIB_SRCS})
