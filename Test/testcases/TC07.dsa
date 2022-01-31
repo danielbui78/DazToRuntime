@@ -27,7 +27,7 @@ function Run_TestCase_07(sTestAsset)
 
     // Set Subdivision Level 2 (TC7.8)
     var nodeSelection = Scene.getPrimarySelection();
-    var wSubdivDialog = DzUnrealSubdivisionDialog().Get(wBridgeDialog);
+    var wSubdivDialog = DzBridgeSubdivisionDialog().Get(wBridgeDialog);
     if (wSubdivDialog != undefined)
     {
 	    var result = wSubdivDialog.setSubdivisionLevelByNode(nodeSelection,2);

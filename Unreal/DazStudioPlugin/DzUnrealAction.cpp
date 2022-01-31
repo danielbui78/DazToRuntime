@@ -25,7 +25,7 @@
 
 #include "DzUnrealDialog.h"
 #include "DzUnrealAction.h"
-#include "DzUnrealMorphSelectionDialog.h"
+#include "DzBridgeMorphSelectionDialog.h"
 
 DzUnrealAction::DzUnrealAction() :
 	 DzRuntimePluginAction(tr("&Daz to Unreal"), tr("Send the selected node to Unreal."))
@@ -116,7 +116,7 @@ void DzUnrealAction::executeAction()
 			ExportMorphs = true;
 			MorphString = ScriptOnly_MorphList.join("\n1\n");
 			MorphString += "\n1\n.CTRLVS\n2\nAnything\n0";
-			DzUnrealMorphSelectionDialog* MorphSelectionDialog = DzUnrealMorphSelectionDialog::Get(BridgeDialog);
+			DzBridgeMorphSelectionDialog* MorphSelectionDialog = DzBridgeMorphSelectionDialog::Get(BridgeDialog);
 			MorphMapping.clear();
 			foreach(QString morphName, ScriptOnly_MorphList)
 			{
@@ -166,7 +166,7 @@ void DzUnrealAction::executeAction()
         ExportSubdivisions = BridgeDialog->subdivisionEnabledCheckBox->isChecked();
         ShowFbxDialog = BridgeDialog->showFbxDialogCheckBox->isChecked();
         ExportMaterialPropertiesCSV = BridgeDialog->exportMaterialPropertyCSVCheckBox->isChecked();
-        SubdivisionDialog = DzUnrealSubdivisionDialog::Get(BridgeDialog);
+        SubdivisionDialog = DzBridgeSubdivisionDialog::Get(BridgeDialog);
         FBXVersion = BridgeDialog->fbxVersionCombo->currentText();
 
         if (AssetType == "SkeletalMesh" && ExportSubdivisions)
@@ -246,7 +246,7 @@ void DzUnrealAction::WriteConfiguration()
 		 if (ExportMorphs)
 		 {
 			 DzMainWindow* mw = dzApp->getInterface();
-			 DzUnrealMorphSelectionDialog* morphDialog = DzUnrealMorphSelectionDialog::Get(mw);
+			 DzBridgeMorphSelectionDialog* morphDialog = DzBridgeMorphSelectionDialog::Get(mw);
 			 if (morphDialog->IsAutoJCMEnabled())
 			 {
 				 writer.startMemberArray("JointLinks", true);
@@ -565,7 +565,7 @@ void DzUnrealAction::resetToDefaults()
 		}
 	}
 	// reset morph selection
-	//DzUnrealMorphSelectionDialog::Get(nullptr)->PrepareDialog();
+	//DzBridgeMorphSelectionDialog::Get(nullptr)->PrepareDialog();
 
 }
 

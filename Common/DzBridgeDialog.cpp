@@ -25,8 +25,8 @@
 
 #include "DzRuntimePluginAction.h"
 #include "DzBridgeDialog.h"
-#include "DzUnrealMorphSelectionDialog.h"
-#include "DzUnrealSubdivisionDialog.h"
+#include "DzBridgeMorphSelectionDialog.h"
+#include "DzBridgeSubdivisionDialog.h"
 #include "common_version.h"
 
 /*****************************
@@ -243,7 +243,7 @@ void DzBridgeDialog::handleSceneSelectionChanged()
 
 void DzBridgeDialog::HandleChooseMorphsButton()
 {
-	DzUnrealMorphSelectionDialog *dlg = DzUnrealMorphSelectionDialog::Get(this);
+	DzBridgeMorphSelectionDialog *dlg = DzBridgeMorphSelectionDialog::Get(this);
 	dlg->exec();
 	morphString = dlg->GetMorphString();
 	morphMapping = dlg->GetMorphRenaming();
@@ -251,14 +251,14 @@ void DzBridgeDialog::HandleChooseMorphsButton()
 
 void DzBridgeDialog::HandleChooseSubdivisionsButton()
 {
-	DzUnrealSubdivisionDialog *dlg = DzUnrealSubdivisionDialog::Get(this);
+	DzBridgeSubdivisionDialog *dlg = DzBridgeSubdivisionDialog::Get(this);
 	dlg->exec();
 }
 
 QString DzBridgeDialog::GetMorphString()
 {
-	morphMapping = DzUnrealMorphSelectionDialog::Get(this)->GetMorphRenaming();
-	return DzUnrealMorphSelectionDialog::Get(this)->GetMorphString();
+	morphMapping = DzBridgeMorphSelectionDialog::Get(this)->GetMorphRenaming();
+	return DzBridgeMorphSelectionDialog::Get(this)->GetMorphString();
 }
 
 void DzBridgeDialog::HandleMorphsCheckBoxChange(int state)

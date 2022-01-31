@@ -8,7 +8,7 @@
 #include <QtCore/qtextstream.h>
 #include <QUuid.h>
 #include <DzRuntimePluginAction.h>
-#include "DzUnrealSubdivisionDialog.h"
+#include "DzBridgeSubdivisionDialog.h"
 
 class DzUnrealDialog;
 
@@ -24,7 +24,7 @@ public:
 
 protected:
 	 int Port;
-	 DzUnrealSubdivisionDialog* SubdivisionDialog;
+	 DzBridgeSubdivisionDialog* SubdivisionDialog;
 	 DzUnrealDialog *BridgeDialog;
 
 	 void executeAction();

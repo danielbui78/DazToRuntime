@@ -15,25 +15,25 @@ class QComboBox;
 class QGridLayout;
 
 
-class DzUnrealSubdivisionDialog : public DzBasicDialog {
+class DzBridgeSubdivisionDialog : public DzBasicDialog {
 	Q_OBJECT
 	Q_PROPERTY(QObjectList aSubdivisionCombos READ getSubdivisionCombos)
 public:
 	QObjectList getSubdivisionCombos();
 
 	/** Constructor **/
-	DzUnrealSubdivisionDialog(QWidget *parent=nullptr);
+	DzBridgeSubdivisionDialog(QWidget *parent=nullptr);
 
 	Q_INVOKABLE void PrepareDialog();
 
 	/** Destructor **/
-	virtual ~DzUnrealSubdivisionDialog() {}
+	virtual ~DzBridgeSubdivisionDialog() {}
 
-	Q_INVOKABLE static DzUnrealSubdivisionDialog* Get(QWidget* Parent)
+	Q_INVOKABLE static DzBridgeSubdivisionDialog* Get(QWidget* Parent)
 	{
 		if (singleton == nullptr)
 		{
-			singleton = new DzUnrealSubdivisionDialog(Parent);
+			singleton = new DzBridgeSubdivisionDialog(Parent);
 		}
 		singleton->PrepareDialog();
 		return singleton;
@@ -63,5 +63,5 @@ private:
 
 	QMap<QString, int> SubdivisionLevels;
 
-	static DzUnrealSubdivisionDialog* singleton;
+	static DzBridgeSubdivisionDialog* singleton;
 };

@@ -54,22 +54,22 @@ struct JointLinkInfo
 	QList<JointLinkKey> Keys;
 };
 
-class DzUnrealMorphSelectionDialog : public DzBasicDialog {
+class DzBridgeMorphSelectionDialog : public DzBasicDialog {
 	 Q_OBJECT
 public:
 
-	 DzUnrealMorphSelectionDialog(QWidget* parent=nullptr);
-	 virtual ~DzUnrealMorphSelectionDialog() {}
+	 DzBridgeMorphSelectionDialog(QWidget* parent=nullptr);
+	 virtual ~DzBridgeMorphSelectionDialog() {}
 
 	 // Setup the dialog
 	 Q_INVOKABLE void PrepareDialog();
 
 	 // Singleton access
-	 Q_INVOKABLE static DzUnrealMorphSelectionDialog* Get(QWidget* Parent)
+	 Q_INVOKABLE static DzBridgeMorphSelectionDialog* Get(QWidget* Parent)
 	 {
 		  if (singleton == nullptr)
 		  {
-				singleton = new DzUnrealMorphSelectionDialog(Parent);
+				singleton = new DzBridgeMorphSelectionDialog(Parent);
 		  }
 		  singleton->PrepareDialog();
 		  return singleton;
@@ -143,7 +143,7 @@ private:
 	 // Store off the presetsFolder path at dialog setup
 	 QString presetsFolder;
 
-	 static DzUnrealMorphSelectionDialog* singleton;
+	 static DzBridgeMorphSelectionDialog* singleton;
 
 	 // A list of all found morphs.
 	 QStringList morphList;

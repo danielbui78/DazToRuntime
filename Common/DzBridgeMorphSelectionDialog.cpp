@@ -37,7 +37,7 @@
 #include "dznumericnodeproperty.h"
 #include "dzerclink.h"
 #include "dzbone.h"
-#include "DzUnrealMorphSelectionDialog.h"
+#include "DzBridgeMorphSelectionDialog.h"
 
 #include "QtGui/qlayout.h"
 #include "QtGui/qlineedit.h"
@@ -50,7 +50,7 @@ Local definitions
 #define DAZ_TO_UNREAL_PLUGIN_NAME		"DazToUnreal"
 
 
-DzUnrealMorphSelectionDialog* DzUnrealMorphSelectionDialog::singleton = nullptr;
+DzBridgeMorphSelectionDialog* DzBridgeMorphSelectionDialog::singleton = nullptr;
 
 // For sorting the lists
 class SortingListItem : public QListWidgetItem {
@@ -66,7 +66,7 @@ public:
 	}
 };
 
-DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
+DzBridgeMorphSelectionDialog::DzBridgeMorphSelectionDialog(QWidget *parent) :
 	DzBasicDialog(parent, DAZ_TO_UNREAL_PLUGIN_NAME)
 {
 	 settings = new QSettings("Daz 3D", "DazToUnreal");
@@ -205,13 +205,13 @@ DzUnrealMorphSelectionDialog::DzUnrealMorphSelectionDialog(QWidget *parent) :
 
 }
 
-QSize DzUnrealMorphSelectionDialog::minimumSizeHint() const
+QSize DzBridgeMorphSelectionDialog::minimumSizeHint() const
 {
 	return QSize(800, 800);
 }
 
 // Build out the Left morphs tree based on the current selection
-void DzUnrealMorphSelectionDialog::PrepareDialog()
+void DzBridgeMorphSelectionDialog::PrepareDialog()
 {
 	DzNode* Selection = dzScene->getPrimarySelection();
 
@@ -245,7 +245,7 @@ void DzUnrealMorphSelectionDialog::PrepareDialog()
 }
 
 // When the filter text is changed, update the center list
-void DzUnrealMorphSelectionDialog::FilterChanged(const QString& filter)
+void DzBridgeMorphSelectionDialog::FilterChanged(const QString& filter)
 {
 	morphListWidget->clear();
 	QString newFilter = filter;
@@ -268,7 +268,7 @@ void DzUnrealMorphSelectionDialog::FilterChanged(const QString& filter)
 // Build a list of availaboe morphs for the node
 // TODO: This function evolved a lot as I figured out where to find the morphs.
 // There may be dead code in here.
-QStringList DzUnrealMorphSelectionDialog::GetAvailableMorphs(DzNode* Node)
+QStringList DzBridgeMorphSelectionDialog::GetAvailableMorphs(DzNode* Node)
 {
 	QStringList newMorphList;
 
@@ -355,7 +355,7 @@ QStringList DzUnrealMorphSelectionDialog::GetAvailableMorphs(DzNode* Node)
 }
 
 // Recursive function for finding all active JCM morphs for a node
-QList<JointLinkInfo> DzUnrealMorphSelectionDialog::GetActiveJointControlledMorphs(DzNode* Node)
+QList<JointLinkInfo> DzBridgeMorphSelectionDialog::GetActiveJointControlledMorphs(DzNode* Node)
 {
 	QList<JointLinkInfo> returnMorphs;
 	if (autoJCMCheckBox->isChecked())
@@ -416,7 +416,7 @@ QList<JointLinkInfo> DzUnrealMorphSelectionDialog::GetActiveJointControlledMorph
 	return returnMorphs;
 }
 
-QList<JointLinkInfo> DzUnrealMorphSelectionDialog::GetJointControlledMorphInfo(DzProperty* property)
+QList<JointLinkInfo> DzBridgeMorphSelectionDialog::GetJointControlledMorphInfo(DzProperty* property)
 {
 	QList<JointLinkInfo> returnMorphs;
 
@@ -519,7 +519,7 @@ QList<JointLinkInfo> DzUnrealMorphSelectionDialog::GetJointControlledMorphInfo(D
 }
 
 // Build out the left tree
-void DzUnrealMorphSelectionDialog::UpdateMorphsTree()
+void DzBridgeMorphSelectionDialog::UpdateMorphsTree()
 {
 	morphTreeWidget->clear();
 	morphsForNode.clear();
@@ -543,7 +543,7 @@ void DzUnrealMorphSelectionDialog::UpdateMorphsTree()
 
 // This function could be better named.  It will find the node matching the property path
 // but it will also create the structure of that path in the tree as needed as it searches
-QTreeWidgetItem* DzUnrealMorphSelectionDialog::FindTreeItem(QTreeWidgetItem* parent, QString name)
+QTreeWidgetItem* DzBridgeMorphSelectionDialog::FindTreeItem(QTreeWidgetItem* parent, QString name)
 {
 	if (parent == nullptr)
 	{
@@ -582,7 +582,7 @@ QTreeWidgetItem* DzUnrealMorphSelectionDialog::FindTreeItem(QTreeWidgetItem* par
 }
 
 // For selection changes in the Left Tree
-void DzUnrealMorphSelectionDialog::ItemSelectionChanged()
+void DzBridgeMorphSelectionDialog::ItemSelectionChanged()
 {
 	selectedInTree.clear();
 	foreach(QTreeWidgetItem* selectedItem, morphTreeWidget->selectedItems())
@@ -595,7 +595,7 @@ void DzUnrealMorphSelectionDialog::ItemSelectionChanged()
 
 // Updates the list of selected morphs in the Left Tree
 // including any children
-void DzUnrealMorphSelectionDialog::SelectMorphsInNode(QTreeWidgetItem* item)
+void DzBridgeMorphSelectionDialog::SelectMorphsInNode(QTreeWidgetItem* item)
 {
 	if (morphsForNode.keys().contains(item))
 	{
@@ -604,7 +604,7 @@ void DzUnrealMorphSelectionDialog::SelectMorphsInNode(QTreeWidgetItem* item)
 }
 
 // Add Morphs for export
-void DzUnrealMorphSelectionDialog::HandleAddMorphsButton()
+void DzBridgeMorphSelectionDialog::HandleAddMorphsButton()
 {
 	foreach(QListWidgetItem* selectedItem, morphListWidget->selectedItems())
 	{
@@ -619,7 +619,7 @@ void DzUnrealMorphSelectionDialog::HandleAddMorphsButton()
 }
 
 // Remove morph from export list
-void DzUnrealMorphSelectionDialog::HandleRemoveMorphsButton()
+void DzBridgeMorphSelectionDialog::HandleRemoveMorphsButton()
 {
 	foreach(QListWidgetItem* selectedItem, morphExportListWidget->selectedItems())
 	{
@@ -634,7 +634,7 @@ void DzUnrealMorphSelectionDialog::HandleRemoveMorphsButton()
 }
 
 // Brings up a dialgo for choosing a preset name
-void DzUnrealMorphSelectionDialog::HandleSavePreset()
+void DzBridgeMorphSelectionDialog::HandleSavePreset()
 {
 	QString filters("CSV Files (*.csv)");
 	QString defaultFilter("CSV Files (*.csv)");
@@ -653,7 +653,7 @@ void DzUnrealMorphSelectionDialog::HandleSavePreset()
 }
 
 // Saves out a preset.  If the path isn't supplied, it's saved as the last selection
-void DzUnrealMorphSelectionDialog::SavePresetFile(QString filePath)
+void DzBridgeMorphSelectionDialog::SavePresetFile(QString filePath)
 {
 	QDir dir;
 	dir.mkpath(presetsFolder);
@@ -675,7 +675,7 @@ void DzUnrealMorphSelectionDialog::SavePresetFile(QString filePath)
 
 // Hard coded list of morphs for Genesis 3 and 8
 // It just adds them all, the other functions will ignore any that don't fit the character
-void DzUnrealMorphSelectionDialog::HandleArmJCMMorphsButton()
+void DzBridgeMorphSelectionDialog::HandleArmJCMMorphsButton()
 {
 	QStringList MorphsToAdd;
 
@@ -729,7 +729,7 @@ void DzUnrealMorphSelectionDialog::HandleArmJCMMorphsButton()
 
 // Hard coded list of morphs for Genesis 3 and 8
 // It just adds them all, the other functions will ignore any that don't fit the character
-void DzUnrealMorphSelectionDialog::HandleLegJCMMorphsButton()
+void DzBridgeMorphSelectionDialog::HandleLegJCMMorphsButton()
 {
 	QStringList MorphsToAdd;
 
@@ -767,7 +767,7 @@ void DzUnrealMorphSelectionDialog::HandleLegJCMMorphsButton()
 
 // Hard coded list of morphs for Genesis 3 and 8
 // It just adds them all, the other functions will ignore any that don't fit the character
-void DzUnrealMorphSelectionDialog::HandleTorsoJCMMorphsButton()
+void DzBridgeMorphSelectionDialog::HandleTorsoJCMMorphsButton()
 {
 	QStringList MorphsToAdd;
 
@@ -804,7 +804,7 @@ void DzUnrealMorphSelectionDialog::HandleTorsoJCMMorphsButton()
 
 // Hard coded list of morphs for Genesis 8.1 and ARKit
 // It just adds them all, the other functions will ignore any that don't fit the character
-void DzUnrealMorphSelectionDialog::HandleARKitGenesis81MorphsButton()
+void DzBridgeMorphSelectionDialog::HandleARKitGenesis81MorphsButton()
 {
 	QStringList MorphsToAdd;
 
@@ -875,7 +875,7 @@ void DzUnrealMorphSelectionDialog::HandleARKitGenesis81MorphsButton()
 	RefreshExportMorphList();
 }
 
-void DzUnrealMorphSelectionDialog::HandleFaceFXGenesis8Button()
+void DzBridgeMorphSelectionDialog::HandleFaceFXGenesis8Button()
 {
 	QStringList MorphsToAdd;
 
@@ -899,13 +899,13 @@ void DzUnrealMorphSelectionDialog::HandleFaceFXGenesis8Button()
 	RefreshExportMorphList();
 }
 
-void DzUnrealMorphSelectionDialog::HandleAutoJCMCheckBoxChange(bool checked)
+void DzBridgeMorphSelectionDialog::HandleAutoJCMCheckBoxChange(bool checked)
 {
 	settings->setValue("AutoJCMEnabled", checked);
 }
 
 // Refresh the Right export list
-void DzUnrealMorphSelectionDialog::RefreshExportMorphList()
+void DzBridgeMorphSelectionDialog::RefreshExportMorphList()
 {
 	morphExportListWidget->clear();
 	foreach(MorphInfo morphInfo, morphsToExport)
@@ -920,7 +920,7 @@ void DzUnrealMorphSelectionDialog::RefreshExportMorphList()
 }
 
 // Refresh the list of preset csvs from the files in the folder
-void DzUnrealMorphSelectionDialog::RefreshPresetsCombo()
+void DzBridgeMorphSelectionDialog::RefreshPresetsCombo()
 {
 	disconnect(presetCombo, SIGNAL(currentIndexChanged(const QString &)), this, SLOT(HandlePresetChanged(const QString &)));
 
@@ -938,7 +938,7 @@ void DzUnrealMorphSelectionDialog::RefreshPresetsCombo()
 }
 
 // Call when the preset combo is changed by the user
-void DzUnrealMorphSelectionDialog::HandlePresetChanged(const QString& presetName)
+void DzBridgeMorphSelectionDialog::HandlePresetChanged(const QString& presetName)
 {
 	morphsToExport.clear();
 	QString PresetFilePath = presetsFolder + QDir::separator() + presetName;
@@ -971,7 +971,7 @@ void DzUnrealMorphSelectionDialog::HandlePresetChanged(const QString& presetName
 }
 
 // Get the morph string in the format for the Daz FBX Export
-QString DzUnrealMorphSelectionDialog::GetMorphString()
+QString DzBridgeMorphSelectionDialog::GetMorphString()
 {
 	GetActiveJointControlledMorphs();
 
@@ -990,7 +990,7 @@ QString DzUnrealMorphSelectionDialog::GetMorphString()
 }
 
 // Get the morph string in the format used for presets
-QString DzUnrealMorphSelectionDialog::GetMorphCSVString()
+QString DzBridgeMorphSelectionDialog::GetMorphCSVString()
 {
 	morphList.clear();
 	QString morphString;
@@ -1006,7 +1006,7 @@ QString DzUnrealMorphSelectionDialog::GetMorphCSVString()
 
 // Get the morph string in an internal name = friendly name format
 // Used to rename them to the friendly name in Unreal
-QMap<QString,QString> DzUnrealMorphSelectionDialog::GetMorphRenaming()
+QMap<QString,QString> DzBridgeMorphSelectionDialog::GetMorphRenaming()
 {
 	morphNameMapping.clear();
 	foreach(MorphInfo exportMorph, morphsToExport)
@@ -1017,7 +1017,7 @@ QMap<QString,QString> DzUnrealMorphSelectionDialog::GetMorphRenaming()
 	return morphNameMapping;
 }
 
-QString DzUnrealMorphSelectionDialog::GetMorphLabelFromName(QString morphName)
+QString DzBridgeMorphSelectionDialog::GetMorphLabelFromName(QString morphName)
 {
 	if (morphs.isEmpty()) return QString();
 
@@ -1033,4 +1033,4 @@ QString DzUnrealMorphSelectionDialog::GetMorphLabelFromName(QString morphName)
 
 }
 
-#include "moc_DzUnrealMorphSelectionDialog.cpp"
+#include "moc_DzBridgeMorphSelectionDialog.cpp"

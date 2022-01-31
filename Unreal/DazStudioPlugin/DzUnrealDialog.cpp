@@ -25,8 +25,8 @@
 
 #include "DzRuntimePluginAction.h"
 #include "DzUnrealDialog.h"
-#include "DzUnrealMorphSelectionDialog.h"
-#include "DzUnrealSubdivisionDialog.h"
+#include "DzBridgeMorphSelectionDialog.h"
+#include "DzBridgeSubdivisionDialog.h"
 #include "version.h"
 
 /*****************************

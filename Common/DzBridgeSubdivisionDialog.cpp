@@ -37,7 +37,7 @@
 #include "dzmorph.h"
 #include "dzgeometry.h"
 
-#include "DzUnrealSubdivisionDialog.h"
+#include "DzBridgeSubdivisionDialog.h"
 
 #include "QtGui/qlayout.h"
 #include "QtGui/qlineedit.h"
@@ -50,10 +50,10 @@ Local definitions
 #define DAZ_TO_UNREAL_PLUGIN_NAME		"DazToUnreal"
 
 
-DzUnrealSubdivisionDialog* DzUnrealSubdivisionDialog::singleton = nullptr;
+DzBridgeSubdivisionDialog* DzBridgeSubdivisionDialog::singleton = nullptr;
 
 
-DzUnrealSubdivisionDialog::DzUnrealSubdivisionDialog(QWidget *parent) :
+DzBridgeSubdivisionDialog::DzBridgeSubdivisionDialog(QWidget *parent) :
 	DzBasicDialog(parent, DAZ_TO_UNREAL_PLUGIN_NAME)
 {
 	 subdivisionItemsGrid = NULL;
@@ -86,13 +86,13 @@ DzUnrealSubdivisionDialog::DzUnrealSubdivisionDialog(QWidget *parent) :
 	SubdivisionCombos.clear();
 }
 
-QSize DzUnrealSubdivisionDialog::minimumSizeHint() const
+QSize DzBridgeSubdivisionDialog::minimumSizeHint() const
 {
 	return QSize(800, 800);
 }
 
 
-void DzUnrealSubdivisionDialog::PrepareDialog()
+void DzBridgeSubdivisionDialog::PrepareDialog()
 {
 	/*foreach(QObject* object, this->children())
 	{
@@ -135,7 +135,7 @@ void DzUnrealSubdivisionDialog::PrepareDialog()
 	CreateList(Selection);
 }
 
-void DzUnrealSubdivisionDialog::CreateList(DzNode* Node)
+void DzBridgeSubdivisionDialog::CreateList(DzNode* Node)
 {
 	DzObject* Object = Node->getObject();
 	if (Object)
@@ -182,7 +182,7 @@ void DzUnrealSubdivisionDialog::CreateList(DzNode* Node)
 	}
 }
 
-void DzUnrealSubdivisionDialog::HandleSubdivisionLevelChanged(const QString& text)
+void DzBridgeSubdivisionDialog::HandleSubdivisionLevelChanged(const QString& text)
 {
 	foreach(QComboBox* combo, SubdivisionCombos)
 	{
@@ -192,7 +192,7 @@ void DzUnrealSubdivisionDialog::HandleSubdivisionLevelChanged(const QString& tex
 	}
 }
 
-DzNode* DzUnrealSubdivisionDialog::FindObject(DzNode* Node, QString Name)
+DzNode* DzBridgeSubdivisionDialog::FindObject(DzNode* Node, QString Name)
 {
 	DzObject* Object = Node->getObject();
 	if (Object)
@@ -209,7 +209,7 @@ DzNode* DzUnrealSubdivisionDialog::FindObject(DzNode* Node, QString Name)
 	return NULL;
 }
 
-bool DzUnrealSubdivisionDialog::setSubdivisionLevelByNode(DzNode* Node, int level)
+bool DzBridgeSubdivisionDialog::setSubdivisionLevelByNode(DzNode* Node, int level)
 {
 	DzNode* selection = dzScene->getPrimarySelection();
 	QString searchName = Node->getName();
@@ -230,7 +230,7 @@ bool DzUnrealSubdivisionDialog::setSubdivisionLevelByNode(DzNode* Node, int leve
 	return false;
 }
 
-void DzUnrealSubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled)
+void DzBridgeSubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnabled)
 {
 	DzNode* Selection = dzScene->getPrimarySelection();
 	foreach(QComboBox* combo, SubdivisionCombos)
@@ -273,7 +273,7 @@ void DzUnrealSubdivisionDialog::LockSubdivisionProperties(bool subdivisionEnable
 	}
 }
 
-void DzUnrealSubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
+void DzBridgeSubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 {
 	DzNode* Selection = dzScene->getPrimarySelection();
 
@@ -293,7 +293,7 @@ void DzUnrealSubdivisionDialog::WriteSubdivisions(DzJsonWriter& Writer)
 	}
 }
 
-QObjectList DzUnrealSubdivisionDialog::getSubdivisionCombos()
+QObjectList DzBridgeSubdivisionDialog::getSubdivisionCombos()
 {
 	QObjectList *returnList = new QObjectList();
 	foreach(QComboBox * combo, SubdivisionCombos)
@@ -303,4 +303,4 @@ QObjectList DzUnrealSubdivisionDialog::getSubdivisionCombos()
 	return *returnList;
 }
 
-#include "moc_DzUnrealSubdivisionDialog.cpp"
+#include "moc_DzBridgeSubdivisionDialog.cpp"
